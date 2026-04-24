@@ -24,7 +24,7 @@ export const TopNavBar = ({ userEmail }: { userEmail?: string | null }) => {
             className="text-2xl font-semibold tracking-tight text-zinc-900 cursor-pointer font-headline"
             onClick={() => router.push('/dashboard')}
           >
-            Lumina Builder
+            SoloSite
           </div>
           <nav className="hidden md:flex gap-8">
             {navLinks.map((link) => (

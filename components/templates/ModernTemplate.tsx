@@ -7,7 +7,7 @@ import { useStore } from '@/lib/store';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-full flex items-center justify-center transition-all z-20 hover:scale-110 border-none">
+  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-none flex items-center justify-center transition-all z-20 hover:scale-110 border-none">
     <i className="fa-solid fa-trash-can text-[10px]"></i>
   </button>
 );
@@ -19,17 +19,17 @@ const IconEditor = ({ value, onChange, className = "" }: { value: string; onChan
 };
 
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => (
-  <div className="fixed bg-white rounded-xl border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200" style={{ left: x, top: y }} onClick={(e) => e.stopPropagation()}>
+  <div className="fixed bg-white rounded-none border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200" style={{ left: x, top: y }} onClick={(e) => e.stopPropagation()}>
     <div className="flex justify-between items-center mb-3">
       <span className="text-[10px] font-bold uppercase text-gray-400">Link Settings</span>
       <button onClick={onClose} className="text-gray-300 hover:text-gray-600"><i className="fa-solid fa-xmark"></i></button>
     </div>
-    <input type="text" placeholder="e.g. #pricing or https://..." className="w-full text-xs p-2 bg-gray-50 border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value={link || ''} onChange={(e) => onChange(e.target.value)} />
+    <input type="text" placeholder="e.g. #pricing or https://..." className="w-full text-xs p-2 bg-gray-50 border border-gray-100 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500" value={link || ''} onChange={(e) => onChange(e.target.value)} />
   </div>
 );
 
 const SchemaEditor = ({ plan, onChange, onClose, x, y }: { plan: any; onChange: (val: any) => void, onClose: () => void, x: number, y: number }) => (
-  <div className="fixed bg-[#111] rounded-2xl shadow-2xl border border-white/10 p-5 z-[99999] w-80 animate-in zoom-in-95 duration-200 text-left" style={{ left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 340 : x), top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 400 : y) }} onClick={(e) => e.stopPropagation()}>
+  <div className="fixed bg-[#111] rounded-none shadow-2xl border border-white/10 p-5 z-[99999] w-80 animate-in zoom-in-95 duration-200 text-left" style={{ left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 340 : x), top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 400 : y) }} onClick={(e) => e.stopPropagation()}>
     <div className="flex justify-between items-center mb-4 border-b border-white/5 pb-2">
       <span className="text-xs font-bold text-white uppercase tracking-widest flex items-center gap-2"><i className="fa-solid fa-bolt text-blue-400"></i> Product Schema</span>
       <button onClick={onClose} className="text-white/40 hover:text-white transition-colors"><i className="fa-solid fa-times"></i></button>
@@ -37,24 +37,24 @@ const SchemaEditor = ({ plan, onChange, onClose, x, y }: { plan: any; onChange: 
     <div className="space-y-4">
       <div>
         <label className="text-[10px] font-bold text-white/40 uppercase mb-1 block">GTIN / Barcode</label>
-        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.gtin || ''} onChange={(e) => onChange({ gtin: e.target.value })} placeholder="e.g. 5901234123457" />
+        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-none focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.gtin || ''} onChange={(e) => onChange({ gtin: e.target.value })} placeholder="e.g. 5901234123457" />
       </div>
       <div>
         <label className="text-[10px] font-bold text-white/40 uppercase mb-1 block">Category</label>
-        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 outline-none text-white" value={plan.category || ''} onChange={(e) => onChange({ category: e.target.value })} placeholder="e.g. Software" />
+        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-none focus:ring-2 focus:ring-blue-500/40 outline-none text-white" value={plan.category || ''} onChange={(e) => onChange({ category: e.target.value })} placeholder="e.g. Software" />
       </div>
       <div>
         <label className="text-[10px] font-bold text-white/40 uppercase mb-1 block">SKU</label>
-        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.sku || ''} onChange={(e) => onChange({ sku: e.target.value })} placeholder="e.g. MOD-001" />
+        <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-none focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.sku || ''} onChange={(e) => onChange({ sku: e.target.value })} placeholder="e.g. MOD-001" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-[10px] font-bold text-white/40 uppercase mb-1 block">UNCL Code</label>
-          <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.unclCode || ''} onChange={(e) => onChange({ unclCode: e.target.value })} placeholder="e.g. 711" />
+          <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-none focus:ring-2 focus:ring-blue-500/40 outline-none font-mono text-white" value={plan.unclCode || ''} onChange={(e) => onChange({ unclCode: e.target.value })} placeholder="e.g. 711" />
         </div>
         <div>
           <label className="text-[10px] font-bold text-white/40 uppercase mb-1 block">Role</label>
-          <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-xl focus:ring-2 focus:ring-blue-500/40 outline-none text-white" value={plan.productRole || ''} onChange={(e) => onChange({ productRole: e.target.value })} placeholder="e.g. Consumable" />
+          <input type="text" className="w-full text-sm p-2 bg-white/5 border border-white/10 rounded-none focus:ring-2 focus:ring-blue-500/40 outline-none text-white" value={plan.productRole || ''} onChange={(e) => onChange({ productRole: e.target.value })} placeholder="e.g. Consumable" />
         </div>
       </div>
     </div>
@@ -77,6 +77,9 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
     }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to set link"}>
       {children}
       {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
+      <div className="absolute -top-3 -right-3 opacity-0 group-hover/link:opacity-100 transition-opacity bg-blue-500 text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
+        <i className="fa-solid fa-link text-[8px]"></i>
+      </div>
       {link && <div className="absolute -top-6 left-0 bg-blue-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50">LINK: {link}</div>}
     </div>
   );
@@ -90,11 +93,11 @@ export const ModernTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter
+    updateFooter, updateTestimonials, addTestimonial, removeTestimonial
   } = useStore();
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
-    <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-white text-[12px] font-bold py-2 px-5 rounded-full transition-all flex items-center gap-2 mx-auto my-8 uppercase tracking-widest border-none" style={{ backgroundColor: projectData?.theme?.primary || '#1e3932' }}>
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-white text-[12px] font-bold py-2 px-5 rounded-none transition-all flex items-center gap-2 mx-auto my-8 uppercase tracking-widest border-none" style={{ backgroundColor: projectData?.theme?.primary || '#1e3932' }}>
       <i className="fa-solid fa-plus"></i> Add {label}
     </button>
   );
@@ -195,7 +198,7 @@ export const ModernTemplate: React.FC = () => {
               <EditableImage
                 src={projectData.hero.logoImage || "https://placehold.co/100x100?text=Logo"}
                 onChange={(val) => updateHero({ logoImage: val })}
-                className="w-full h-full rounded-lg bg-white/5 border border-dashed border-white/10"
+                className="w-full h-full rounded-none bg-white/5 border border-dashed border-white/10"
                 style={{ objectFit: 'contain' }}
                 alt="Brand Logo"
               />
@@ -215,13 +218,20 @@ export const ModernTemplate: React.FC = () => {
               </button>
             </Linkable>
           </div>
-          <button className="d-lg-none border-none bg-transparent p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-            <div className="d-flex flex-column gap-1">
-              <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
-              <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
-              <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
-            </div>
-          </button>
+          <div className="d-flex align-items-center gap-2 d-lg-none">
+            <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
+              <button className="modern-btn modern-btn-primary py-2 px-3 text-nowrap" style={{ fontSize: '0.8rem', padding: '0.5rem 1rem', width: 'auto', whiteSpace: 'nowrap' }}>
+                <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => {}} />
+              </button>
+            </Linkable>
+            <button className="border-none bg-transparent p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              <div className="d-flex flex-column gap-1">
+                <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
+                <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
+                <div className="rounded" style={{ width: '24px', height: '3px', background: secondary }}></div>
+              </div>
+            </button>
+          </div>
         </div>
         {isMenuOpen && (
           <div className="d-lg-none w-100 p-4 d-flex flex-column align-items-center gap-3" style={{ background: 'rgba(10,10,10,0.95)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -241,7 +251,7 @@ export const ModernTemplate: React.FC = () => {
           <div className="row align-items-center g-5">
             <div className="col-12 col-lg-7 text-center text-lg-start">
               <div className="mb-3">
-                <span className="px-4 py-1.5 rounded-full text-[11px] fw-bold uppercase tracking-widest" style={{ background: `${secondary}20`, color: secondary, border: `1px solid ${secondary}40` }}>
+                <span className="px-4 py-1.5 rounded-none text-[11px] fw-bold uppercase tracking-widest" style={{ background: `${secondary}20`, color: secondary, border: `1px solid ${secondary}40` }}>
                   ✦ Premium Blood Support Formula
                 </span>
               </div>
@@ -316,7 +326,38 @@ export const ModernTemplate: React.FC = () => {
         </div>
       </section>
 
-      {/* Benefits */}
+      {/* Testimonials */}
+      <section className="section-dark py-5">
+        <div className="container">
+          <div className="text-center mb-5">
+            <span className="px-4 py-1.5 rounded-none text-[10px] fw-bold uppercase tracking-[0.3em] mb-3 d-inline-block" style={{ background: `${secondary}10`, color: secondary, border: `1px solid ${secondary}30` }}>Proof of Concept</span>
+            <EditableText tagName="h2" className="fw-bold gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Community Feedback"} onChange={(val) => updateTestimonials(-1, { title: val })} />
+          </div>
+          <div className="row g-4">
+            {projectData.testimonials?.items.map((item, i) => (
+              <div key={i} className="col-12 col-md-4">
+                <div className="glass-card p-5 h-100 relative group/card">
+                  <RemoveButton onClick={() => removeTestimonial(i)} />
+                  <div className="mb-4 d-flex align-items-center gap-3">
+                    <div className="w-12 h-12 rounded-none overflow-hidden border border-white/10 p-0.5">
+                      <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-100 h-100 object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500" />
+                    </div>
+                    <div>
+                      <EditableText tagName="h5" className="fw-bold mb-0 text-white text-sm" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
+                      <EditableText tagName="p" className="mb-0 text-[10px] text-white/40 uppercase tracking-widest font-mono" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
+                    </div>
+                  </div>
+                  <div className="mb-4 d-flex gap-1 text-yellow-500 text-[10px]">
+                    {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+                  </div>
+                  <EditableText tagName="p" className="mb-0 text-white/60 italic text-sm" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
+                </div>
+              </div>
+            ))}
+          </div>
+          <AddButton onClick={addTestimonial} label="Testimonial" />
+        </div>
+      </section>
       <section className="section-darker py-5">
         <div className="container">
           <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
@@ -327,7 +368,7 @@ export const ModernTemplate: React.FC = () => {
                 <div className="glass-card p-4 h-100">
                   <RemoveButton onClick={() => removeBenefit(i)} />
                   <div className="d-flex align-items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-xl d-flex align-items-center justify-content-center" style={{ background: `${secondary}15` }}>
+                    <div className="flex-shrink-0 w-10 h-10 rounded-none d-flex align-items-center justify-content-center" style={{ background: `${secondary}15` }}>
                       <i className="fa-solid fa-check" style={{ color: secondary, fontSize: '0.8rem' }}></i>
                     </div>
                     <div>
@@ -373,7 +414,7 @@ export const ModernTemplate: React.FC = () => {
               <div key={i} className="col-12 col-md-6 col-lg-4">
                 <div className="glass-card p-4 h-100 text-center relative">
                   <RemoveButton onClick={() => removeIngredient(i)} />
-                  <div className="mx-auto mb-3 rounded-full overflow-hidden" style={{ width: '120px', height: '120px', border: `3px solid ${secondary}30` }}>
+                  <div className="mx-auto mb-3 rounded-none overflow-hidden" style={{ width: '120px', height: '120px', border: `3px solid ${secondary}30` }}>
                     <EditableImage src={item.image || '/image/ingredient-schisandra.png'} onChange={(val) => updateIngredient(i, { image: val })} className="w-100 h-100" style={{ objectFit: 'cover' }} />
                   </div>
                   <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
@@ -414,9 +455,22 @@ export const ModernTemplate: React.FC = () => {
                         />
                       </>
                     )}
-                    {plan.isPrimary && <div className="mb-3"><span className="px-3 py-1 rounded-full text-[10px] fw-bold" style={{ background: secondary, color: primary }}>BEST VALUE</span></div>}
+                    {plan.isPrimary && <div className="mb-3"><span className="px-3 py-1 rounded-none text-[10px] fw-bold" style={{ background: secondary, color: primary }}>BEST VALUE</span></div>}
                   <EditableText tagName="h4" className="fw-bold mb-2 text-uppercase" style={{ color: '#fff', fontSize: '0.95rem', letterSpacing: '2px' }} value={plan.title} onChange={(val) => updatePricing(i, { title: val })} />
-                  <EditableImage src={plan.image || '/image/bottle-1.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto my-3" style={{ height: '140px', objectFit: 'contain' }} />
+                  <div className="relative my-3 group/img">
+                    {/* Futuristic Multiplier Badge */}
+                    <div className="absolute -top-1 -right-1 z-10 pointer-events-auto">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-white/20 translate-x-1 translate-y-1" />
+                        <EditableText
+                          className="relative bg-white text-black px-3 py-1 rounded-none flex items-center justify-center font-black text-xs border border-black shadow-[0_0_15px_rgba(255,255,255,0.3)] min-w-[40px]"
+                          value={plan.multiplier || "X1"}
+                          onChange={(val) => updatePricing(i, { multiplier: val })}
+                        />
+                      </div>
+                    </div>
+                    <EditableImage src={plan.image || '/image/bottle-snap.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto transition-all duration-700 group-hover/img:scale-110 group-hover/img:rotate-2" style={{ height: '140px', objectFit: 'contain' }} />
+                  </div>
                   <EditableText tagName="p" className="fw-bold mb-3" style={{ color: secondary, fontSize: '2rem' }} value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
                   <div className="mb-4">
                     {plan.features.map((f, fi) => (
@@ -467,19 +521,27 @@ export const ModernTemplate: React.FC = () => {
           <EditableText tagName="h2" className="fw-bold gradient-text mb-3" style={{ fontSize: '1.5rem' }} value={projectData.footerHeadline || "Final Thoughts"} onChange={(val) => useStore.getState().updateProjectData({ footerHeadline: val })} />
           <EditableText tagName="p" className="mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.35)', maxWidth: '700px', fontSize: '0.9rem', lineHeight: 1.7 }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="my-4" />
-          <div className="d-flex justify-content-center gap-4 mb-3">
+          <div className="flex flex-wrap justify-center gap-6 mb-12">
             {projectData.footer.links.map((link, i) => (
-              <Linkable key={i} link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
-                <EditableText tagName="span" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem' }} value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
-              </Linkable>
+              <div key={i} className="relative group/linkitem">
+                 <RemoveButton onClick={() => {
+                   const nl = [...projectData.footer.links];
+                   nl.splice(i, 1);
+                   updateFooter({ links: nl });
+                 }} />
+                 <Linkable link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
+                   <EditableText tagName="span" className="text-white/40 hover:text-white transition-colors cursor-pointer text-sm font-mono uppercase tracking-widest" value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
+                 </Linkable>
+              </div>
             ))}
           </div>
+          <AddButton onClick={() => updateFooter({ links: [...projectData.footer.links, { label: 'New Link', href: '#' }] })} label="Footer Link" />
           <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem' }}>© {new Date().getFullYear()} {projectData.productName}. All Rights Reserved.</p>
         </div>
       </footer>
 
       {/* Back to top */}
-      <button className="position-fixed bottom-4 right-4 w-12 h-12 rounded-full flex items-center justify-center z-50 border-none transition-all hover:-translate-y-1" style={{ background: secondary, color: primary }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+      <button className="position-fixed bottom-4 right-4 w-12 h-12 rounded-none flex items-center justify-center z-50 border-none transition-all hover:-translate-y-1" style={{ background: secondary, color: primary }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
         <i className="fa-solid fa-arrow-up"></i>
       </button>
     </div>

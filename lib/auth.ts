@@ -1,36 +1,74 @@
 import { NextAuthOptions } from "next-auth";
-import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import connectDB from "./db";
-import { User } from "@/models/User";
+import bcrypt from "bcryptjs";
+import { User as UserModel } from "@/models/User";
+
+declare module "next-auth" {
+  interface User {
+    id: string;
+    role?: string;
+  }
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: string;
+    };
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    id: string;
+    role?: string;
+  }
+}
 
 export const authOptions: NextAuthOptions = {
   providers: [
-    ...(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET ? [
-      GoogleProvider({
-        clientId: process.env.GOOGLE_CLIENT_ID,
-        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      })
-    ] : []),
     CredentialsProvider({
       name: "Credentials",
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
+
       async authorize(credentials) {
-        // Development Demo Account
-        if (credentials?.email === "admin@hiralamu.com" && credentials?.password === "admin") {
-          return { id: "000000000000000000000001", name: "Admin User", email: "admin@hiralamu.com" };
+        if (!credentials?.email || !credentials?.password) return null;
+
+        // Initialize admin if none exists
+        await connectDB();
+
+        // Find user by email
+        const user = await UserModel.findOne({ email: credentials.email }).select("+password");
+
+        if (!user) {
+          // First time setup: Initialize root admin if database is empty
+          const adminCount = await UserModel.countDocuments({ role: 'admin' });
+          if (adminCount === 0 && credentials.email === 'admin@admin.com') {
+            const hashedPassword = await bcrypt.hash(credentials.password, 10);
+            const newAdmin = await UserModel.create({
+              name: 'Admin User',
+              email: credentials.email,
+              password: hashedPassword,
+              role: 'admin'
+            });
+            return { id: newAdmin._id.toString(), name: newAdmin.name, email: newAdmin.email, role: newAdmin.role };
+          }
+          return null;
         }
 
-        await connectDB();
-        const user = await User.findOne({ email: credentials?.email }).select("+password");
-        if (user && user.password === credentials?.password) {
-          return user;
+        const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);
+        if (isPasswordMatch) {
+          return { id: user._id.toString(), name: user.name, email: user.email, role: user.role };
         }
+
         return null;
       },
+
     }),
   ],
   session: {
@@ -41,12 +79,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
+        token.role = user.role;
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as any).id = token.id;
+        session.user.id = token.id;
+        session.user.role = token.role;
       }
       return session;
     },

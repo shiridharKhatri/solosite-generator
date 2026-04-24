@@ -27,7 +27,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-6 font-body">
       <div className="w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-zinc-200/50 border border-zinc-100 flex flex-col gap-8">
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-headline font-extrabold tracking-tighter text-zinc-900 leading-none">Lumina Builder</h1>
+          <h1 className="text-4xl font-headline font-extrabold tracking-tighter text-zinc-900 leading-none">SoloSite</h1>
           <p className="text-zinc-500 font-body text-sm">Enter your credentials to continue the journey.</p>
         </div>
 
@@ -39,7 +39,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-zinc-900 font-medium transition-all outline-none"
-                placeholder="admin@hiralamu.com"
+                placeholder="admin@admin.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -65,21 +65,10 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="relative">
-          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-zinc-100"></div></div>
-          <div className="relative flex justify-center text-[10px] uppercase font-bold text-zinc-400"><span className="bg-white px-2">Or continue with</span></div>
-        </div>
-
-        <button
-          onClick={() => signIn('google')}
-          className="w-full bg-white border border-zinc-200 text-zinc-900 font-bold py-4 rounded-full flex items-center justify-center gap-3 hover:bg-zinc-50 transition-all active:scale-[0.98]"
-        >
-          <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
-          Google Account
-        </button>
+        
 
         <p className="text-center text-[11px] text-zinc-400">
-          Demo: <span className="text-zinc-600 font-bold">admin@hiralamu.com</span> / <span className="text-zinc-600 font-bold">admin</span>
+          Setup Default: <span className="text-zinc-600 font-bold">admin@admin.com</span> / <span className="text-zinc-600 font-bold">admin</span>
         </p>
       </div>
     </div>

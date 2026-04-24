@@ -7,7 +7,7 @@ import { useStore } from '@/lib/store';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute -top-2 -right-2 bg-[#FAF6ED] hover:bg-[#8A7969] text-[#8A7969] hover:text-white w-7 h-7 rounded-full flex items-center justify-center transition-all z-20 shadow-sm border border-[#E6D5C3]">
+  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute -top-2 -right-2 bg-[#FAF6ED] hover:bg-[#8A7969] text-[#8A7969] hover:text-white w-7 h-7 rounded-none flex items-center justify-center transition-all z-20 shadow-sm border border-[#E6D5C3]">
     <i className="fa-solid fa-times text-xs"></i>
   </button>
 );
@@ -19,17 +19,17 @@ const IconEditor = ({ value, onChange, className = "" }: { value: string; onChan
 };
 
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => (
-  <div className="fixed bg-[#FAF6ED] rounded-2xl shadow-lg border border-[#E6D5C3] p-4 z-[99999] w-64 animate-in fade-in zoom-in" style={{ left: x, top: y }} onClick={(e) => e.stopPropagation()}>
+  <div className="fixed bg-[#FAF6ED] rounded-none shadow-lg border border-[#E6D5C3] p-4 z-[99999] w-64 animate-in fade-in zoom-in" style={{ left: x, top: y }} onClick={(e) => e.stopPropagation()}>
     <div className="flex justify-between items-center mb-3">
       <span className="text-sm font-semibold text-[#4A3320] font-serif">Update Link</span>
       <button onClick={onClose} className="text-[#8A7969] hover:text-[#4A3320]"><i className="fa-solid fa-xmark"></i></button>
     </div>
-    <input type="text" placeholder="Where to?" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:outline-none focus:border-[#8A7969]" value={link || ''} onChange={(e) => onChange(e.target.value)} />
+    <input type="text" placeholder="Where to?" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:outline-none focus:border-[#8A7969]" value={link || ''} onChange={(e) => onChange(e.target.value)} />
   </div>
 );
 
 const SchemaEditor = ({ plan, onChange, onClose, x, y }: { plan: any; onChange: (val: any) => void, onClose: () => void, x: number, y: number }) => (
-  <div className="fixed bg-[#FAF6ED] rounded-2xl shadow-2xl border border-[#E6D5C3] p-5 z-[99999] w-80 animate-in zoom-in-95 duration-200 text-left" style={{ left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 340 : x), top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 400 : y) }} onClick={(e) => e.stopPropagation()}>
+  <div className="fixed bg-[#FAF6ED] rounded-none shadow-2xl border border-[#E6D5C3] p-5 z-[99999] w-80 animate-in zoom-in-95 duration-200 text-left" style={{ left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 340 : x), top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 400 : y) }} onClick={(e) => e.stopPropagation()}>
     <div className="flex justify-between items-center mb-4 border-b border-[#E6D5C3] pb-2">
       <span className="text-sm font-bold text-[#4A3320] font-serif flex items-center gap-2"><i className="fa-solid fa-leaf text-[#8A7969]"></i> Product Schema</span>
       <button onClick={onClose} className="text-[#8A7969] hover:text-[#4A3320] transition-colors"><i className="fa-solid fa-times"></i></button>
@@ -37,24 +37,24 @@ const SchemaEditor = ({ plan, onChange, onClose, x, y }: { plan: any; onChange: 
     <div className="space-y-4">
       <div>
         <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">GTIN / Barcode</label>
-        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.gtin || ''} onChange={(e) => onChange({ gtin: e.target.value })} placeholder="e.g. 5901234123457" />
+        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.gtin || ''} onChange={(e) => onChange({ gtin: e.target.value })} placeholder="e.g. 5901234123457" />
       </div>
       <div>
         <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">Category</label>
-        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:ring-2 focus:ring-[#8A7969]/20 outline-none" value={plan.category || ''} onChange={(e) => onChange({ category: e.target.value })} placeholder="e.g. Consumable" />
+        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:ring-2 focus:ring-[#8A7969]/20 outline-none" value={plan.category || ''} onChange={(e) => onChange({ category: e.target.value })} placeholder="e.g. Consumable" />
       </div>
       <div>
         <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">SKU</label>
-        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.sku || ''} onChange={(e) => onChange({ sku: e.target.value })} placeholder="e.g. BATT-X001" />
+        <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.sku || ''} onChange={(e) => onChange({ sku: e.target.value })} placeholder="e.g. BATT-X001" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">UNCL Code</label>
-          <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.unclCode || ''} onChange={(e) => onChange({ unclCode: e.target.value })} placeholder="e.g. 711" />
+          <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:ring-2 focus:ring-[#8A7969]/20 outline-none font-mono" value={plan.unclCode || ''} onChange={(e) => onChange({ unclCode: e.target.value })} placeholder="e.g. 711" />
         </div>
         <div>
           <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">Role</label>
-          <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-xl focus:ring-2 focus:ring-[#8A7969]/20 outline-none" value={plan.productRole || ''} onChange={(e) => onChange({ productRole: e.target.value })} placeholder="e.g. Consumable" />
+          <input type="text" className="w-full text-sm p-2 bg-white border border-[#E6D5C3] rounded-none focus:ring-2 focus:ring-[#8A7969]/20 outline-none" value={plan.productRole || ''} onChange={(e) => onChange({ productRole: e.target.value })} placeholder="e.g. Consumable" />
         </div>
       </div>
     </div>
@@ -77,7 +77,10 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
     }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to set link"}>
       {children}
       {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
-      {link && <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#4A3320] text-[#FAF6ED] text-[10px] px-2 py-1 rounded-full opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">→ {link}</div>}
+      <div className="absolute -top-3 -right-3 opacity-0 group-hover/link:opacity-100 transition-opacity bg-[#8A7969] text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
+        <i className="fa-solid fa-link text-[8px]"></i>
+      </div>
+      {link && <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#4A3320] text-[#FAF6ED] text-[10px] px-2 py-1 rounded-none opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">→ {link}</div>}
     </div>
   );
 };
@@ -90,11 +93,11 @@ export const OrganicTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter
+    updateFooter, updateTestimonials, addTestimonial, removeTestimonial
   } = useStore();
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
-    <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-[#4A3320] bg-transparent hover:bg-[#E6D5C3] text-sm font-semibold py-2 px-6 rounded-full transition-colors flex items-center gap-2 mx-auto my-8 border border-[#4A3320] border-dashed">
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-[#4A3320] bg-transparent hover:bg-[#E6D5C3] text-sm font-semibold py-2 px-6 rounded-none transition-colors flex items-center gap-2 mx-auto my-8 border border-[#4A3320] border-dashed">
       <i className="fa-solid fa-leaf"></i> Cultivate {label}
     </button>
   );
@@ -187,7 +190,7 @@ export const OrganicTemplate: React.FC = () => {
               <EditableImage
                 src={projectData.hero.logoImage || "https://placehold.co/100x100?text=Logo"}
                 onChange={(val) => updateHero({ logoImage: val })}
-                className="w-full h-full rounded-full border border-dashed border-[#8A7969] bg-white"
+                className="w-full h-full rounded-none border border-dashed border-[#8A7969] bg-white"
                 style={{ objectFit: 'contain' }}
                 alt="Brand Logo"
               />
@@ -206,7 +209,31 @@ export const OrganicTemplate: React.FC = () => {
               </button>
             </Linkable>
           </div>
+          <div className="d-flex align-items-center gap-2 d-lg-none">
+            <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
+              <button className="organic-btn organic-btn-primary py-2 px-3 fs-6 text-nowrap" style={{ minWidth: 'auto', width: 'auto', whiteSpace: 'nowrap' }}>
+                <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => {}} />
+              </button>
+            </Linkable>
+            <button className="border-none bg-transparent p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} fs-2`} style={{ color: primary }}></i>
+            </button>
+          </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="d-lg-none absolute top-full left-0 w-full p-4 d-flex flex-column align-items-center gap-3 z-[999] shadow-sm animate-in slide-in-from-top duration-300 border-top" style={{ backgroundColor: 'rgba(250, 246, 237, 0.98)' }}>
+            {projectData.footer.links.slice(0, 3).map((link, i) => (
+              <EditableText key={i} tagName="span" className="fs-5 font-serif italic fw-bold no-underline cursor-pointer" style={{ color: secondary }} value={link.label} onChange={() => { }} />
+            ))}
+            <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
+              <button className="organic-btn organic-btn-primary w-100 mt-2">
+                <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => { }} />
+              </button>
+            </Linkable>
+          </div>
+        )}
       </nav>
 
       {/* Hero */}
@@ -229,7 +256,7 @@ export const OrganicTemplate: React.FC = () => {
 
               <div className="mt-5 d-flex gap-3 justify-content-center justify-content-lg-start align-items-center">
                  <div className="d-flex -space-x-2">
-                    {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-full bg-[#E6D5C3] border-2 border-[#FAF6ED]"></div>)}
+                    {[1,2,3].map(i => <div key={i} className="w-8 h-8 rounded-none bg-[#E6D5C3] border-2 border-[#FAF6ED]"></div>)}
                  </div>
                  <span className="text-sm font-semibold text-[#8A7969]">Loved by 10,000+ naturally</span>
               </div>
@@ -291,14 +318,70 @@ export const OrganicTemplate: React.FC = () => {
         </div>
       </section>
 
-      {/* About Section */}
+      {/* Benefits - Why it Works */}
+      <section className="py-5" style={{ backgroundColor: '#ffffff' }}>
+        <div className="container py-lg-5">
+           <div className="text-center mb-5 max-w-[700px] mx-auto">
+             <i className="fa-solid fa-sun mb-3 text-2xl" style={{ color: secondary }}></i>
+             <EditableText tagName="h2" className="fw-bold mb-3 font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.benefits.title || "The Gift of Vitality"} onChange={(val) => updateBenefit(-1, { title: val })} />
+             <EditableText tagName="p" className="text-[#6A5949] italic" value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+           </div>
+
+           <div className="row g-4">
+             {projectData.benefits.items.map((benefit, i) => (
+               <div key={i} className="col-md-6 relative">
+                 <div className="organic-card p-4 h-100 flex gap-4 bg-[#FAF6ED]/30">
+                   <RemoveButton onClick={() => removeBenefit(i)} />
+                   <div className="flex-shrink-0 w-12 h-12 bg-white rounded-none border border-[#E6D5C3] flex items-center justify-center">
+                     <i className="fa-solid fa-check text-[#8A7969]"></i>
+                   </div>
+                   <div>
+                     <EditableText tagName="h4" className="fw-bold mb-2 font-serif" style={{ color: primary }} value={benefit.title} onChange={(val) => updateBenefit(i, { title: val })} />
+                     <EditableText tagName="p" className="mb-0 text-[#6A5949] text-sm" style={{ lineHeight: 1.7 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
+                   </div>
+                 </div>
+               </div>
+             ))}
+           </div>
+           <AddButton onClick={addBenefit} label="Benefit" />
+        </div>
+      </section>
+
+      {/* Testimonials - Voices of Harmony */}
+      <section className="py-5" style={{ backgroundColor: bgAccent }}>
+        <div className="container py-lg-5">
+           <div className="text-center mb-5">
+             <i className="fa-solid fa-heart mb-3 text-2xl" style={{ color: secondary }}></i>
+             <EditableText tagName="h2" className="fw-bold font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Kind Words"} onChange={(val) => updateTestimonials(-1, { title: val })} />
+           </div>
+
+           <div className="row g-4 justify-content-center">
+             {projectData.testimonials?.items.map((item, i) => (
+               <div key={i} className="col-md-6 col-lg-4 relative">
+                 <div className="organic-card p-4 h-100 bg-white">
+                   <RemoveButton onClick={() => removeTestimonial(i)} />
+                   <div className="mb-4 text-center">
+                     <div className="mb-3 organic-blob overflow-hidden mx-auto" style={{ width: '80px', height: '80px', border: `3px solid ${bgLight}` }}>
+                       <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-100 h-100 object-cover" />
+                     </div>
+                     <EditableText tagName="h5" className="fw-bold mb-1 font-serif" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
+                     <EditableText tagName="p" className="mb-0 text-xs italic text-[#8A7969]" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
+                   </div>
+                   <EditableText tagName="p" className="mb-0 text-[#6A5949] text-sm italic text-center" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
+                 </div>
+               </div>
+             ))}
+           </div>
+           <AddButton onClick={addTestimonial} label="Story" />
+        </div>
+      </section>
       <section className="py-5" style={{ backgroundColor: bgLight }}>
         <div className="container py-lg-5">
           <div className="row align-items-center g-5">
              <div className="col-12 col-lg-5">
                 <div className="position-relative">
                    <div className="position-absolute top-0 start-0 w-100 h-100 organic-blob" style={{ backgroundColor: secondary, transform: 'translate(-5%, 5%)', opacity: 0.1 }}></div>
-                   <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid position-relative z-10 rounded-3xl shadow-sm" style={{ objectFit: 'cover' }} />
+                   <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid position-relative z-10 rounded-none shadow-sm" style={{ objectFit: 'cover' }} />
                 </div>
              </div>
              <div className="col-12 col-lg-7 ps-lg-5">
@@ -347,7 +430,20 @@ export const OrganicTemplate: React.FC = () => {
                   </div>
                   
                   <div className="p-4 flex-grow-1 d-flex flex-column">
-                    <EditableImage src={plan.image || '/image/bottle-1.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto mb-4" style={{ height: '160px', objectFit: 'contain' }} />
+                    <div className="relative mb-4 group/img">
+                      {/* Rustic Label Badge */}
+                      <div className="absolute -top-1 -right-1 z-10 pointer-events-auto">
+                        <div className="relative">
+                          <div className="absolute inset-0 bg-[#4A3320]/10 translate-x-0.5 translate-y-0.5" />
+                          <EditableText
+                            className="relative bg-[#4A3320] text-[#FAF6ED] px-2 py-1 rounded-none flex items-center justify-center font-bold text-[10px] border border-[#E6D5C3] shadow-md min-w-[32px]"
+                            value={plan.multiplier || "X1"}
+                            onChange={(val) => updatePricing(i, { multiplier: val })}
+                          />
+                        </div>
+                      </div>
+                      <EditableImage src={plan.image || '/image/bottle-snap.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto transition-transform duration-700 hover:scale-105" style={{ height: '160px', objectFit: 'contain' }} />
+                    </div>
                     <EditableText tagName="div" className="fw-bold mb-4 font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
                     
                     <ul className="list-unstyled text-start mb-4 mx-auto" style={{ maxWidth: '80%' }}>
@@ -382,11 +478,11 @@ export const OrganicTemplate: React.FC = () => {
           
           <div className="d-flex flex-column gap-3">
             {projectData.faq?.map((item, i) => (
-              <div key={i} className="bg-white rounded-2xl border border-[#E6D5C3] overflow-hidden relative">
+              <div key={i} className="bg-white rounded-none border border-[#E6D5C3] overflow-hidden relative">
                 <RemoveButton onClick={() => removeFAQ(i)} />
                 <div className="p-4 cursor-pointer d-flex justify-content-between align-items-center" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
                   <EditableText tagName="span" className="fw-bold font-serif" style={{ color: primary, fontSize: '1.1rem' }} value={item.question} onChange={(val) => updateFAQ(i, { question: val })} />
-                  <div className="w-8 h-8 rounded-full d-flex align-items-center justify-content-center transition-colors" style={{ backgroundColor: openFaq === i ? primary : bgLight, color: openFaq === i ? '#fff' : primary }}>
+                  <div className="w-8 h-8 rounded-none d-flex align-items-center justify-content-center transition-colors" style={{ backgroundColor: openFaq === i ? primary : bgLight, color: openFaq === i ? '#fff' : primary }}>
                      <i className={`fa-solid ${openFaq === i ? 'fa-minus' : 'fa-plus'} text-xs`}></i>
                   </div>
                 </div>
@@ -410,12 +506,22 @@ export const OrganicTemplate: React.FC = () => {
            <EditableText tagName="p" className="mx-auto mb-5 text-center" style={{ maxWidth: '600px', opacity: 0.8, fontSize: '0.95rem', lineHeight: 1.8 }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
            
            <div className="d-flex justify-content-center flex-wrap gap-4 mb-4">
-             {projectData.footer.links.map((link, i) => (
-               <Linkable key={i} link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
-                 <EditableText tagName="span" className="font-serif italic cursor-pointer hover:opacity-75 transition-opacity" style={{ fontSize: '1.1rem' }} value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
-               </Linkable>
-             ))}
-           </div>
+              {projectData.footer.links.map((link, i) => (
+                <div key={i} className="relative group/linkitem">
+                  <RemoveButton onClick={() => {
+                    const nl = [...projectData.footer.links];
+                    nl.splice(i, 1);
+                    updateFooter({ links: nl });
+                  }} />
+                  <Linkable link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
+                    <EditableText tagName="span" className="font-serif italic cursor-pointer group-hover/linkitem:opacity-75 transition-opacity" style={{ fontSize: '1.1rem' }} value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
+                  </Linkable>
+                </div>
+              ))}
+            </div>
+            <div className="mb-4">
+              <AddButton onClick={() => updateFooter({ links: [...projectData.footer.links, { label: 'New Link', href: '#' }] })} label="Link" />
+            </div>
            
            <hr className="my-4 mx-auto" style={{ maxWidth: '300px', borderColor: 'rgba(250, 246, 237, 0.2)' }} />
            <p className="opacity-50 text-sm mb-0">© {new Date().getFullYear()} {projectData.productName}. Cultivated with care.</p>

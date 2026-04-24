@@ -58,6 +58,7 @@ interface ProjectData {
   pricing: {
     title: string;
     quantity?: string;
+    multiplier?: string;
     price: string;
     features: string[];
     image?: string;
@@ -152,7 +153,7 @@ interface EditorState {
   addFeature: () => void;
   removeFeature: (index: number) => void;
   updateAbout: (about: Partial<ProjectData['about']>) => void;
-  updateIngredient: (index: number, item: Partial<ProjectData['ingredients']['items'][0]>) => void;
+  updateIngredient: (index: number, item: any) => void;
   addIngredient: () => void;
   removeIngredient: (index: number) => void;
   updateBenefit: (index: number, item: Partial<ProjectData['benefits']['items'][0]>) => void;
@@ -336,6 +337,7 @@ export const initialProjectData: ProjectData = {
     {
       title: "Starter Package",
       quantity: "1 Bottle",
+      multiplier: "X1",
       price: "69",
       features: ["30 Day Supply", "60-Day Guarantee"],
       image: "/image/bottle-snap.webp",
@@ -345,9 +347,10 @@ export const initialProjectData: ProjectData = {
     {
       title: "Best Value Bundle",
       quantity: "6 Bottles",
+      multiplier: "X6",
       price: "49",
       features: ["180 Day Supply", "Free Shipping", "Huge Savings Included"],
-      image: "/image/bottle-6.webp",
+      image: "/image/bottle-snap.webp",
       isPrimary: true,
       buttonText: "Buy Now For $294",
       buttonHref: "order.html"
@@ -355,6 +358,7 @@ export const initialProjectData: ProjectData = {
     {
       title: "Popular Choice",
       quantity: "3 Bottles",
+      multiplier: "X3",
       price: "59",
       features: ["90 Day Supply", "Significant Savings"],
       image: "/image/bottle-snap.webp",
@@ -586,7 +590,7 @@ export const useStore = create<EditorState>((set) => ({
 
   addPricing: () => set((state) => {
     if (!state.projectData) return state;
-    const newPricing = [...state.projectData.pricing, { title: 'New Plan', price: '49', features: [], buttonText: 'Buy Now', buttonHref: '#' }];
+    const newPricing = [...state.projectData.pricing, { title: 'New Plan', multiplier: 'X1', price: '49', features: [], buttonText: 'Buy Now', buttonHref: '#' }];
     return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true };
   }),
 

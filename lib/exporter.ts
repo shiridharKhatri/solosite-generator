@@ -1,5 +1,3 @@
-'use client';
-
 import JSZip from 'jszip';
 
 export async function generateProjectZip(data: any) {
@@ -216,14 +214,21 @@ ${seoBlock}
                     ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="Logo" />` : ''}
                     <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
                 </a>
-                <div class="d-lg-flex d-none align-items-center gap-4">
-                    <a href="#features" class="nav-link text-dark fs-5 fw-bold text-decoration-none">Features</a>
-                    <a href="#about" class="nav-link text-dark fs-5 fw-bold text-decoration-none">About</a>
-                    <a href="#pricing" class="nav-link text-dark fs-5 fw-bold text-decoration-none">Pricing</a>
-                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">${data.hero?.buttonText || 'Order Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">${data.hero?.buttonText || 'Order Now'}</a>
+                    <button class="navbar-toggler border-0 shadow-none px-1 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <i class="fa-solid fa-bars fs-3 text-dark"></i>
+                    </button>
                 </div>
-                <!-- Mobile Shop Button -->
-                <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill d-lg-none py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">${data.hero?.buttonText || 'Order Now'}</a>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
+                        <a href="#features" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">Features</a>
+                        <a href="#about" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">About</a>
+                        <a href="#pricing" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">Pricing</a>
+                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; white-space: nowrap;">${data.hero?.buttonText || 'Order Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                    </div>
+                </div>
             </div>
         </nav>
     </header>
@@ -243,12 +248,8 @@ ${seoBlock}
                     </div>
                 </div>
                 <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start pt-3 pt-lg-4">
-                    ${data.hero?.badgeText ? `
-                    <div class="mb-4">
-                        <span class="bg-[#FF922B] text-white px-4 py-2 rounded-full fw-bold" style="font-size: 13px; text-transform: uppercase; letter-spacing: 1px; box-shadow: 0 2px 10px rgba(255,146,43,0.3);">${data.hero.badgeText}</span>
-                    </div>` : ''}
                     <h1 class="fw-bold mb-3" style="font-size: clamp(1.5rem, 4vw, 2.75rem); line-height: 1.15;">${data.hero?.title}</h1>
-                    <p class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0" style="line-height: 1.7; max-width: 600px; white-space: pre-line; text-align: justify;">${data.hero?.subtitle}</p>
+                    <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; max-width: 600px; white-space: pre-line; text-align: justify;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
                         <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none" style="min-width: 200px; background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
                         <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; min-width: 200px; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
@@ -272,15 +273,26 @@ ${seoBlock}
 
     <!-- About -->
     <section id="about" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.about?.title || "Understanding the Formula"}</h2></section>
-    <section class="container-fluid py-5 sectioncolor1">
-        <div class="container"><div class="row g-5"><div class="col-12"><div class="fs-5 text-muted about-description" style="line-height: 1.8; white-space: pre-line;">${data.about?.description}</div></div><div class="col-12 text-center mt-4"><img src="${data.about?.image}" class="img-fluid rounded-3 border" style="max-height: 250px; object-fit: contain;" /></div></div></div>
+    <section class="container-fluid py-4 sectioncolor1 border-bottom">
+        <div class="container">
+            <div class="clearfix">
+                <!-- Image Section - Floated Right for Newspaper Style -->
+                <div class="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
+                    <div class="d-inline-block p-3 bg-white rounded-3 shadow-md border border-light w-100">
+                        <img src="${data.about?.image}" class="img-fluid rounded w-100" style="max-height: 380px; object-fit: contain;" />
+                        <div class="mt-2" style="font-size: 9px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2em; border-top: 1px solid #eee; pt-2;">Editorial: Clinical Formula Composition</div>
+                    </div>
+                </div>
+                <div class="fs-5 text-muted about-description" style="line-height: 1.7; white-space: pre-line; text-align: justify; color: #444 !important;">${data.about?.description}</div>
+            </div>
+        </div>
     </section>
 
     <!-- Benefits -->
     <section id="benefits" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.benefits?.title || "Powerful Advantages"}</h2></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            <p class="fs-5 text-center mb-5 max-w-4xl mx-auto text-muted">${data.benefits?.description || ''}</p>
+            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="max-width: 896px;">${data.benefits?.description || ''}</p>
             <div class="row g-4 justify-content-center">
                 ${(data.benefits?.items || []).map((b: any) => `
                 <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${b.title}</h3><p class="fs-5 text-muted mb-0">${b.description}</p></div></div>
@@ -292,16 +304,16 @@ ${seoBlock}
     <!-- Money Back -->
     <section class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.guaranteeTitle || "Verified Quality"}</h2></section>
     <section class="container-fluid py-5 bg-white">
-        <div class="container border p-4 p-lg-5" style="border-radius: 12px;">
+        <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
             <div class="row align-items-center g-5">
-                <div class="col-lg-5 text-center">
-                    <img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3 mx-auto" style="max-width: 350px;" />
-                    <p class="fs-5 fw-semibold text-success mt-3">${data.guaranteeSubtitle || "Zero Risk • Complete Satisfaction"}</p>
+                <div class="col-lg-4 text-center">
+                    <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px;" />
+                    <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}</p>
                 </div>
-                <div class="col-lg-7 text-center text-lg-start">
-                    <h3 class="fs-3 fw-bold mb-3">${data.guaranteeHeadline || "60-Day Refund Assurance"}</h3>
-                    <p class="fs-5 text-muted leading-relaxed">${data.guaranteeDescription || ""}</p>
-                    <a href="${data.hero?.buttonHref}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Get Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
+                <div class="col-lg-8 text-center text-lg-start">
+                    <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
+                    <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${data.guaranteeDescription || `Your happiness is our highest priority. Every order of ${data.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}</p>
+                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Grab Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
                 </div>
             </div>
         </div>
@@ -315,7 +327,15 @@ ${seoBlock}
             <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-full fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase">${plan.title}</h3>
-                <img src="${plan.image}" class="mx-auto mb-3" style="height: 160px; object-fit: contain;" />
+                <div class="position-relative mx-auto mb-3" style="width: 160px;">
+                    <div class="position-absolute top-0 end-0" style="z-index: 2; transform: translate(10%, -10%);">
+                        <div style="position: relative;">
+                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); transform: translate(3px, 3px);"></div>
+                            <div style="position: relative; background: #000; color: #fff; padding: 4px 8px; font-weight: 900; font-size: 11px; border: 1px solid #fff;">${plan.multiplier || 'X1'}</div>
+                        </div>
+                    </div>
+                    <img src="${plan.image}" class="mx-auto" style="height: 160px; object-fit: contain;" />
+                </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
                     <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
                     <span class="fs-6 text-muted">/ bottle</span>
@@ -340,7 +360,7 @@ ${seoBlock}
                             <img src="${item.image}" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="fw-bold fs-4 mb-2 text-dark">${item.title}</h3>
-                        <p class="fs-6 text-muted mb-0 leading-relaxed">${item.description}</p>
+                        <p class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${item.description}</p>
                     </div>
                 </div>
                 `).join('')}
@@ -350,8 +370,8 @@ ${seoBlock}
 
     <!-- Testimonials -->
     ${data.testimonials ? `
-    <section id="testimonials" class="container-fluid py-5 bg-white">
-        <div class="container mx-auto">
+    <section class="container py-5 bg-white">
+        <div class="container py-lg-5">
             <div class="text-center mb-5">
                 <h2 class="fs-1 fw-bold mb-3">${data.testimonials.title}</h2>
                 <p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.testimonials.subtitle || ''}</p>
@@ -359,20 +379,20 @@ ${seoBlock}
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="testimonial-card bg-white shadow-sm h-100">
+                    <div class="testimonial-card bg-white shadow-sm h-100 p-4 border rounded-0">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="avatar-frame">
-                                <img src="${item.image || 'images/avatar-placeholder.png'}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border-radius: 50%;">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-0 text-dark">${item.name}</h4>
+                                <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
                                 <span class="text-muted small">${item.role || 'Verified Buyer'}</span>
                             </div>
                         </div>
                         <div class="mb-3 text-warning">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < item.rating ? '' : 'opacity-25'}"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
                         </div>
-                        <p class="fs-6 text-dark leading-relaxed font-italic italic">"${item.content}"</p>
+                        <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
                 </div>
                 `).join('')}
@@ -399,15 +419,17 @@ ${seoBlock}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
-        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5 max-w-5xl mx-auto leading-relaxed opacity-90">${data.footer?.companyInfo}</p><hr class="my-5 opacity-25" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6 opacity-75">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
+        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5  mx-auto  opacity-75" style="line-height: 1.6;" style="max-width: 1024px;">${data.footer?.companyInfo}</p><hr class="my-5 opacity-25" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6 opacity-75">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
     </footer>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    
     <script>
         // Simple mobile menu toggle if needed
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Site loaded');
         });
     </script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
     }
@@ -462,14 +484,20 @@ ${seoBlock}
                 ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 36px; width: auto;" alt="Logo" />` : ''}
                 <span class="fs-4 fw-bold logo gradient-text">${data.productName}</span>
             </a>
-        <div class="d-none d-lg-flex align-items-center gap-4">
-            <a href="#features" class="nav-link fw-medium p-0 text-white-50 text-decoration-none" style="font-size: 0.85rem;">Features</a>
-            <a href="#about" class="nav-link fw-medium p-0 text-white-50 text-decoration-none" style="font-size: 0.85rem;">About</a>
-            <a href="#pricing" class="nav-link fw-medium p-0 text-white-50 text-decoration-none" style="font-size: 0.85rem;">Pricing</a>
-            <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary">${data.hero?.buttonText || 'Shop Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+        <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+            <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary py-2 px-3" style="font-size: 0.8rem; width: auto; min-width: auto; padding: 0.5rem 1rem;">Shop Now</a>
+            <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavModern">
+                <i class="fa-solid fa-bars fs-3 text-white"></i>
+            </button>
         </div>
-        <!-- Mobile Shop Button -->
-        <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-lg-none py-2 px-3" style="font-size: 0.8rem;">Shop Now</a>
+        <div class="collapse navbar-collapse" id="navbarNavModern">
+            <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-dark bg-lg-transparent rounded p-3 p-lg-0" style="backdrop-filter: blur(10px);">
+                <a href="#features" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">Features</a>
+                <a href="#about" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">About</a>
+                <a href="#pricing" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">Pricing</a>
+                <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-none d-lg-inline-flex text-nowrap" style="width: auto; white-space: nowrap;">${data.hero?.buttonText || 'Shop Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+            </div>
+        </div>
     </div>
 </nav>
 
@@ -500,6 +528,27 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+
+    ${data.ingredients?.items?.length ? `
+    <section id="ingredients" class="section-dark py-5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.ingredients.title || "Natural Ingredients"}</h2>
+            <div class="row g-4 justify-content-center">
+                ${data.ingredients.items.map((item: any) => `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="glass-card p-4 h-100 text-center">
+                        <div class="mb-4 mx-auto rounded-circle overflow-hidden border border-white/10" style="width: 120px; height: 120px;">
+                            <img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" />
+                        </div>
+                        <h4 class="fw-bold mb-2 text-white" style="font-size: 1.1rem;">${item.title}</h4>
+                        <p class="mb-0 text-white-50" style="font-size: 0.9rem; line-height: 1.6;">${item.description}</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
     <section id="features" class="section-darker py-5">
         <div class="container">
@@ -549,7 +598,7 @@ ${seoBlock}
                     <div class="glass-card p-4 h-100">
                         <div class="d-flex align-items-center gap-3 mb-4">
                             <div class="w-12 h-12 rounded-full overflow-hidden border border-white/10">
-                                <img src="${item.image || ''}" style="width: 100%; height: 100%; object-fit: cover;">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 text-white" style="font-size: 0.95rem;">${item.name}</h4>
@@ -557,9 +606,9 @@ ${seoBlock}
                             </div>
                         </div>
                         <div class="mb-3" style="color: ${secondaryColor};">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < item.rating ? '' : 'opacity-25'}"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
                         </div>
-                        <p class="text-white-50 italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content}"</p>
+                        <p class="text-white-50 italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
                 </div>
                 `).join('')}
@@ -594,6 +643,30 @@ ${seoBlock}
         </div>
     </section>
 
+
+    ${data.faq?.length ? `
+    <section id="faq" class="section-dark py-5">
+        <div class="container" style="max-width: 800px;">
+            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.faqTitle || "FAQ"}</h2>
+            <div class="accordion" id="faqAccordionModern">
+                ${data.faq.map((item: any, i: number) => `
+                <div class="accordion-item mb-3 glass-card border-0">
+                    <h2 class="accordion-header" id="heading${i}">
+                        <button class="accordion-button collapsed fw-bold p-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}" style="color: #fff; font-size: 0.95rem;">
+                            ${item.question}
+                        </button>
+                    </h2>
+                    <div id="collapse${i}" class="accordion-collapse collapse" data-bs-parent="#faqAccordionModern">
+                        <div class="accordion-body px-4 pb-4 pt-0 text-white-50" style="font-size: 0.9rem; line-height: 1.7;">
+                            ${item.answer}
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
     <footer class="py-5 text-center" style="background: #050505; border-top: 1px solid rgba(255,255,255,0.05);">
         <div class="container">
             <h2 class="fw-bold gradient-text mb-3" style="font-size: 1.5rem;">${data.footerHeadline || "Questions?"}</h2>
@@ -604,6 +677,8 @@ ${seoBlock}
             <p class="text-white-50 opacity-25" style="font-size: 0.75rem;">© ${new Date().getFullYear()} ${data.productName}</p>
         </div>
     </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
     }
@@ -647,14 +722,20 @@ ${seoBlock}
                 <div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>
                 <span class="fw-bold fs-5 logo" style="color: ${primaryColor}">${data.productName}</span>
             </a>
-            <div class="d-none d-lg-flex align-items-center gap-4">
-                <a href="#features" class="nav-link fw-semibold p-0 text-decoration-none" style="font-size: 0.85rem; color: #64748b;">FEATURES</a>
-                <a href="#about" class="nav-link fw-semibold p-0 text-decoration-none" style="font-size: 0.85rem; color: #64748b;">OVERVIEW</a>
-                <a href="#pricing" class="nav-link fw-semibold p-0 text-decoration-none" style="font-size: 0.85rem; color: #64748b;">PRICING</a>
-                <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm text-decoration-none" style="background: ${secondaryColor} !important; border: none;">Order Now</a>
+            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-3 text-decoration-none" style="background: ${secondaryColor} !important; border: none; font-size: 0.8rem;">Order Now</a>
+                <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavClinical">
+                    <i class="fa-solid fa-bars fs-3" style="color: ${primaryColor}"></i>
+                </button>
             </div>
-            <!-- Mobile Shop Button -->
-            <a href="${data.hero?.buttonHref}" class="clinical-btn-primary d-lg-none py-2 px-3 text-decoration-none" style="background: ${secondaryColor} !important; border: none; font-size: 0.8rem;">Order Now</a>
+            <div class="collapse navbar-collapse" id="navbarNavClinical">
+                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-light bg-lg-transparent rounded p-3 p-lg-0">
+                    <a href="#features" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">FEATURES</a>
+                    <a href="#about" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">OVERVIEW</a>
+                    <a href="#pricing" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">PRICING</a>
+                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${secondaryColor} !important; border: none; white-space: nowrap;">Order Now</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -692,17 +773,20 @@ ${seoBlock}
         </div>
     </section>
 
-    <section id="about" class="bg-white py-5 border-bottom">
-        <div class="container py-lg-5 max-w-[900px]">
-            <div class="clinical-header mb-5"><span class="data-label">PROTOCOL SUMMARY</span><h2 class="fw-bold mb-0" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "The Formula"}</h2></div>
-            <div class="row g-5">
-                <div class="col-12">
-                    <div class="p-4 bg-light border-start border-4 rounded-end mb-5 d-flex gap-4 align-items-center"><i class="fa-solid fa-circle-info text-muted fs-4"></i><p class="mb-0 text-sm font-monospace text-muted">Review full documentation before commencing protocol. Results require 60+ days compliance.</p></div>
-                    <div class="text-muted" style="line-height: 1.8; font-size: 1.05rem; white-space: pre-line;">${data.about?.description}</div>
+    <section id="about" class="bg-white py-4 border-bottom">
+        <div class="container  mx-auto" style="max-width: 1100px;">
+            <div class="clinical-header mb-4"><span class="data-label">PROTOCOL SUMMARY</span><h2 class="fw-bold mb-0" style="color: ${primaryColor}; font-size: 2.3rem;">${data.about?.title || "The Formula"}</h2></div>
+            <div class="clearfix">
+                <!-- Image Section - Floated Left for Newspaper/Journal Style -->
+                <div class="float-lg-start me-lg-5 mb-4 col-12 col-lg-5 px-0">
+                    <div class="p-2 bg-light border rounded shadow-sm text-center">
+                        <img src="${data.about?.image}" class="img-fluid rounded border border-light mx-auto" style="max-height: 380px; object-fit: contain;" />
+                        <div class="mt-2 pb-1 text-center"><span class="data-label" style="font-size: 10px;">FIG 1.1: SYSTEMIC DISPERSION PROFILE</span></div>
+                    </div>
                 </div>
-                <div class="col-12 text-center mt-5 pt-4 border-top">
-                    <img src="${data.about?.image}" class="img-fluid rounded border shadow-sm mx-auto" style="max-height: 300px; object-fit: contain;" />
-                    <span class="data-label mt-3">FIG 1. FORMULA PRESENTATION</span>
+                <div class="protocol-text">
+                    <div class="p-3 bg-light border-start border-2 border-secondary mb-3 d-flex gap-3 align-items-center"><i class="fa-solid fa-circle-info text-muted"></i><p class="mb-0 text-muted uppercase tracking-tight" style="font-size: 11px; font-family: monospace;">Clinical Note: Data suggests 60-day adherence for optimal metabolic synchronization.</p></div>
+                    <div class="text-muted" style="line-height: 1.7; font-size: 1.05rem; white-space: pre-line; text-align: justify; font-family: serif;">${data.about?.description}</div>
                 </div>
             </div>
         </div>
@@ -739,10 +823,10 @@ ${seoBlock}
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="clinical-card p-4 h-100">
+                    <div class="clinical-card p-4 h-100 bg-white shadow-sm border">
                         <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
                             <div class="w-12 h-12 rounded bg-light border d-flex align-items-center justify-content-center overflow-hidden">
-                                <img src="${item.image || ''}" class="w-100 h-100 object-cover" />
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" class="w-100 h-100" style="object-fit: cover;" />
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
@@ -750,9 +834,9 @@ ${seoBlock}
                             </div>
                         </div>
                         <div class="mb-2 text-warning" style="font-size: 12px;">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < item.rating ? '' : 'opacity-25'}"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
                         </div>
-                        <p class="mb-0 text-muted italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content}"</p>
+                        <p class="mb-0 text-muted italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
                 </div>
                 `).join('')}
@@ -760,10 +844,33 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    <section class="py-5 bg-light" id="pricing">
+
+    ${data.ingredients?.items?.length ? `
+    <section id="ingredients" class="py-5 bg-light">
+        <div class="container py-lg-5">
+            <div class="text-center mb-5"><span class="data-label">FORMULATION</span><h2 class="fw-bold clinical-header border-0 px-0 d-inline-block" style="color: ${primaryColor};">${data.ingredients.title || "Active Constituents"}</h2></div>
+            <div class="row g-4">
+                ${data.ingredients.items.map((item: any) => `
+                <div class="col-lg-4 col-md-6">
+                    <div class="clinical-card p-4 h-100 d-flex gap-4 align-items-start">
+                        <div class="flex-shrink-0 rounded overflow-hidden border" style="width: 80px; height: 80px;">
+                            <img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" />
+                        </div>
+                        <div>
+                            <h4 class="fw-bold mb-2 fs-5" style="color: ${primaryColor};">${item.title}</h4>
+                            <p class="mb-0 text-secondary text-sm" style="line-height: 1.6;">${item.description}</p>
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
+    <section class="py-5 bg-white" id="pricing">
         <div class="container py-lg-5">
             <div class="text-center mb-5"><span class="data-label">DISTRIBUTION TIERS</span><h2 class="fw-bold" style="color: ${primaryColor};">${data.pricingTitle || "Select Supply"}</h2></div>
-            <div class="row g-4 justify-content-center max-w-[1000px] mx-auto">
+            <div class="row g-4 justify-content-center  mx-auto" style="max-width: 1000px;">
                 ${(data.pricing || []).map((plan: any) => `
                 <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}">
                     <div class="p-3 border-bottom ${plan.isPrimary ? 'bg-primary text-white' : 'bg-white text-dark'}"><h4 class="fw-bold mb-0 text-uppercase fs-6">${plan.title}</h4></div>
@@ -779,6 +886,30 @@ ${seoBlock}
         </div>
     </section>
 
+
+    ${data.faq?.length ? `
+    <section id="faq" class="py-5 bg-white">
+        <div class="container py-lg-5  mx-auto" style="max-width: 800px;">
+            <h2 class="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style="color: ${primaryColor};">${data.faqTitle || "Protocol FAQ"}</h2>
+            <div class="accordion" id="faqAccordionClinical">
+                ${data.faq.map((item: any, i: number) => `
+                <div class="accordion-item mb-3 border rounded shadow-sm">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-semibold p-4" type="button" data-bs-toggle="collapse" data-bs-target="#c_collapse${i}" style="color: ${primaryColor};">
+                            ${item.question}
+                        </button>
+                    </h2>
+                    <div id="c_collapse${i}" class="accordion-collapse collapse" data-bs-parent="#faqAccordionClinical">
+                        <div class="accordion-body px-4 pb-4 pt-0 text-secondary" style="font-size: 0.95rem; line-height: 1.7;">
+                            ${item.answer}
+                        </div>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
     <footer class="bg-dark text-light py-5 font-monospace text-sm"><div class="container text-center">
         <h2 class="fw-bold mb-3 text-white fs-5">${data.footerHeadline || "End of Document"}</h2>
         <p class="mb-4 text-secondary mx-auto" style="max-width: 600px;">${data.footer?.companyInfo}</p>
@@ -787,6 +918,8 @@ ${seoBlock}
         </div>
         <p class="text-secondary small">© ${new Date().getFullYear()} ${data.productName}. DOC_REV_A.</p>
     </div></footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
     }
@@ -825,7 +958,7 @@ h1, h2, h3, h4, .logo { font-family: 'Lora', serif !important; }
 ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="assets/css/style.css" />
+    <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
     <nav class="navbar navbar-expand-lg sticky-top py-4" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px);">
@@ -834,14 +967,20 @@ ${seoBlock}
                 <i class="fa-solid fa-leaf fs-4" style="color: ${secondaryColor}"></i>
                 <span class="fw-bold fs-4 logo" style="color: ${primaryColor}">${data.productName}</span>
             </a>
-            <div class="d-none d-lg-flex align-items-center gap-4">
-                <a href="#features" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">Features</a>
-                <a href="#about" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">Nature</a>
-                <a href="#pricing" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">Shop</a>
-                <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-4 text-decoration-none" style="background: ${primaryColor} !important; color: #FAF6ED !important;">Order Now</a>
+            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-3 text-decoration-none" style="background: ${primaryColor} !important; color: #FAF6ED !important; font-size: 0.8rem; width: auto; min-width: auto;">Order Now</a>
+                <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavOrganic">
+                    <i class="fa-solid fa-bars fs-3" style="color: ${primaryColor}"></i>
+                </button>
             </div>
-            <!-- Mobile Shop Button -->
-            <a href="${data.hero?.buttonHref}" class="organic-btn-primary d-lg-none py-2 px-3 text-decoration-none" style="background: ${primaryColor} !important; color: #FAF6ED !important; font-size: 0.8rem;">Order Now</a>
+            <div class="collapse navbar-collapse" id="navbarNavOrganic">
+                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center rounded p-3 p-lg-0" style="background: rgba(250, 246, 237, 0.95);">
+                    <a href="#features" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Features</a>
+                    <a href="#about" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Nature</a>
+                    <a href="#pricing" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Shop</a>
+                    <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-4 text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${primaryColor} !important; color: #FAF6ED !important; width: auto; white-space: nowrap;">Order Now</a>
+                </div>
+            </div>
         </div>
     </nav>
 
@@ -891,7 +1030,7 @@ ${seoBlock}
             <p class="mb-5 font-serif fs-5" style="color: #6A5949;">Sourced sustainably, crafted carefully.</p>
             <div class="row g-4">
                 ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white"><div class="mx-auto mb-4 organic-blob overflow-hidden border border-4 border-light" style="width: 130px; height: 130px;"><img src="${item.image}" class="w-100 h-100 object-cover" /></div><h4 class="fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 1.25rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${item.description}</p></div></div>
+                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white"><div class="mx-auto mb-4 organic-blob overflow-hidden border border-4 border-light" style="width: 130px; height: 130px;"><img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" /></div><h4 class="fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 1.25rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${item.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
@@ -945,10 +1084,10 @@ ${seoBlock}
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="organic-card p-4 h-100 bg-white text-start">
+                    <div class="organic-card p-4 h-100 bg-white text-start shadow-sm">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="leaf-shape overflow-hidden" style="width: 56px; height: 56px; border: 2px solid ${secondaryColor}30;">
-                                <img src="${item.image || ''}" class="w-100 h-100 object-cover" />
+                            <div class="leaf-shape overflow-hidden" style="width: 56px; height: 56px; border: 2px solid ${secondaryColor}30; border-radius: 50% 0 50% 0;">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" class="w-100 h-100" style="object-fit: cover;" />
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 font-serif" style="color: ${primaryColor}">${item.name}</h4>
@@ -956,9 +1095,33 @@ ${seoBlock}
                             </div>
                         </div>
                         <div class="mb-3" style="color: ${secondaryColor}">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < item.rating ? '' : 'opacity-25'}" style="font-size: 14px;"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}" style="font-size: 14px;"></i>`).join('')}
                         </div>
-                        <p class="mb-0 italic" style="color: #6A5949; line-height: 1.7; font-size: 0.95rem;">"${item.content}"</p>
+                        <p class="mb-0 italic" style="color: #6A5949; line-height: 1.7; font-size: 0.95rem;">"${item.content || ''}"</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
+
+    ${data.faq?.length ? `
+    <section id="faq" class="py-5" style="background: #F0EBE1;">
+        <div class="container py-lg-5" style="max-width: 800px;">
+            <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.faqTitle || "Wisdom & Questions"}</h2>
+            <div class="accordion" id="faqAccordionOrganic">
+                ${data.faq.map((item: any, i: number) => `
+                <div class="accordion-item mb-3 border-0 bg-transparent">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed fw-bold p-4 bg-white shadow-sm font-serif" type="button" data-bs-toggle="collapse" data-bs-target="#o_collapse${i}" style="color: ${primaryColor}; font-size: 1.1rem; border-radius: 0;">
+                            ${item.question}
+                        </button>
+                    </h2>
+                    <div id="o_collapse${i}" class="accordion-collapse collapse bg-white" data-bs-parent="#faqAccordionOrganic">
+                        <div class="accordion-body px-4 pb-4 pt-0" style="color: #6A5949; font-size: 1rem; line-height: 1.7;">
+                            ${item.answer}
+                        </div>
                     </div>
                 </div>
                 `).join('')}
@@ -977,6 +1140,8 @@ ${seoBlock}
             <p class="opacity-50 small">© ${new Date().getFullYear()} ${data.productName}. Cultivated with care.</p>
         </div>
     </footer>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>`;
     }
@@ -987,6 +1152,7 @@ ${seoBlock}
 
     // Re-use logic for fetching images
     const imageSources = new Set<string>();
+    if (data.hero?.logoImage) imageSources.add(data.hero.logoImage);
     if (data.hero?.image) imageSources.add(data.hero.image);
     if (data.hero?.badgeImage) imageSources.add(data.hero.badgeImage);
     if (data.about?.image) imageSources.add(data.about.image);
@@ -1041,27 +1207,147 @@ ${seoBlock}
     cssFolder?.file("style.css", rawCss);
     zip.file("index.html", rawHtml);
 
-    // Legal Pages - Use the processed rawHtml but replace content with a simple legal container
-    const legalPages = ['privacy-policy', 'disclaimer', 'terms-and-conditions'];
-    const legalContentParts = rawHtml.split('</header>');
-    const footerParts = rawHtml.split('<!-- Footer -->');
+    // Legal Pages - Using user-provided high-quality content
+    const legalPages = [
+        { id: 'privacy-policy', title: 'Privacy Policy' },
+        { id: 'disclaimer', title: 'Disclaimer' },
+        { id: 'terms-and-conditions', title: 'Terms & Conditions' }
+    ];
 
-    if (legalContentParts.length > 1 && footerParts.length > 1) {
-        const legalContentBase = legalContentParts[0] + '</header><main class="container py-5" style="min-height: 50vh;"><div class="bg-white p-5 rounded shadow-sm"><h1>{{TITLE}}</h1><p class="mt-4">This is the {{TITLE}} for ${data.productName}. [Insert legal text here]</p></div></main><!-- Footer -->' + footerParts[1];
+    const headerEndIndex = rawHtml.indexOf('</header>') + 9;
+    const footerStartIndex = rawHtml.lastIndexOf('<footer');
+
+    if (headerEndIndex > 8 && footerStartIndex > -1) {
+        const pageHeader = rawHtml.substring(0, headerEndIndex);
+        const pageFooter = rawHtml.substring(footerStartIndex);
 
         for (const page of legalPages) {
-            const title = page.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-            zip.file(`${page}.html`, legalContentBase.replace(/index\.html/g, 'index.html').replace(/{{TITLE}}/g, title));
+            let bodyContent = '';
+
+            if (page.id === 'privacy-policy') {
+                bodyContent = `
+                    <main class="container py-5" style="min-height: 70vh;">
+                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
+                            <h1 class="fw-bold mb-5">${page.title}</h1>
+                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
+At ${data.productName}, safeguarding your personal data is fundamental to how we operate. This Privacy Policy outlines the types of information we gather, the purposes for which we utilize it, and the protective measures we employ when you browse our website, complete a purchase, or engage with any of our digital services. Your continued use of this website indicates your agreement with the data practices described herein.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">1. Data We Gather</h4>
+In order to deliver and enhance our offerings, we may collect specific personal details and technical data points whenever you interact with our digital platform.
+
+<strong class="text-dark">Personally Identifiable Data:</strong> When you submit an order, sign up for newsletters, or reach out to our team, we may gather your full name, email address, telephone number, delivery and payment addresses, and purchase records.
+<strong class="text-dark">Automatically Collected Data:</strong> Our systems may passively record details such as your IP address, hardware type, browser version, pages browsed, and navigation behavior to optimize site speed and improve your overall browsing experience.
+
+All financial transactions are handled securely via reputable third-party payment processors. We do not retain complete credit card numbers or confidential financial details on any of our internal systems.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">2. Purpose of Data Usage</h4>
+• To fulfill and dispatch your purchases
+• To deliver prompt and helpful customer assistance
+• To transmit order acknowledgments, status alerts, and delivery tracking notices
+• To refine website performance and overall user satisfaction
+• To distribute marketing materials (with straightforward opt-out mechanisms)
+• To adhere to applicable legal and regulatory requirements
+
+Under no circumstances do we trade or lease your personal details to outside organizations for their promotional activities.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">3. Cookie Usage and Tracking Technologies</h4>
+This website may deploy cookies and comparable tracking mechanisms to enrich your browsing experience, recall your preferences, and evaluate overall site engagement. You retain the ability to configure or deactivate cookies via your browser preferences, though certain site features may function differently as a result.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">4. Information Protection</h4>
+We maintain robust technical infrastructure and organizational protocols to shield your personal data against unauthorized access or unintended exposure. Nevertheless, no digital communication method can offer an absolute guarantee of security.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">5. External Service Partners</h4>
+We may collaborate with vetted service providers who assist with payment handling, order fulfillment, data analytics, and customer care. These partners are granted access solely to the information essential for performing their designated functions and are contractually bound to maintain strict confidentiality.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">6. Your Data Rights</h4>
+Subject to the privacy regulations in your jurisdiction, you may be entitled to review your stored personal data, rectify any inaccuracies, or request its removal. You may also withdraw from promotional communications at any point by utilizing the unsubscribe links embedded in our emails or by reaching out directly to our support staff.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">7. Policy Revisions</h4>
+This Privacy Policy may be revised from time to time to accommodate legal developments, technological advancements, or evolving business practices. Any modifications will be published on this page along with the updated effective date. Your ongoing use of this website following any changes signifies your acceptance of the revised terms.
+
+Should you have any inquiries regarding this Privacy Policy or the way your information is managed, please do not hesitate to contact our support team. ${data.productName} remains steadfast in its dedication to preserving your privacy and ensuring complete openness about your data.
+                            </div>
+                        </div>
+                    </main>`;
+            } else if (page.id === 'disclaimer') {
+                bodyContent = `
+                    <main class="container py-5" style="min-height: 70vh;">
+                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
+                            <h1 class="fw-bold mb-5">${page.title}</h1>
+                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
+All material published on this website is offered exclusively for general knowledge and educational reference. Nothing presented here should be construed as professional medical counsel, nor should it serve as a substitute for personalized advice from a certified healthcare practitioner. ${data.productName} is a naturally-formulated dietary supplement engineered to encourage stable blood sugar readings, well-tuned metabolic processes, and enhanced daily vitality when used in conjunction with sensible eating habits and consistent physical movement. Individual experiences and outcomes will naturally differ from person to person. User reviews, success stories, and shared testimonials represent the subjective views of those individuals and should not be taken as guarantees of typical results. How well any dietary supplement performs can be influenced by numerous variables including age, nutritional intake, activity frequency, personal habits, and baseline health condition.
+
+<div class="bg-light p-4 border-start border-4 border-warning my-5">
+    <h5 class="fw-bold text-dark mb-2">FDA Disclosure</h5>
+    <p class="mb-0 text-dark small">Claims associated with ${data.productName} have not undergone formal review or approval by the U.S. Food and Drug Administration (FDA). This product is not formulated with the intent to diagnose, treat, cure, or prevent any disease, medical condition, or health disorder.</p>
+</div>
+
+Those who are currently pregnant, nursing, on prescription medication regimens, or dealing with ongoing health issues should seek professional medical guidance prior to incorporating this product into their routine. Should you experience any unexpected reactions, stop usage right away and consult a qualified medical professional without delay.
+
+${data.productName} is composed of premium, plant-origin ingredients chosen specifically to promote metabolic well-being in a safe manner. However, every product and piece of information available on this site is furnished on an "as is" basis with no guarantees, whether explicit or implied. We encourage all users to thoroughly review product labels, composition details, and dosage guidelines before consumption to ensure proper and beneficial integration into their personal wellness practice.
+
+By navigating this website or purchasing ${data.productName}, you recognize and agree that dietary supplements are meant to augment a health-conscious lifestyle rather than take the place of qualified medical treatment or professional healthcare services.
+                            </div>
+                        </div>
+                    </main>`;
+            } else {
+                bodyContent = `
+                    <main class="container py-5" style="min-height: 70vh;">
+                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
+                            <h1 class="fw-bold mb-5">${page.title}</h1>
+                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
+Welcome to ${data.productName}. These Terms & Conditions establish the guidelines governing your use of our website, product purchases, and access to services available at our official website. By navigating this website or submitting an order, you acknowledge and accept these terms in their entirety. If you find yourself unable to agree, please exit the site immediately.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">1. Agreement to These Terms</h4>
+By entering this website, you affirm that you have thoroughly reviewed, comprehended, and consented to abide by these Terms & Conditions, our Privacy Policy, and any supplementary guidelines published on this platform. These provisions extend to every visitor, browser, and purchaser.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">2. Responsible Website Usage</h4>
+This website may only be accessed and utilized for legitimate, lawful purposes. Any effort to undermine site operations, infiltrate secured sections, propagate malicious material, or participate in deceptive conduct is expressly forbidden.
+
+Every element of this website, including written material, photographs, product specifications, visual assets, and brand marks, constitutes the intellectual property of ${data.productName} or its authorized licensors, safeguarded under applicable copyright and trademark statutes. No unauthorized reproduction, duplication, or redistribution is permitted without explicit written authorization.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">3. Product Details and Accuracy</h4>
+Although we make every reasonable effort to present precise product descriptions, pricing structures, ingredient profiles, and stock availability, ${data.productName} cannot warrant that all published information is entirely free of error. We maintain the right to revise content, address inaccuracies, modify pricing, or withdraw products at any time without advance notification.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">4. Eligibility Requirements</h4>
+By utilizing this website or completing a purchase, you certify that you are no younger than 18 years of age, or that you are accessing the platform with appropriate parental or guardian oversight. You pledge to furnish truthful and complete details when creating accounts, placing orders, or engaging with our support channels.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">5. Purchasing and Payment Processing</h4>
+All orders placed through our website are contingent upon verification and formal acceptance. ${data.productName} retains the authority to decline or void any order where fraud is suspected, errors have occurred, or requested items are temporarily unavailable.
+
+Payment transactions are executed securely through established third-party processing platforms. We do not collect or store complete credit card credentials, and all payment exchanges benefit from industry-standard encryption safeguards.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">6. Delivery and Shipping</h4>
+Estimated shipping windows are approximate and may fluctuate based on carrier logistics, customs procedures, or other circumstances beyond our direct control. It is the buyer's responsibility to supply an accurate and complete shipping address during the checkout process.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">7. Return and Refund Procedures</h4>
+${data.productName} is dedicated to ensuring buyer satisfaction. Qualifying purchases may be eligible for a return or monetary refund in accordance with our published return policy. Buyers are required to adhere to the designated return process and initiate any claims within the applicable guarantee timeframe.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">8. Wellness Disclaimer</h4>
+All information appearing on this website serves general educational purposes exclusively. ${data.productName} is a dietary supplement formulated to complement overall wellness and support healthy blood sugar levels as part of a balanced nutritional plan and active lifestyle. Individual results are inherently variable.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">9. Liability Boundaries</h4>
+To the maximum extent allowable under applicable law, ${data.productName} shall bear no responsibility for any direct, indirect, incidental, or consequential damages resulting from the use of this website, its published content, its products, or its associated services.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">10. External Website Links</h4>
+This website may occasionally feature hyperlinks directing you to third-party websites. ${data.productName} exercises no authority over these external platforms and assumes no liability for their content, privacy practices, or operational policies.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">11. Modifications to These Terms</h4>
+We reserve the right to amend these Terms & Conditions at any point to reflect operational shifts, legal developments, or policy refinements. Revised terms will be posted directly on this page, and your continued engagement with the website constitutes acceptance of the amended provisions.
+
+<h4 class="fw-bold text-dark mt-5 mb-3">12. Applicable Legal Framework</h4>
+These Terms & Conditions fall under the jurisdiction of the laws governing the company's registered location. Any disputes originating from website usage or product purchases will be resolved in accordance with those governing statutes.
+
+For any questions or concerns regarding these Terms & Conditions, please contact our dedicated support team. ${data.productName} is firmly committed to upholding transparency, robust security measures, and unwavering trust for every user and customer.
+                            </div>
+                        </div>
+                    </main>`;
+            }
+
+            const fullHtml = pageHeader + bodyContent + pageFooter;
+            zip.file(`${page.id}.html`, fullHtml.replace(/href="#"/g, 'href="index.html"'));
         }
     }
 
-    const content = await zip.generateAsync({ type: "blob" });
-    const link = document.createElement("a");
-    const fileName = data.exportName ? 
-        (data.exportName.endsWith('.zip') ? data.exportName : `${data.exportName}.zip`) : 
-        `${data.productName.toLowerCase().replace(/\s+/g, '-')}-site.zip`;
-    
-    link.href = URL.createObjectURL(content);
-    link.download = fileName;
-    link.click();
+    return await zip.generateAsync({ type: "blob" });
 }

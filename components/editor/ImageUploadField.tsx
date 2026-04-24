@@ -43,8 +43,8 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
   };
 
   return (
-    <div className="space-y-2">
-      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">{label}</label>
+    <div className="space-y-1.5">
+      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">{label}</label>
 
       {/* Upload Zone */}
       <div
@@ -52,7 +52,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
         onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`relative flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed transition-all cursor-pointer min-h-[100px] overflow-hidden
+        className={`relative flex flex-col items-center justify-center gap-1 rounded-none border-2 border-dashed transition-all cursor-pointer min-h-[80px] overflow-hidden
           ${isDragging ? 'border-purple-400 bg-purple-50' : 'border-gray-200 hover:border-purple-300 hover:bg-purple-50/30'}
           ${isUploading ? 'opacity-60 cursor-wait' : ''}`}
       >
@@ -65,23 +65,23 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
           />
         ) : null}
 
-        <div className="relative z-10 flex flex-col items-center gap-1 py-4 px-3 text-center">
+        <div className="relative z-10 flex flex-col items-center gap-1 py-3 px-2 text-center">
           {isUploading ? (
             <>
-              <i className="fa-solid fa-circle-notch animate-spin text-purple-500 text-xl" />
-              <span className="text-xs font-bold text-gray-500">Uploading…</span>
+              <i className="fa-solid fa-circle-notch animate-spin text-purple-500 text-lg" />
+              <span className="text-[10px] font-bold text-gray-500">Uploading…</span>
             </>
           ) : (
             <>
               {value ? (
-                <i className="fa-solid fa-image text-purple-400 text-2xl" />
+                <i className="fa-solid fa-image text-purple-400 text-xl" />
               ) : (
-                <i className="fa-solid fa-cloud-arrow-up text-gray-300 text-3xl" />
+                <i className="fa-solid fa-cloud-arrow-up text-gray-300 text-2xl" />
               )}
-              <span className="text-xs font-bold text-gray-500">
+              <span className="text-[10px] font-bold text-gray-500 leading-tight">
                 {value ? 'Click or drag to replace' : 'Click or drag to upload'}
               </span>
-              <span className="text-[10px] text-gray-400">PNG, JPG, WEBP, SVG</span>
+              <span className="text-[8px] text-gray-400 uppercase tracking-tighter">PNG, JPG, WEBP, SVG</span>
             </>
           )}
         </div>
@@ -93,7 +93,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="Or paste a URL directly…"
-        className="w-full px-3 py-2 rounded-xl border border-gray-100 bg-gray-50 text-[11px] font-mono text-gray-500 focus:ring-2 focus:ring-purple-400 outline-none transition-all"
+        className="w-full px-2 py-1.5 rounded-none border border-gray-100 bg-gray-50 text-[10px] font-mono text-gray-500 focus:ring-2 focus:ring-purple-400 outline-none transition-all"
       />
 
       <input

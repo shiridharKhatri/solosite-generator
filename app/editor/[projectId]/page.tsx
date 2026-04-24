@@ -21,7 +21,10 @@ export default function EditorPage() {
   const router = useRouter();
   const {
     projectData, setProjectData, updateTheme, updateLayoutStyle, updateProductName, updateSEO,
-    updateTestimonials, addTestimonial, removeTestimonial,
+    updateHero, updateAbout, updateFeature, addFeature, removeFeature,
+    updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
+    updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
+    updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
     isDirty, setDirty
   } = useStore();
   const [isExporting, setIsExporting] = useState(false);
@@ -46,6 +49,21 @@ export default function EditorPage() {
             const updatedData = { ...data.data };
             if (!updatedData.testimonials) updatedData.testimonials = initialProjectData.testimonials;
             if (!updatedData.about) updatedData.about = initialProjectData.about;
+            
+            // Sanitize corrupted testimonials
+            if (updatedData.testimonials?.items) {
+              updatedData.testimonials.items = updatedData.testimonials.items.map((item: any, i: number) => {
+                if (item.content === '"${item.content}"' || item.content === '${item.content}') {
+                  return { ...item, content: initialProjectData.testimonials.items[i]?.content || 'Highly recommend this product!' };
+                }
+                return item;
+              });
+            }
+
+            // Sanitize missing guarantee description
+            if (updatedData.guaranteeDescription === "") {
+                updatedData.guaranteeDescription = initialProjectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${updatedData.productName} comes protected by a comprehensive 60-day satisfaction promise.`;
+            }
 
             setProjectData(updatedData);
             setProjectStatus(data.status || 'draft');
@@ -109,18 +127,27 @@ export default function EditorPage() {
 
   const handleExport = async () => {
     if (!projectData) return;
-    
+
     const defaultName = projectData.productName.toLowerCase().replace(/\s+/g, '-') || 'my-project';
     const customName = prompt('Enter a name for your export (e.g. glycopezil-official):', defaultName);
-    
+
     if (customName === null) return; // User cancelled
 
     setIsExporting(true);
     try {
-      await generateProjectZip({
+      const blob = await generateProjectZip({
         ...projectData,
         exportName: customName
       });
+      
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = customName.endsWith('.zip') ? customName : `${customName}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Export failed', error);
       alert('Export failed.');
@@ -151,11 +178,11 @@ export default function EditorPage() {
         <div className="flex items-center gap-4">
           {/* Logo & Brand Info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-black rounded-xl flex items-center justify-center text-white">
+            <div className="w-10 h-10 bg-black rounded-none flex items-center justify-center text-white">
               <IconLayout />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-sm tracking-tight leading-tight">Hiralamu</span>
+              <span className="font-bold text-sm tracking-tight leading-tight">SoloSite</span>
             </div>
           </div>
 
@@ -165,19 +192,19 @@ export default function EditorPage() {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'settings' ? null : 'settings')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${activeDropdown === 'settings' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'settings' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
             >
               <i className="fa-solid fa-cog"></i>
               Settings
               <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'settings' ? 'rotate-180' : ''}`}></i>
             </button>
             {activeDropdown === 'settings' && (
-              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
+              <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-none shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
                 <button
                   onClick={() => { setIsSEOModalOpen(true); setActiveDropdown(null); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 text-left transition-colors group"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-none hover:bg-gray-50 text-left transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
+                  <div className="w-8 h-8 rounded-none bg-blue-50 flex items-center justify-center text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-colors">
                     <i className="fa-solid fa-chart-line text-xs"></i>
                   </div>
                   <div>
@@ -187,9 +214,9 @@ export default function EditorPage() {
                 </button>
                 <button
                   onClick={() => { setIsContentModalOpen(true); setActiveDropdown(null); }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-gray-50 text-left transition-colors group"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-none hover:bg-gray-50 text-left transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-colors">
+                  <div className="w-8 h-8 rounded-none bg-purple-50 flex items-center justify-center text-purple-500 group-hover:bg-purple-500 group-hover:text-white transition-colors">
                     <i className="fa-solid fa-pen-to-square text-xs"></i>
                   </div>
                   <div>
@@ -204,9 +231,9 @@ export default function EditorPage() {
                       setActiveDropdown(null);
                     }
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-red-50 text-left transition-colors group"
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-none hover:bg-red-50 text-left transition-colors group"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
+                  <div className="w-8 h-8 rounded-none bg-red-50 flex items-center justify-center text-red-500 group-hover:bg-red-500 group-hover:text-white transition-colors">
                     <i className="fa-solid fa-rotate-left text-xs"></i>
                   </div>
                   <div>
@@ -220,7 +247,7 @@ export default function EditorPage() {
                   <div className="flex flex-col gap-2">
                     <div className="flex justify-between items-center text-[11px]">
                       <span className="text-gray-500 font-bold">Status</span>
-                      <span className={`px-2 py-0.5 rounded-full font-black uppercase text-[8px] ${projectStatus === 'published' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
+                      <span className={`px-2 py-0.5 rounded-none font-black uppercase text-[8px] ${projectStatus === 'published' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
                         {projectStatus}
                       </span>
                     </div>
@@ -242,14 +269,14 @@ export default function EditorPage() {
             <div className="relative">
               <button
                 onClick={() => setActiveDropdown(activeDropdown === 'layout' ? null : 'layout')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${activeDropdown === 'layout' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'layout' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
               >
                 <i className="fa-solid fa-layer-group"></i>
                 Layout
                 <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'layout' ? 'rotate-180' : ''}`}></i>
               </button>
               {activeDropdown === 'layout' && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
+                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-none shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
                   {[
                     { id: 'default', name: 'Classic', desc: 'The original high-conversion template', color: '#2C0D67', secondary: '#fbbf24' },
                     { id: 'modern', name: 'Modern', desc: 'Minimalist and spacious design', color: '#1e3932', secondary: '#f1f8f5' },
@@ -259,10 +286,10 @@ export default function EditorPage() {
                     <button
                       key={style.id}
                       onClick={() => { updateLayoutStyle(style.id as any); updateTheme({ primary: style.color, secondary: style.secondary }); setActiveDropdown(null); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all ${projectData.layoutStyle === style.id || (style.id === 'default' && !projectData.layoutStyle) ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-none transition-all ${projectData.layoutStyle === style.id || (style.id === 'default' && !projectData.layoutStyle) ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
                     >
-                      <div className="w-10 h-10 rounded-lg flex items-center justify-center text-white shrink-0 shadow-inner" style={{ background: style.color }}>
-                        <div className="w-4 h-4 rounded-full" style={{ background: style.secondary }}></div>
+                      <div className="w-10 h-10 rounded-none flex items-center justify-center text-white shrink-0 shadow-inner" style={{ background: style.color }}>
+                        <div className="w-4 h-4 rounded-none" style={{ background: style.secondary }}></div>
                       </div>
                       <div className="text-left">
                         <div className="text-xs font-bold text-gray-900">{style.name}</div>
@@ -278,14 +305,14 @@ export default function EditorPage() {
             <div className="relative">
               <button
                 onClick={() => setActiveDropdown(activeDropdown === 'theme' ? null : 'theme')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-bold transition-all border ${activeDropdown === 'theme' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
+                className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'theme' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
               >
                 <i className="fa-solid fa-palette"></i>
                 Theme
                 <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'theme' ? 'rotate-180' : ''}`}></i>
               </button>
               {activeDropdown === 'theme' && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-2xl shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
+                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-none shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
                   <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Color Presets</div>
                   <div className="flex gap-3 mb-6">
                     {[
@@ -297,7 +324,7 @@ export default function EditorPage() {
                       <button
                         key={i}
                         onClick={() => updateTheme({ primary: c.p, secondary: c.s })}
-                        className="w-10 h-10 rounded-xl cursor-pointer border-2 border-white hover:scale-110 transition-transform shadow-sm relative overflow-hidden shrink-0"
+                        className="w-10 h-10 rounded-none cursor-pointer border-2 border-white hover:scale-110 transition-transform shadow-sm relative overflow-hidden shrink-0"
                         style={{ backgroundColor: c.p }}
                       >
                         <div className="absolute top-0 right-0 w-1/2 h-full" style={{ backgroundColor: c.s }}></div>
@@ -309,8 +336,8 @@ export default function EditorPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <div className="text-[10px] font-bold text-gray-500">Primary</div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-100">
-                        <div className="w-6 h-6 rounded-lg border border-gray-200 overflow-hidden shrink-0">
+                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-none border border-gray-100">
+                        <div className="w-6 h-6 rounded-none border border-gray-200 overflow-hidden shrink-0">
                           <input type="color" value={projectData.theme?.primary || '#2C0D67'} onChange={(e) => updateTheme({ primary: e.target.value })} className="w-full h-full scale-150 cursor-pointer" />
                         </div>
                         <span className="text-[10px] font-mono text-gray-600 uppercase">{projectData.theme?.primary}</span>
@@ -318,8 +345,8 @@ export default function EditorPage() {
                     </div>
                     <div className="space-y-2">
                       <div className="text-[10px] font-bold text-gray-500">Accent</div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-xl border border-gray-100">
-                        <div className="w-6 h-6 rounded-lg border border-gray-200 overflow-hidden shrink-0">
+                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-none border border-gray-100">
+                        <div className="w-6 h-6 rounded-none border border-gray-200 overflow-hidden shrink-0">
                           <input type="color" value={projectData.theme?.secondary || '#fbbf24'} onChange={(e) => updateTheme({ secondary: e.target.value })} className="w-full h-full scale-150 cursor-pointer" />
                         </div>
                         <span className="text-[10px] font-mono text-gray-600 uppercase">{projectData.theme?.secondary}</span>
@@ -334,17 +361,17 @@ export default function EditorPage() {
 
         {/* Right Side: Viewport & Export */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-full border border-gray-100">
+          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-none border border-gray-100">
             <button
               onClick={() => setViewport('desktop')}
-              className={`w-9 h-9 flex items-center justify-center rounded-full transition-all ${viewport === 'desktop' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`w-9 h-9 flex items-center justify-center rounded-none transition-all ${viewport === 'desktop' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
               title="Desktop Preview"
             >
               <i className="fa-solid fa-desktop text-sm"></i>
             </button>
             <button
               onClick={() => setViewport('mobile')}
-              className={`w-9 h-9 flex items-center justify-center rounded-full transition-all ${viewport === 'mobile' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`w-9 h-9 flex items-center justify-center rounded-none transition-all ${viewport === 'mobile' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
               title="Mobile Preview"
             >
               <i className="fa-solid fa-mobile-screen-button text-sm"></i>
@@ -357,14 +384,14 @@ export default function EditorPage() {
             <button
               onClick={() => handleSave('draft')}
               disabled={isSaving}
-              className="px-4 py-2 bg-white border border-gray-200 text-black rounded-xl font-bold text-xs hover:bg-gray-50 transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-white border border-gray-200 text-black rounded-none font-bold text-xs hover:bg-gray-50 transition-all disabled:opacity-50"
             >
               {isSaving ? 'Saving...' : 'Save Draft'}
             </button>
             <button
               onClick={() => handleSave('published')}
               disabled={isSaving}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-xs hover:bg-emerald-700 transition-all disabled:opacity-50"
+              className="px-4 py-2 bg-emerald-600 text-white rounded-none font-bold text-xs hover:bg-emerald-700 transition-all disabled:opacity-50"
             >
               Publish
             </button>
@@ -375,7 +402,7 @@ export default function EditorPage() {
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="group flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-xl font-bold text-xs hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+            className="group flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-none font-bold text-xs hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {isExporting ? (
               <i className="fa-solid fa-circle-notch animate-spin"></i>
@@ -396,35 +423,26 @@ export default function EditorPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10001] bg-black text-white px-6 py-2.5 rounded-full text-[10px] font-bold uppercase tracking-widest pointer-events-none opacity-80 backdrop-blur-sm">
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10001] bg-black text-white px-6 py-2.5 rounded-none text-[10px] font-bold uppercase tracking-widest pointer-events-none opacity-80 backdrop-blur-sm">
         Client-Side Mode • Edit and Export Anytime
       </div>
-
       {/* Content Editor Modal */}
       {isContentModalOpen && (
         <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsContentModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-[32px] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
-            {/* Header */}
-            <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 rounded-2xl bg-purple-600 flex items-center justify-center text-white shadow-lg shadow-purple-200">
-                  <i className="fa-solid fa-pen-to-square text-xl"></i>
-                </div>
-                <div>
-                  <h2 className="text-xl font-black text-gray-900">Content Editor</h2>
-                  <p className="text-xs text-gray-500 font-bold uppercase tracking-widest">Master Content Control</p>
-                </div>
-              </div>
-              <button onClick={() => setIsContentModalOpen(false)} className="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center transition-colors">
-                <i className="fa-solid fa-times text-gray-400"></i>
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]" onClick={() => setIsContentModalOpen(false)}></div>
+          <div className="relative bg-white w-full max-w-4xl max-h-[90vh] rounded-none shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Header - ultra-compact */}
+            <div className="px-6 py-3 border-b border-gray-100 flex items-center justify-between bg-white sticky top-0 z-10">
+              <h2 className="text-base font-black text-gray-900">Content Editor</h2>
+              <button onClick={() => setIsContentModalOpen(false)} className="w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors">
+                <i className="fa-solid fa-times text-gray-400 text-sm"></i>
               </button>
             </div>
 
             <div className="flex-1 flex overflow-hidden">
               {/* Sidebar Tabs */}
-              <div className="w-64 border-r border-gray-100 bg-gray-50/50 p-4 overflow-y-auto">
-                <div className="space-y-1">
+              <div className="w-64 border-r border-gray-100 bg-gray-50/50 p-3 overflow-y-auto">
+                <div className="space-y-0.5">
                   {[
                     { id: 'hero', name: 'Hero Section', icon: 'fa-bolt' },
                     { id: 'about', name: 'About', icon: 'fa-info-circle' },
@@ -438,7 +456,7 @@ export default function EditorPage() {
                     <button
                       key={tab.id}
                       onClick={() => setActiveContentTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold transition-all ${activeContentTab === tab.id ? 'bg-white text-purple-600 shadow-sm border border-gray-100' : 'text-gray-500 hover:bg-white/50 hover:text-gray-900'}`}
+                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-none text-sm font-bold transition-all ${activeContentTab === tab.id ? 'bg-white text-purple-600 shadow-sm border border-gray-100' : 'text-gray-500 hover:bg-white/50 hover:text-gray-900'}`}
                     >
                       <i className={`fa-solid ${tab.icon} w-5 text-center`}></i>
                       {tab.name}
@@ -448,121 +466,112 @@ export default function EditorPage() {
               </div>
 
               {/* Main Form Content */}
-              <div className="flex-1 overflow-y-auto p-8 bg-white">
+              <div className="flex-1 overflow-y-auto p-5 bg-white">
                 {activeContentTab === 'hero' && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Product Name</label>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Product Name</label>
                         <input
                           type="text"
                           value={projectData.productName}
                           onChange={(e) => updateProductName(e.target.value)}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                          className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                         />
                       </div>
                       <ImageUploadField
                         label="Navbar Logo (Optional)"
                         value={projectData.hero.logoImage || ''}
-                        onChange={(url) => setProjectData({ ...projectData, hero: { ...projectData.hero, logoImage: url } })}
+                        onChange={(url) => updateHero({ logoImage: url })}
                       />
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Badge Text</label>
-                        <input
-                          type="text"
-                          value={projectData.hero.badgeText || ''}
-                          onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, badgeText: e.target.value } })}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Primary Button Icon</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Primary Button Icon</label>
                         <input
                           type="text"
                           value={projectData.hero.icon}
-                          onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, icon: e.target.value } })}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                          onChange={(e) => updateHero({ icon: e.target.value })}
+                          className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
+                    <div className="grid grid-cols-2 gap-3">
                       <ImageUploadField
                         label="Hero Image"
                         value={projectData.hero.image}
-                        onChange={(url) => setProjectData({ ...projectData, hero: { ...projectData.hero, image: url } })}
+                        onChange={(url) => updateHero({ image: url })}
                       />
                       <ImageUploadField
                         label="Badge Image"
                         value={projectData.hero.badgeImage || ''}
-                        onChange={(url) => setProjectData({ ...projectData, hero: { ...projectData.hero, badgeImage: url } })}
+                        onChange={(url) => updateHero({ badgeImage: url })}
                       />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Main Title</label>
-                      <input type="text" value={projectData.hero.title} onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, title: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Main Title</label>
+                      <input type="text" value={projectData.hero.title} onChange={(e) => updateHero({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
-                      <textarea rows={3} value={projectData.hero.subtitle} onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, subtitle: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
+                      <textarea rows={3} value={projectData.hero.subtitle} onChange={(e) => updateHero({ subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Primary Button</label>
-                        <input type="text" value={projectData.hero.buttonText} onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, buttonText: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Primary Button</label>
+                        <input type="text" value={projectData.hero.buttonText} onChange={(e) => updateHero({ buttonText: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Secondary Button</label>
-                        <input type="text" value={projectData.hero.secondaryButtonText} onChange={(e) => setProjectData({ ...projectData, hero: { ...projectData.hero, secondaryButtonText: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Secondary Button</label>
+                        <input type="text" value={projectData.hero.secondaryButtonText} onChange={(e) => updateHero({ secondaryButtonText: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                       </div>
                     </div>
                   </div>
                 )}
 
                 {activeContentTab === 'testimonials' && (
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
                         <input
                           type="text"
                           value={projectData.testimonials?.title || ''}
                           onChange={(e) => updateTestimonials(-1, { title: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                          className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                         />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section Subtitle</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Subtitle</label>
                         <input
                           type="text"
                           value={projectData.testimonials?.subtitle || ''}
                           onChange={(e) => updateTestimonials(-1, { subtitle: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                          className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-3">
                       {projectData.testimonials?.items.map((item, i) => (
-                        <div key={i} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/50 space-y-4 relative group">
+                        <div key={i} className="p-4 rounded-none border border-gray-100 bg-gray-50/50 space-y-3 relative group">
                           <button
                             onClick={() => removeTestimonial(i)}
-                            className="absolute top-4 right-4 w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            className="absolute top-3 right-3 w-7 h-7 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 z-10"
                           >
-                            <i className="fa-solid fa-times"></i>
+                            <i className="fa-solid fa-times text-xs"></i>
                           </button>
 
-                          <div className="grid grid-cols-2 gap-6">
-                            <div className="space-y-2">
-                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Name</label>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Name</label>
                               <input
                                 type="text"
                                 value={item.name}
                                 onChange={(e) => updateTestimonials(i, { name: e.target.value })}
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                               />
                             </div>
-                            <div className="space-y-2">
-                              <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Rating (1-5)</label>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Rating (1-5)</label>
                               <input
                                 type="number"
                                 min="1"
@@ -572,18 +581,18 @@ export default function EditorPage() {
                                   const val = parseInt(e.target.value);
                                   updateTestimonials(i, { rating: isNaN(val) ? 5 : val });
                                 }}
-                                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900"
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm"
                               />
                             </div>
                           </div>
 
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Testimonial Content</label>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Testimonial Content</label>
                             <textarea
                               value={item.content}
                               onChange={(e) => updateTestimonials(i, { content: e.target.value })}
                               rows={3}
-                              className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 resize-none"
+                              className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm resize-none"
                             />
                           </div>
                         </div>
@@ -591,7 +600,7 @@ export default function EditorPage() {
 
                       <button
                         onClick={addTestimonial}
-                        className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/50 transition-all font-bold flex items-center justify-center gap-2"
+                        className="w-full py-3 rounded-none border-2 border-dashed border-gray-200 text-gray-400 hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/50 transition-all font-bold flex items-center justify-center gap-2 text-sm"
                       >
                         <i className="fa-solid fa-plus-circle"></i>
                         Add Testimonial
@@ -601,56 +610,38 @@ export default function EditorPage() {
                 )}
 
                 {activeContentTab === 'benefits' && (
-                  <div className="space-y-8">
+                  <div className="space-y-3">
                     {projectData.features.map((feature, idx) => (
-                      <div key={idx} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-4 relative group">
+                      <div key={idx} className="p-4 rounded-none border border-gray-100 bg-gray-50/30 space-y-3 relative group">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-500">Feature #{idx + 1}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-purple-500">Feature #{idx + 1}</span>
                           <button
-                            onClick={() => {
-                              const newFeatures = projectData.features.filter((_, i) => i !== idx);
-                              setProjectData({ ...projectData, features: newFeatures });
-                            }}
-                            className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            onClick={() => removeFeature(idx)}
+                            className="absolute top-3 right-3 w-7 h-7 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <i className="fa-solid fa-trash-can text-xs"></i>
+                            <i className="fa-solid fa-trash-can text-[10px]"></i>
                           </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Title</label>
-                            <input type="text" value={feature.title} onChange={(e) => {
-                              const newFeatures = [...projectData.features];
-                              newFeatures[idx].title = e.target.value;
-                              setProjectData({ ...projectData, features: newFeatures });
-                            }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Title</label>
+                            <input type="text" value={feature.title} onChange={(e) => updateFeature(idx, { title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
                           <ImageUploadField
                             label="Image"
                             value={feature.image}
-                            onChange={(url) => {
-                              const newFeatures = [...projectData.features];
-                              newFeatures[idx].image = url;
-                              setProjectData({ ...projectData, features: newFeatures });
-                            }}
+                            onChange={(url) => updateFeature(idx, { image: url })}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Description</label>
-                          <textarea rows={2} value={feature.description} onChange={(e) => {
-                            const newFeatures = [...projectData.features];
-                            newFeatures[idx].description = e.target.value;
-                            setProjectData({ ...projectData, features: newFeatures });
-                          }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Description</label>
+                          <textarea rows={2} value={feature.description} onChange={(e) => updateFeature(idx, { description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                         </div>
                       </div>
                     ))}
                     <button
-                      onClick={() => {
-                        const newFeatures = [...projectData.features, { title: 'New Feature', description: 'Describe this feature here...', image: '' }];
-                        setProjectData({ ...projectData, features: newFeatures });
-                      }}
-                      className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2"
+                      onClick={addFeature}
+                      className="w-full py-3 rounded-none border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <i className="fa-solid fa-plus-circle"></i>
                       Add New Feature
@@ -659,84 +650,66 @@ export default function EditorPage() {
                 )}
 
                 {activeContentTab === 'about' && (
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
-                      <input type="text" value={projectData.about.title} onChange={(e) => setProjectData({ ...projectData, about: { ...projectData.about, title: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                      <input type="text" value={projectData.about.title} onChange={(e) => updateAbout({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Main Description</label>
-                      <textarea rows={6} value={projectData.about.description} onChange={(e) => setProjectData({ ...projectData, about: { ...projectData.about, description: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Main Description</label>
+                      <textarea rows={6} value={projectData.about.description} onChange={(e) => updateAbout({ description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
                     <ImageUploadField
                       label="About Image"
                       value={projectData.about.image}
-                      onChange={(url) => setProjectData({ ...projectData, about: { ...projectData.about, image: url } })}
+                      onChange={(url) => updateAbout({ image: url })}
                     />
                   </div>
                 )}
 
                 {activeContentTab === 'ingredients' && (
-                  <div className="space-y-8">
-                    <div className="space-y-4 pb-6 border-b border-gray-100">
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
-                        <input type="text" value={projectData.ingredients.title} onChange={(e) => setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, title: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                  <div className="space-y-3">
+                    <div className="space-y-3 pb-4 border-b border-gray-100">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                        <input type="text" value={projectData.ingredients.title} onChange={(e) => updateIngredient(-1, { title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Section Subtitle</label>
-                        <input type="text" value={projectData.ingredients.subtitle} onChange={(e) => setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, subtitle: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Subtitle</label>
+                        <input type="text" value={projectData.ingredients.subtitle} onChange={(e) => updateIngredient(-1, { subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                       </div>
                     </div>
                     {projectData.ingredients.items.map((item, idx) => (
-                      <div key={idx} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-4 relative group">
+                      <div key={idx} className="p-4 rounded-none border border-gray-100 bg-gray-50/30 space-y-3 relative group">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-500">Ingredient #{idx + 1}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-purple-500">Ingredient #{idx + 1}</span>
                           <button
-                            onClick={() => {
-                              const newItems = projectData.ingredients.items.filter((_, i) => i !== idx);
-                              setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, items: newItems } });
-                            }}
-                            className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            onClick={() => removeIngredient(idx)}
+                            className="absolute top-3 right-3 w-7 h-7 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <i className="fa-solid fa-trash-can text-xs"></i>
+                            <i className="fa-solid fa-trash-can text-[10px]"></i>
                           </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Title</label>
-                            <input type="text" value={item.title} onChange={(e) => {
-                              const newItems = [...projectData.ingredients.items];
-                              newItems[idx].title = e.target.value;
-                              setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, items: newItems } });
-                            }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Title</label>
+                            <input type="text" value={item.title} onChange={(e) => updateIngredient(idx, { title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
                           <ImageUploadField
                             label="Image"
                             value={item.image}
-                            onChange={(url) => {
-                              const newItems = [...projectData.ingredients.items];
-                              newItems[idx].image = url;
-                              setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, items: newItems } });
-                            }}
+                            onChange={(url) => updateIngredient(idx, { image: url })}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Description</label>
-                          <textarea rows={2} value={item.description} onChange={(e) => {
-                            const newItems = [...projectData.ingredients.items];
-                            newItems[idx].description = e.target.value;
-                            setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, items: newItems } });
-                          }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Description</label>
+                          <textarea rows={2} value={item.description} onChange={(e) => updateIngredient(idx, { description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                         </div>
                       </div>
                     ))}
                     <button
-                      onClick={() => {
-                        const newItems = [...projectData.ingredients.items, { title: 'New Ingredient', description: 'Describe this ingredient...', image: '' }];
-                        setProjectData({ ...projectData, ingredients: { ...projectData.ingredients, items: newItems } });
-                      }}
-                      className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2"
+                      onClick={addIngredient}
+                      className="w-full py-3 rounded-none border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <i className="fa-solid fa-plus-circle"></i>
                       Add New Ingredient
@@ -745,78 +718,46 @@ export default function EditorPage() {
                 )}
 
                 {activeContentTab === 'pricing' && (
-                  <div className="space-y-8">
+                  <div className="space-y-3">
                     {projectData.pricing.map((plan, idx) => (
-                      <div key={idx} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-4 relative group">
+                      <div key={idx} className="p-4 rounded-none border border-gray-100 bg-gray-50/30 space-y-3 relative group">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-500">Pricing Plan #{idx + 1}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-purple-500">Pricing Plan #{idx + 1}</span>
                           <button
-                            onClick={() => {
-                              const newPricing = projectData.pricing.filter((_, i) => i !== idx);
-                              setProjectData({ ...projectData, pricing: newPricing });
-                            }}
-                            className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            onClick={() => removePricing(idx)}
+                            className="absolute top-3 right-3 w-7 h-7 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <i className="fa-solid fa-trash-can text-xs"></i>
+                            <i className="fa-solid fa-trash-can text-[10px]"></i>
                           </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Plan Title</label>
-                            <input type="text" value={plan.title} onChange={(e) => {
-                              const newPricing = [...projectData.pricing];
-                              newPricing[idx].title = e.target.value;
-                              setProjectData({ ...projectData, pricing: newPricing });
-                            }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Plan Title</label>
+                            <input type="text" value={plan.title} onChange={(e) => updatePricing(idx, { title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Bottle Quantity (e.g. x6)</label>
-                            <input type="text" value={plan.quantity || ''} onChange={(e) => {
-                              const newPricing = [...projectData.pricing];
-                              newPricing[idx].quantity = e.target.value;
-                              setProjectData({ ...projectData, pricing: newPricing });
-                            }} placeholder="6 Bottles" className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Bottle Quantity</label>
+                            <input type="text" value={plan.quantity || ''} onChange={(e) => updatePricing(idx, { quantity: e.target.value })} placeholder="6 Bottles" className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
-                          <div className="space-y-2">
-                            <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Price</label>
-                            <input type="text" value={plan.price} onChange={(e) => {
-                              const newPricing = [...projectData.pricing];
-                              newPricing[idx].price = e.target.value;
-                              setProjectData({ ...projectData, pricing: newPricing });
-                            }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Price</label>
+                            <input type="text" value={plan.price} onChange={(e) => updatePricing(idx, { price: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
                           <ImageUploadField
                             label="Image (Optional)"
                             value={plan.image || ''}
-                            onChange={(url) => {
-                              const newPricing = [...projectData.pricing];
-                              newPricing[idx].image = url;
-                              setProjectData({ ...projectData, pricing: newPricing });
-                            }}
+                            onChange={(url) => updatePricing(idx, { image: url })}
                           />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Features (one per line)</label>
-                          <textarea rows={4} value={plan.features.join('\n')} onChange={(e) => {
-                            const newPricing = [...projectData.pricing];
-                            newPricing[idx].features = e.target.value.split('\n');
-                            setProjectData({ ...projectData, pricing: newPricing });
-                          }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Features (one per line)</label>
+                          <textarea rows={3} value={plan.features.join('\n')} onChange={(e) => updatePricing(idx, { features: e.target.value.split('\n') })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                         </div>
                       </div>
                     ))}
                     <button
-                      onClick={() => {
-                        const newPricing = [...projectData.pricing, {
-                          title: 'New Plan',
-                          price: '$99',
-                          features: ['Feature 1', 'Feature 2'],
-                          buttonText: 'Get Started',
-                          buttonHref: '#'
-                        }];
-                        setProjectData({ ...projectData, pricing: newPricing });
-                      }}
-                      className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2"
+                      onClick={addPricing}
+                      className="w-full py-3 rounded-none border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <i className="fa-solid fa-plus-circle"></i>
                       Add New Pricing Plan
@@ -825,45 +766,31 @@ export default function EditorPage() {
                 )}
 
                 {activeContentTab === 'faq' && (
-                  <div className="space-y-8">
+                  <div className="space-y-3">
                     {projectData.faq.map((item, idx) => (
-                      <div key={idx} className="p-6 rounded-2xl border border-gray-100 bg-gray-50/30 space-y-4 relative group">
+                      <div key={idx} className="p-4 rounded-none border border-gray-100 bg-gray-50/30 space-y-3 relative group">
                         <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-purple-500">FAQ Item #{idx + 1}</span>
+                          <span className="text-[9px] font-black uppercase tracking-widest text-purple-500">FAQ Item #{idx + 1}</span>
                           <button
-                            onClick={() => {
-                              const newFaq = projectData.faq.filter((_, i) => i !== idx);
-                              setProjectData({ ...projectData, faq: newFaq });
-                            }}
-                            className="w-8 h-8 rounded-full bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
+                            onClick={() => removeFAQ(idx)}
+                            className="absolute top-3 right-3 w-7 h-7 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100"
                           >
-                            <i className="fa-solid fa-trash-can text-xs"></i>
+                            <i className="fa-solid fa-trash-can text-[10px]"></i>
                           </button>
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Question</label>
-                          <input type="text" value={item.question} onChange={(e) => {
-                            const newFaq = [...projectData.faq];
-                            newFaq[idx].question = e.target.value;
-                            setProjectData({ ...projectData, faq: newFaq });
-                          }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Question</label>
+                          <input type="text" value={item.question} onChange={(e) => updateFAQ(idx, { question: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                         </div>
-                        <div className="space-y-2">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Answer</label>
-                          <textarea rows={3} value={item.answer} onChange={(e) => {
-                            const newFaq = [...projectData.faq];
-                            newFaq[idx].answer = e.target.value;
-                            setProjectData({ ...projectData, faq: newFaq });
-                          }} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Answer</label>
+                          <textarea rows={2} value={item.answer} onChange={(e) => updateFAQ(idx, { answer: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                         </div>
                       </div>
                     ))}
                     <button
-                      onClick={() => {
-                        const newFaq = [...projectData.faq, { question: 'New Question?', answer: 'New Answer...' }];
-                        setProjectData({ ...projectData, faq: newFaq });
-                      }}
-                      className="w-full py-4 rounded-2xl border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2"
+                      onClick={addFAQ}
+                      className="w-full py-3 rounded-none border-2 border-dashed border-gray-200 text-gray-400 font-bold hover:border-purple-300 hover:text-purple-500 hover:bg-purple-50/30 transition-all flex items-center justify-center gap-2 text-sm"
                     >
                       <i className="fa-solid fa-plus-circle"></i>
                       Add New FAQ Item
@@ -872,10 +799,10 @@ export default function EditorPage() {
                 )}
 
                 {activeContentTab === 'footer' && (
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Company Info</label>
-                      <textarea rows={4} value={projectData.footer.companyInfo} onChange={(e) => setProjectData({ ...projectData, footer: { ...projectData.footer, companyInfo: e.target.value } })} className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900" />
+                  <div className="space-y-3">
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Company Info / Disclaimer</label>
+                      <textarea rows={4} value={projectData.footer.companyInfo} onChange={(e) => updateFooter({ companyInfo: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
                   </div>
                 )}
@@ -884,7 +811,7 @@ export default function EditorPage() {
 
             {/* Footer */}
             <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3">
-              <button onClick={() => setIsContentModalOpen(false)} className="px-8 py-3 rounded-2xl bg-black text-white text-sm font-black transition-transform hover:scale-105 active:scale-95 shadow-xl shadow-gray-200">
+              <button onClick={() => setIsContentModalOpen(false)} className="px-8 py-3 rounded-none bg-black text-white text-sm font-black transition-transform hover:scale-105 active:scale-95 shadow-xl shadow-gray-200">
                 Done Editing
               </button>
             </div>
@@ -896,13 +823,13 @@ export default function EditorPage() {
       {isSEOModalOpen && (
         <div className="fixed inset-0 z-[10005] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={() => setIsSEOModalOpen(false)}></div>
-          <div className="relative bg-white w-full max-w-2xl rounded-2xl shadow-xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
+          <div className="relative bg-white w-full max-w-2xl rounded-none shadow-xl flex flex-col max-h-[90vh] animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-6 border-b border-gray-100">
               <div>
                 <h3 className="font-bold text-lg">SEO Settings</h3>
                 <p className="text-sm text-gray-500">Manage your meta tags and schema markup.</p>
               </div>
-              <button onClick={() => setIsSEOModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+              <button onClick={() => setIsSEOModalOpen(false)} className="w-8 h-8 flex items-center justify-center rounded-none hover:bg-gray-100 text-gray-500 transition-colors">
                 <i className="fa-solid fa-xmark"></i>
               </button>
             </div>
@@ -915,71 +842,71 @@ export default function EditorPage() {
             <div className="p-6 overflow-y-auto flex-1 custom-scrollbar">
 
               {seoTab === 'general' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
+                <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Meta Title</label>
-                    <input type="text" placeholder="e.g. Glycopezil - Natural Blood Support" value={projectData.seo?.title || ''} onChange={(e) => updateSEO({ title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                    <input type="text" placeholder="e.g. Glycopezil - Natural Blood Support" value={projectData.seo?.title || ''} onChange={(e) => updateSEO({ title: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Meta Description</label>
-                    <textarea rows={3} placeholder="Enter a compelling description for search engines..." value={projectData.seo?.description || ''} onChange={(e) => updateSEO({ description: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none resize-none"></textarea>
+                    <textarea rows={3} placeholder="Enter a compelling description for search engines..." value={projectData.seo?.description || ''} onChange={(e) => updateSEO({ description: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none resize-none"></textarea>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Keywords</label>
-                      <input type="text" placeholder="health, sugar, natural" value={projectData.seo?.keywords || ''} onChange={(e) => updateSEO({ keywords: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="health, sugar, natural" value={projectData.seo?.keywords || ''} onChange={(e) => updateSEO({ keywords: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Author</label>
-                      <input type="text" placeholder="Author Name" value={projectData.seo?.author || ''} onChange={(e) => updateSEO({ author: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="Author Name" value={projectData.seo?.author || ''} onChange={(e) => updateSEO({ author: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Language</label>
-                      <input type="text" placeholder="en" value={projectData.seo?.language || ''} onChange={(e) => updateSEO({ language: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="en" value={projectData.seo?.language || ''} onChange={(e) => updateSEO({ language: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Locale</label>
-                      <input type="text" placeholder="en_US" value={projectData.seo?.locale || ''} onChange={(e) => updateSEO({ locale: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="en_US" value={projectData.seo?.locale || ''} onChange={(e) => updateSEO({ locale: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Theme Color</label>
-                    <input type="color" value={projectData.seo?.themeColor || '#2C0D67'} onChange={(e) => updateSEO({ themeColor: e.target.value })} className="w-12 h-12 p-1 bg-white border border-gray-200 rounded-xl cursor-pointer" />
+                    <input type="color" value={projectData.seo?.themeColor || '#2C0D67'} onChange={(e) => updateSEO({ themeColor: e.target.value })} className="w-12 h-12 p-1 bg-white border border-gray-200 rounded-none cursor-pointer" />
                   </div>
                 </div>
               )}
 
               {seoTab === 'social' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">OG Title</label>
-                      <input type="text" placeholder="Overrides Meta Title for Socials" value={projectData.seo?.ogTitle || ''} onChange={(e) => updateSEO({ ogTitle: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="Overrides Meta Title for Socials" value={projectData.seo?.ogTitle || ''} onChange={(e) => updateSEO({ ogTitle: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
 
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mt-4 mb-1">OG Description</label>
-                      <textarea rows={3} placeholder="Overrides Meta Desc for Socials" value={projectData.seo?.ogDescription || ''} onChange={(e) => updateSEO({ ogDescription: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none resize-none"></textarea>
+                      <textarea rows={3} placeholder="Overrides Meta Desc for Socials" value={projectData.seo?.ogDescription || ''} onChange={(e) => updateSEO({ ogDescription: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none resize-none"></textarea>
 
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mt-4 mb-1">Twitter Creator</label>
-                      <input type="text" placeholder="@username" value={projectData.seo?.twitterCreator || ''} onChange={(e) => updateSEO({ twitterCreator: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="@username" value={projectData.seo?.twitterCreator || ''} onChange={(e) => updateSEO({ twitterCreator: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
 
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mt-4 mb-1">Twitter Card Type</label>
-                      <select value={projectData.seo?.twitterCard || 'summary_large_image'} onChange={(e) => updateSEO({ twitterCard: e.target.value as any })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none">
+                      <select value={projectData.seo?.twitterCard || 'summary_large_image'} onChange={(e) => updateSEO({ twitterCard: e.target.value as any })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none">
                         <option value="summary_large_image">Summary Large Image (Recommended)</option>
                         <option value="summary">Summary (Small Image)</option>
                       </select>
                     </div>
 
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-3">
                       <div>
                         <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">OG / Social Image</label>
-                        <div className="w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
+                        <div className="w-full rounded-none overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center">
                           <EditableImage src={projectData.seo?.ogImage || '/image/banner-img.webp'} onChange={(url) => updateSEO({ ogImage: url })} alt="Social Image" style={{ width: '100%', height: '140px', objectFit: 'cover' }} />
                         </div>
                         <p className="text-[10px] text-gray-400 mt-2 text-center">1200x630px strictly for FB, LinkedIn, X</p>
                       </div>
                       <div>
                         <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Favicon</label>
-                        <div className="w-full rounded-xl overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center py-2">
+                        <div className="w-full rounded-none overflow-hidden border border-gray-200 bg-gray-50 flex items-center justify-center py-2">
                           <EditableImage src={projectData.seo?.favicon || '/favicon.ico'} onChange={(url) => updateSEO({ favicon: url })} alt="Favicon Preview" style={{ width: '64px', height: '64px', objectFit: 'contain' }} />
                         </div>
                         <p className="text-[10px] text-gray-400 mt-2 text-center">64x64px square icon</p>
@@ -990,15 +917,15 @@ export default function EditorPage() {
               )}
 
               {seoTab === 'advanced' && (
-                <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-300">
-                  <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-300">
+                  <div className="grid grid-cols-2 gap-3">
                     <div>
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Canonical URL</label>
-                      <input type="text" placeholder="https://example.com" value={projectData.seo?.canonicalUrl || ''} onChange={(e) => updateSEO({ canonicalUrl: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none" />
+                      <input type="text" placeholder="https://example.com" value={projectData.seo?.canonicalUrl || ''} onChange={(e) => updateSEO({ canonicalUrl: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                     <div>
                       <label className="block text-xs font-bold text-gray-700 u                                                                                                                       ppercase tracking-wide mb-1">Robots</label>
-                      <select value={projectData.seo?.robots || 'index, follow'} onChange={(e) => updateSEO({ robots: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-black outline-none">
+                      <select value={projectData.seo?.robots || 'index, follow'} onChange={(e) => updateSEO({ robots: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none">
                         <option value="index, follow">Index, Follow</option>
                         <option value="noindex, follow">Noindex, Follow</option>
                         <option value="index, nofollow">Index, Nofollow</option>
@@ -1010,18 +937,18 @@ export default function EditorPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide">Custom Meta Tags</label>
-                      <button onClick={() => { const newTags = [...(projectData.seo?.customTags || [])]; newTags.push({ type: 'name', key: '', value: '' }); updateSEO({ customTags: newTags }); }} className="text-[10px] bg-black text-white px-3 py-1 rounded-full font-bold uppercase transition-all hover:scale-105">+ Add Tag</button>
+                      <button onClick={() => { const newTags = [...(projectData.seo?.customTags || [])]; newTags.push({ type: 'name', key: '', value: '' }); updateSEO({ customTags: newTags }); }} className="text-[10px] bg-black text-white px-3 py-1 rounded-none font-bold uppercase transition-all hover:scale-105">+ Add Tag</button>
                     </div>
                     <div className="space-y-2">
                       {(projectData.seo?.customTags || []).map((tag, idx) => (
                         <div key={idx} className="flex items-center gap-2">
-                          <select value={tag.type} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].type = e.target.value as 'name' | 'property'; updateSEO({ customTags: newTags }); }} className="w-24 px-2 py-1.5 border rounded-xl text-xs outline-none bg-gray-50">
+                          <select value={tag.type} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].type = e.target.value as 'name' | 'property'; updateSEO({ customTags: newTags }); }} className="w-24 px-2 py-1.5 border rounded-none text-xs outline-none bg-gray-50">
                             <option value="name">name</option>
                             <option value="property">property</option>
                           </select>
-                          <input type="text" placeholder="key (e.g. fb:app_id)" value={tag.key} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].key = e.target.value; updateSEO({ customTags: newTags }); }} className="flex-1 px-3 py-1.5 border rounded-xl text-xs outline-none bg-gray-50" />
-                          <input type="text" placeholder="Content" value={tag.value} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].value = e.target.value; updateSEO({ customTags: newTags }); }} className="flex-1 px-3 py-1.5 border rounded-xl text-xs outline-none bg-gray-50" />
-                          <button onClick={() => { const newTags = [...(projectData.seo?.customTags || [])]; newTags.splice(idx, 1); updateSEO({ customTags: newTags }); }} className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors"><i className="fa-solid fa-trash-can text-[10px]"></i></button>
+                          <input type="text" placeholder="key (e.g. fb:app_id)" value={tag.key} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].key = e.target.value; updateSEO({ customTags: newTags }); }} className="flex-1 px-3 py-1.5 border rounded-none text-xs outline-none bg-gray-50" />
+                          <input type="text" placeholder="Content" value={tag.value} onChange={(e) => { const newTags = [...(projectData.seo?.customTags || [])]; newTags[idx].value = e.target.value; updateSEO({ customTags: newTags }); }} className="flex-1 px-3 py-1.5 border rounded-none text-xs outline-none bg-gray-50" />
+                          <button onClick={() => { const newTags = [...(projectData.seo?.customTags || [])]; newTags.splice(idx, 1); updateSEO({ customTags: newTags }); }} className="w-7 h-7 flex items-center justify-center rounded-none bg-red-50 text-red-500 hover:bg-red-100 transition-colors"><i className="fa-solid fa-trash-can text-[10px]"></i></button>
                         </div>
                       ))}
                       {(!projectData.seo?.customTags || projectData.seo.customTags.length === 0) && (
@@ -1033,9 +960,9 @@ export default function EditorPage() {
                   <div>
                     <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 flex justify-between">
                       <span>JSON-LD Schema</span>
-                      <span className="text-[10px] bg-gray-200 text-gray-600 px-2 rounded-full">DEV</span>
+                      <span className="text-[10px] bg-gray-200 text-gray-600 px-2 rounded-none">DEV</span>
                     </label>
-                    <textarea rows={4} placeholder='{"@context": "https://schema.org", ...}' value={projectData.seo?.schema || ''} onChange={(e) => updateSEO({ schema: e.target.value })} className="w-full px-4 py-2 bg-gray-900 text-green-400 font-mono border rounded-xl text-xs outline-none resize-y"></textarea>
+                    <textarea rows={4} placeholder='{"@context": "https://schema.org", ...}' value={projectData.seo?.schema || ''} onChange={(e) => updateSEO({ schema: e.target.value })} className="w-full px-4 py-2 bg-gray-900 text-green-400 font-mono border rounded-none text-xs outline-none resize-y"></textarea>
                   </div>
                 </div>
               )}
@@ -1044,7 +971,7 @@ export default function EditorPage() {
             <div className="p-6 border-t border-gray-100 flex justify-end">
               <button
                 onClick={() => setIsSEOModalOpen(false)}
-                className="px-6 py-2.5 bg-black text-white rounded-xl font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
+                className="px-6 py-2.5 bg-black text-white rounded-none font-bold text-sm hover:scale-[1.02] active:scale-[0.98] transition-all"
               >
                 Save & Close
               </button>

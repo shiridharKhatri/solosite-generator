@@ -9,7 +9,7 @@ import { useStore } from '@/lib/store';
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => {
   return (
     <div
-      className="fixed bg-white rounded-xl border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200"
+      className="fixed bg-white rounded-none border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200"
       style={{ left: x, top: y }}
       onClick={(e) => e.stopPropagation()}
     >
@@ -23,7 +23,7 @@ const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChang
           <input
             type="text"
             placeholder="e.g. #pricing or https://..."
-            className="w-full text-xs p-2 bg-gray-50 border border-gray-100 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full text-xs p-2 bg-gray-50 border border-gray-100 rounded-none focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={link || ''}
             onChange={(e) => onChange(e.target.value)}
           />
@@ -58,7 +58,10 @@ const Linkable = ({ children, link, onLinkChange, className = "" }: { children: 
           <LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} />
         </>
       )}
-      {link && <div className="absolute -top-6 left-0 bg-blue-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50">LINK: {link}</div>}
+      <div className="absolute -top-4 -right-4 opacity-0 group-hover/link:opacity-100 transition-opacity bg-blue-500 text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
+        <i className="fa-solid fa-link text-[8px]"></i>
+      </div>
+      {link && <div className="absolute -top-8 left-0 bg-blue-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50">LINK: {link}</div>}
     </div>
   );
 };
@@ -86,7 +89,7 @@ const IconEditor = ({ value, onChange, className = "" }: { value: string; onChan
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={(e) => { e.stopPropagation(); onClick(); }}
-    className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-full flex items-center justify-center transition-all z-20 hover:scale-110 border-none"
+    className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-none flex items-center justify-center transition-all z-20 hover:scale-110 border-none"
   >
     <i className="fa-solid fa-trash-can text-[10px]"></i>
   </button>
@@ -100,14 +103,14 @@ export const GlycopezilTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter, updateProductName
+    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial
   } = useStore();
 
   // Add Item Button inside to access projectData
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
     <button
       onClick={(e) => { e.stopPropagation(); onClick(); }}
-      className="text-white text-[12px] font-bold py-2 px-5 rounded-full transition-all flex items-center gap-2 mx-auto my-8 uppercase tracking-widest border-none"
+      className="text-white text-[12px] font-bold py-2 px-5 rounded-none transition-all flex items-center gap-2 mx-auto my-8 uppercase tracking-widest border-none"
       style={{ backgroundColor: projectData?.theme?.primary || '#2C0D67' }}
     >
       <i className="fa-solid fa-plus"></i> Add {label}
@@ -409,7 +412,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <EditableImage
                   src={projectData.hero.logoImage || "https://placehold.co/100x100?text=Logo"}
                   onChange={(val) => updateHero({ logoImage: val })}
-                  className="w-full h-full rounded-lg bg-gray-50 border border-dashed border-gray-200"
+                  className="w-full h-full rounded-none bg-gray-50 border border-dashed border-gray-200"
                   style={{ objectFit: 'contain' }}
                   alt="Brand Logo"
                 />
@@ -450,13 +453,17 @@ export const GlycopezilTemplate: React.FC = () => {
                 </button>
               </Linkable>
             </div>
-
-            {/* Mobile Toggler */}
-            <button className="d-lg-none flex-column gap-1 border-none bg-transparent p-2 d-flex" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              <div className="w-8 h-1 bg-[#FF922B] rounded"></div>
-              <div className="w-8 h-1 bg-[#FF922B] rounded"></div>
-              <div className="w-8 h-1 bg-[#FF922B] rounded"></div>
-            </button>
+            <div className="d-flex align-items-center gap-2 d-lg-none">
+              <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
+                <button className="btn-custom-pill py-2 px-3 fs-6 text-nowrap" style={{ minWidth: 'auto', width: 'auto', whiteSpace: 'nowrap' }}>
+                  <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => { }} />
+                </button>
+              </Linkable>
+              {/* Mobile Toggler */}
+              <button className="border-none bg-transparent p-2 text-[#FF922B]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} fs-2`}></i>
+              </button>
+            </div>
           </div>
 
           {/* Mobile Menu */}
@@ -513,16 +520,6 @@ export const GlycopezilTemplate: React.FC = () => {
 
             {/* Content Column - Right on desktop, bottom on mobile */}
             <div className="col-12 col-lg-7 pt-3 pt-lg-4 text-dark px-3 px-lg-5 text-center text-lg-start">
-              {projectData.hero.badgeText && (
-                <div className="mb-4">
-                  <span className="bg-[#FF922B] text-white px-4 py-2 rounded-full fw-bold text-[13px] uppercase tracking-wider shadow-sm">
-                    <EditableText
-                      value={projectData.hero.badgeText}
-                      onChange={(val) => updateHero({ badgeText: val })}
-                    />
-                  </span>
-                </div>
-              )}
               <EditableText
                 tagName="h1"
                 value={projectData.hero.title}
@@ -608,30 +605,33 @@ export const GlycopezilTemplate: React.FC = () => {
         />
       </section>
 
-      <section className="container-fluid sectioncolor1 py-5">
-        <div className="container py-2">
-          <div className="row g-5">
-            {/* Text Section */}
-            <div className="col-12">
+      <section className="container-fluid sectioncolor1 py-4 border-bottom">
+        <div className="container">
+          <div className="clearfix">
+            {/* Image Section - Floated Right for Newspaper Style */}
+            <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
+              <div className="relative inline-block p-3 bg-white rounded-none shadow-md border border-gray-100 transition-transform hover:scale-[1.01] duration-300 w-full">
+                <EditableImage
+                  src={projectData.about.image || '/image/banner-img.webp'}
+                  onChange={(val) => updateAbout({ image: val })}
+                  className="rounded-none img-fluid w-full"
+                  style={{ maxHeight: '380px', objectFit: 'contain' }}
+                />
+                <div className="mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] border-top pt-2">
+                  Editorial: Clinical Formula Composition
+                </div>
+              </div>
+            </div>
+
+            {/* Text Section - Wrapped around image */}
+            <div className="about-description-wrapper">
               <EditableText
                 tagName="div"
                 value={projectData.about.description}
                 onChange={(val) => updateAbout({ description: val })}
                 className="fs-5 text-secondary about-description"
-                style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.8' }}
+                style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.7', color: '#444' }}
               />
-            </div>
-
-            {/* Image Section */}
-            <div className="col-12 text-center mt-4">
-              <div className="relative inline-block">
-                <EditableImage
-                  src={projectData.about.image || '/image/banner-img.webp'}
-                  onChange={(val) => updateAbout({ image: val })}
-                  className="rounded-3 img-fluid border"
-                  style={{ maxHeight: '250px', objectFit: 'contain' }}
-                />
-              </div>
             </div>
           </div>
         </div>
@@ -694,23 +694,24 @@ export const GlycopezilTemplate: React.FC = () => {
       <section className="container-fluid py-5 bg-white">
         <div className="container bg-white border ing p-4 p-lg-5 mx-auto">
           <div className="row align-items-center g-5">
-            <div className="col-lg-5 text-center">
+            <div className="col-lg-4 text-center">
               <EditableImage
                 src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
                 onChange={(val) => updateFooter({ trustImage: val })}
-                className="img-fluid gurentybadge mb-3 mx-auto"
+                className="img-fluid mb-3 mx-auto"
+                style={{ maxWidth: '300px' }}
               />
               <EditableText
                 tagName="p"
-                className="fs-5 fw-semibold text-success mt-3"
+                className="fs-6 fw-semibold text-success mt-2"
                 value={projectData.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}
                 onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })}
               />
             </div>
-            <div className="col-lg-7">
+            <div className="col-lg-8">
               <EditableText
                 tagName="h3"
-                className="fs-3 fw-bold mb-3"
+                className="fs-2 fw-bold mb-3"
                 value={projectData.guaranteeHeadline || "Full 60-Day Refund Assurance"}
                 onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })}
               />
@@ -722,7 +723,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
               />
               <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
-                <button className="btn-custom-pill mt-4 px-8 py-3 fs-4 w-full md:w-auto">
+                <button className="btn-custom-pill mt-4 px-8 py-3 fs-5 w-full md:w-auto">
                   Grab Your Risk-Free Package
                   <IconEditor value="fa-solid fa-cart-arrow-down" onChange={() => { }} />
                 </button>
@@ -750,7 +751,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="card h-100 border-0 shadow-sm bg-white hover:-translate-y-2 transition-all duration-300 rounded-[2.5rem] p-4 group">
                   <div className="relative">
                     <RemoveButton onClick={() => removeIngredient(i)} />
-                    <div className="w-40 h-40 rounded-full overflow-hidden border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner" style={{ borderColor: '#fcfcfc', outline: `2px solid ${projectData.theme?.secondary || '#fbbf24'}` }}>
+                    <div className="w-40 h-40 rounded-none overflow-hidden border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner" style={{ borderColor: '#fcfcfc', outline: `2px solid ${projectData.theme?.secondary || '#fbbf24'}` }}>
                       <EditableImage
                         src={item.image || '/image/ingredient-schisandra.png'}
                         onChange={(val) => updateIngredient(i, { image: val })}
@@ -808,12 +809,12 @@ export const GlycopezilTemplate: React.FC = () => {
               {projectData.testimonials.items.map((item, i) => (
                 <div key={i} className="col-12 col-md-6 col-lg-4">
                   <div className="card h-100 border-0 shadow-sm bg-white rounded-[2rem] p-4 group relative overflow-hidden">
-                    <RemoveButton onClick={() => useStore.getState().removeTestimonial(i)} />
+                    <RemoveButton onClick={() => removeTestimonial(i)} />
                     <div className="d-flex align-items-center gap-3 mb-4">
-                      <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-warning">
+                      <div className="w-16 h-16 rounded-none overflow-hidden border-2 border-warning shadow-sm">
                         <EditableImage
                           src={item.image || "https://i.pravatar.cc/150"}
-                          onChange={(val) => useStore.getState().updateTestimonials(i, { image: val })}
+                          onChange={(val) => updateTestimonials(i, { image: val })}
                           className="w-full h-full object-cover"
                         />
                       </div>
@@ -822,13 +823,13 @@ export const GlycopezilTemplate: React.FC = () => {
                           tagName="h4"
                           className="fw-bold mb-0 text-dark"
                           value={item.name}
-                          onChange={(val) => useStore.getState().updateTestimonials(i, { name: val })}
+                          onChange={(val) => updateTestimonials(i, { name: val })}
                         />
                         <EditableText
                           tagName="span"
                           className="text-muted small"
                           value={item.role || "Verified Buyer"}
-                          onChange={(val) => useStore.getState().updateTestimonials(i, { role: val })}
+                          onChange={(val) => updateTestimonials(i, { role: val })}
                         />
                       </div>
                     </div>
@@ -838,24 +839,27 @@ export const GlycopezilTemplate: React.FC = () => {
                         <i
                           key={starIndex}
                           className={`fa-solid fa-star ${starIndex < item.rating ? '' : 'opacity-30'}`}
-                          onClick={() => useStore.getState().updateTestimonials(i, { rating: starIndex + 1 })}
+                          onClick={() => updateTestimonials(i, { rating: starIndex + 1 })}
                         ></i>
                       ))}
                     </div>
 
-                    <EditableText
-                      tagName="p"
-                      className="fs-6 text-dark leading-relaxed font-medium italic"
-                      value={`"\${item.content}"`}
-                      onChange={(val) => useStore.getState().updateTestimonials(i, { content: val.replace(/"/g, '') })}
-                    />
+                    <div className="relative">
+                      <i className="fa-solid fa-quote-left absolute -top-2 -left-2 opacity-10 text-4xl"></i>
+                      <EditableText
+                        tagName="p"
+                        className="fs-6 text-dark leading-relaxed font-medium italic relative z-10"
+                        value={item.content}
+                        onChange={(val) => updateTestimonials(i, { content: val })}
+                      />
+                    </div>
                   </div>
                 </div>
               ))}
             </div>
 
             <div className="mt-5 text-center">
-              <AddButton onClick={() => useStore.getState().addTestimonial()} label="Testimonial" />
+              <AddButton onClick={addTestimonial} label="Testimonial" />
             </div>
           </div>
         </section>
@@ -887,7 +891,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 >
                   {plan.isPrimary && (
                     <div
-                      className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-full fw-bold text-xs"
+                      className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-none fw-bold text-xs"
                       style={{ backgroundColor: projectData.theme?.secondary, color: '#000' }}
                     >
                       BEST VALUE BUNDLE
@@ -903,16 +907,28 @@ export const GlycopezilTemplate: React.FC = () => {
 
                     <div className="mb-2">
                       <EditableText
-                        className="fs-6 fw-black text-purple-600 bg-purple-50 px-3 py-1 rounded-full d-inline-block"
+                        className="fs-6 fw-black text-purple-600 bg-purple-50 px-3 py-1 rounded-none d-inline-block"
                         value={plan.quantity || "1 Bottle"}
                         onChange={(val) => updatePricing(i, { quantity: val })}
                       />
                     </div>
 
                     <div className="mb-3 relative group mx-auto" style={{ width: '180px' }}>
+                      {/* Premium Quantity Multiplier Badge */}
+                      <div className="absolute -top-2 -right-2 z-20 pointer-events-auto">
+                        <div className="relative group/badge">
+                          <div className="absolute inset-0 bg-black/20 translate-x-1 translate-y-1" />
+                          <EditableText
+                            className="relative bg-[#2C0D67] text-white px-3 py-1 rounded-none flex items-center justify-center fw-black text-xs border border-white shadow-xl min-w-[40px]"
+                            value={plan.multiplier || "X1"}
+                            onChange={(val) => updatePricing(i, { multiplier: val })}
+                          />
+                        </div>
+                      </div>
+
                       <EditableImage
-                        src={plan.image || '/image/bottle-6.webp'}
-                        className="mx-auto"
+                        src={plan.image || '/image/bottle-snap.webp'}
+                        className="mx-auto transition-transform group-hover:scale-105 duration-500"
                         style={{ height: '160px', objectFit: 'contain' }}
                         onChange={(val) => updatePricing(i, { image: val })}
                       />
@@ -1069,7 +1085,7 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Scroll Button */}
       <button
-        className="position-fixed bottom-4 right-4 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center text-black z-50 border-none transition-transform hover:-translate-y-2 border-2 border-black"
+        className="position-fixed bottom-4 right-4 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-none flex items-center justify-center text-black z-50 border-none transition-transform hover:-translate-y-2 border-2 border-black"
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
         <i className="fa-solid fa-arrow-up fs-4"></i>

@@ -66,3 +66,12 @@ h1, h2, h3, h4, .font-headline {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 }
 
+/* Force Bootstrap breakpoints behavior inside mobile-preview */
+.mobile-preview .d-lg-flex { display: none !important; }
+.mobile-preview .d-lg-block { display: none !important; }
+.mobile-preview .d-lg-inline-flex { display: none !important; }
+.mobile-preview .d-lg-inline-block { display: none !important; }
+
+.mobile-preview .d-flex.d-lg-none { display: flex !important; }
+.mobile-preview .d-lg-none:not(.d-flex) { display: block !important; }
+
