@@ -45,21 +45,7 @@ export const authOptions: NextAuthOptions = {
         // Find user by email
         const user = await UserModel.findOne({ email: credentials.email }).select("+password");
 
-        if (!user) {
-          // First time setup: Initialize root admin if database is empty
-          const adminCount = await UserModel.countDocuments({ role: 'admin' });
-          if (adminCount === 0 && credentials.email === 'lycoris@admin.com') {
-            const hashedPassword = await bcrypt.hash(credentials.password, 10);
-            const newAdmin = await UserModel.create({
-              name: 'Lycoris Admin',
-              email: credentials.email,
-              password: hashedPassword,
-              role: 'admin'
-            });
-            return { id: newAdmin._id.toString(), name: newAdmin.name, email: newAdmin.email, role: newAdmin.role };
-          }
-          return null;
-        }
+        if (!user) return null;
 
         const isPasswordMatch = await bcrypt.compare(credentials.password, user.password);
         if (isPasswordMatch) {
@@ -74,7 +60,7 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
-  secret: process.env.NEXTAUTH_SECRET || "fallback-secret-for-dev-only-123",
+  secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
