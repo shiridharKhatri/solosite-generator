@@ -18,7 +18,7 @@ export const EditableButton: React.FC<EditableButtonProps> = ({
   return (
     <div className="relative group inline-block">
       <button
-        className={`px-6 py-2 rounded-full font-semibold transition-all ${className}`}
+        className={`px-6 py-2 rounded-md font-semibold transition-all ${className}`}
         onClick={onClick}
       >
         <span

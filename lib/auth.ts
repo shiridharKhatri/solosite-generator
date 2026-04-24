@@ -48,10 +48,10 @@ export const authOptions: NextAuthOptions = {
         if (!user) {
           // First time setup: Initialize root admin if database is empty
           const adminCount = await UserModel.countDocuments({ role: 'admin' });
-          if (adminCount === 0 && credentials.email === 'admin@admin.com') {
+          if (adminCount === 0 && credentials.email === 'lycoris@admin.com') {
             const hashedPassword = await bcrypt.hash(credentials.password, 10);
             const newAdmin = await UserModel.create({
-              name: 'Admin User',
+              name: 'Lycoris Admin',
               email: credentials.email,
               password: hashedPassword,
               role: 'admin'

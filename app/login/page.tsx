@@ -25,7 +25,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#fafafa] flex items-center justify-center p-6 font-body">
-      <div className="w-full max-w-md bg-white rounded-[2.5rem] p-10 shadow-2xl shadow-zinc-200/50 border border-zinc-100 flex flex-col gap-8">
+      <div className="w-full max-w-md bg-white rounded-md p-10 shadow-2xl shadow-zinc-200/50 border border-zinc-100 flex flex-col gap-8">
         <div className="text-center space-y-2">
           <h1 className="text-4xl font-headline font-extrabold tracking-tighter text-zinc-900 leading-none">SoloSite</h1>
           <p className="text-zinc-500 font-body text-sm">Enter your credentials to continue the journey.</p>
@@ -38,7 +38,7 @@ export default function LoginPage() {
               <input
                 type="email"
                 required
-                className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-zinc-900 font-medium transition-all outline-none"
+                className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-zinc-900 font-medium transition-all outline-none"
                 placeholder="admin@admin.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -49,7 +49,7 @@ export default function LoginPage() {
               <input
                 type="password"
                 required
-                className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-2xl focus:ring-2 focus:ring-primary/20 text-zinc-900 font-medium transition-all outline-none"
+                className="w-full px-5 py-3.5 bg-zinc-50 border-none rounded-lg focus:ring-2 focus:ring-primary/20 text-zinc-900 font-medium transition-all outline-none"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -59,7 +59,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dim text-white font-bold py-4 rounded-full transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
+            className="w-full bg-primary hover:bg-primary-dim text-white font-bold py-4 rounded-md transition-all active:scale-[0.98] shadow-lg shadow-primary/20"
           >
             Sign In
           </button>
@@ -67,9 +67,7 @@ export default function LoginPage() {
 
         
 
-        <p className="text-center text-[11px] text-zinc-400">
-          Setup Default: <span className="text-zinc-600 font-bold">admin@admin.com</span> / <span className="text-zinc-600 font-bold">admin</span>
-        </p>
+
       </div>
     </div>
   );

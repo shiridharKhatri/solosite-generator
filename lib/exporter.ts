@@ -325,7 +325,7 @@ ${seoBlock}
         <div class="container"><div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
             <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
-                ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-full fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
+                ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-md fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase">${plan.title}</h3>
                 <div class="position-relative mx-auto mb-3" style="width: 160px;">
                     <div class="position-absolute top-0 end-0" style="z-index: 2; transform: translate(10%, -10%);">
@@ -507,8 +507,8 @@ ${seoBlock}
                 <div class="col-12 col-lg-7 text-center text-lg-start">
                     <div class="mb-3">
                         ${data.hero?.badgeText ? `
-                        <span class="px-4 py-1.5 rounded-full text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ ${data.hero.badgeText}</span>
-                        ` : `<span class="px-4 py-1.5 rounded-full text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ Premium Support Formula</span>`}
+                        <span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ ${data.hero.badgeText}</span>
+                        ` : `<span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ Premium Support Formula</span>`}
                     </div>
                     <h1 class="fw-bold mb-4 gradient-text" style="font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1;">${data.hero?.title}</h1>
                     <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; max-width: 550px; font-size: 0.95rem; white-space: pre-line;">${data.hero?.subtitle}</p>
@@ -597,7 +597,7 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="glass-card p-4 h-100">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-full overflow-hidden border border-white/10">
+                            <div class="w-12 h-12 rounded-md overflow-hidden border border-white/10">
                                 <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div>
@@ -631,7 +631,7 @@ ${seoBlock}
             <div class="row g-4 justify-content-center">
                 ${(data.pricing || []).map((plan: any) => `
                 <div class="col-12 col-md-6 col-lg-4"><div class="glass-card p-4 h-100 text-center" style="${plan.isPrimary ? `border: 2px solid ${secondaryColor}; transform: scale(1.03);` : ''}">
-                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-full text-uppercase fw-bold" style="background: ${secondaryColor}; color: ${primaryColor}; font-size: 10px;">Best Value</span></div>` : ''}
+                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: ${primaryColor}; font-size: 10px;">Best Value</span></div>` : ''}
                     <h4 class="fw-bold mb-2 text-uppercase text-white" style="font-size: 0.95rem; letter-spacing: 2px;">${plan.title}</h4>
                     <img src="${plan.image}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
                     <div class="fw-bold mb-3" style="color: ${secondaryColor}; font-size: 2rem;">${plan.price}</div>
@@ -1063,7 +1063,7 @@ ${seoBlock}
             <div class="row g-4 justify-content-center">
                 ${(data.pricing || []).map((plan: any) => `
                 <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}" style="${plan.isPrimary ? 'transform: scale(1.05); z-index: 10;' : ''}">
-                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-full text-uppercase fw-bold" style="background: ${secondaryColor}; color: white; font-size: 10px;">Best Choice</span></div>` : ''}
+                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: white; font-size: 10px;">Best Choice</span></div>` : ''}
                     <h4 class="fw-bold mb-2 font-serif text-uppercase" style="color: ${primaryColor}">${plan.title}</h4>
                     <img src="${plan.image}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
                     <div class="fw-bold mb-3 font-serif fs-2" style="color: ${primaryColor}">${plan.price}</div>

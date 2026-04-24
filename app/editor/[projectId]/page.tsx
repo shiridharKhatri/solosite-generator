@@ -416,7 +416,7 @@ export default function EditorPage() {
 
       <main className="flex-1 overflow-auto bg-gray-100 pt-20 px-8 pb-12 custom-scrollbar">
         <div
-          className={`mx-auto bg-white rounded-[2.5rem] border border-gray-100 transition-all duration-500 ease-in-out relative ${viewport === 'mobile' ? 'max-w-[450px] mobile-preview shadow-2xl' : 'max-w-[1400px]'}`}
+          className={`mx-auto bg-white rounded-md border border-gray-100 transition-all duration-500 ease-in-out relative ${viewport === 'mobile' ? 'max-w-[450px] mobile-preview shadow-2xl' : 'max-w-[1400px]'}`}
           style={{ transform: 'translate(0, 0)', height: 'fit-content', overflow: 'hidden' }}
         >
           {renderActiveTemplate()}

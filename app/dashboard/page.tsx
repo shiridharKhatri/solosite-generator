@@ -68,22 +68,22 @@ function DashboardContent() {
             <p className="text-zinc-500 font-body text-lg max-w-md">Continue building your digital experiences or start a new architectural journey.</p>
           </div>
           <div className="flex gap-3">
-            <div className="flex bg-white rounded-full p-1 border border-zinc-200">
+            <div className="flex bg-white rounded-md p-1 border border-zinc-200">
               <button
                 onClick={() => router.push('/dashboard')}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${!filterStatus ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${!filterStatus ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
               >
                 All
               </button>
               <button
                 onClick={() => router.push('/dashboard?status=published')}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${filterStatus === 'published' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'published' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
               >
                 Published
               </button>
               <button
                 onClick={() => router.push('/dashboard?status=draft')}
-                className={`px-6 py-2 rounded-full text-sm font-bold transition-all ${filterStatus === 'draft' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'draft' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
               >
                 Drafts
               </button>
@@ -93,18 +93,18 @@ function DashboardContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {projects.map((project) => (
-            <div key={project._id} className="group relative flex flex-col bg-white rounded-[1.5rem] overflow-hidden transition-all duration-300 card-shadow hover-card-shadow border border-zinc-100/50">
+            <div key={project._id} className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-300 card-shadow hover-card-shadow border border-zinc-100/50">
               <div className="aspect-[16/10] overflow-hidden relative bg-zinc-50">
                 <div className="w-full h-full flex items-center justify-center text-zinc-200">
                   <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                 </div>
                 <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href={`/editor/${project._id}`} className="w-12 h-12 rounded-full bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/20">
+                  <Link href={`/editor/${project._id}`} className="w-12 h-12 rounded-md bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/20">
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
                   </Link>
                   <button
                     onClick={() => deleteProject(project._id)}
-                    className="w-12 h-12 rounded-full bg-white text-rose-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-zinc-200/50"
+                    className="w-12 h-12 rounded-md bg-white text-rose-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-zinc-200/50"
                   >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                   </button>
@@ -125,8 +125,8 @@ function DashboardContent() {
             </div>
           ))}
 
-          <Link href="/editor/new" className="group relative flex flex-col border-2 border-dashed border-zinc-200 rounded-[1.5rem] aspect-[16/10] items-center justify-center hover:border-primary/50 hover:bg-zinc-50 transition-all duration-300 cursor-pointer">
-            <div className="w-16 h-16 rounded-full bg-zinc-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+          <Link href="/editor/new" className="group relative flex flex-col border-2 border-dashed border-zinc-200 rounded-lg aspect-[16/10] items-center justify-center hover:border-primary/50 hover:bg-zinc-50 transition-all duration-300 cursor-pointer">
+            <div className="w-16 h-16 rounded-md bg-zinc-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
               <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             </div>
             <p className="font-headline text-lg font-bold text-zinc-900">Create New Page</p>

@@ -25,7 +25,7 @@ export default function TemplatesPage() {
             </div>
             <div className="flex flex-wrap gap-3 justify-start lg:justify-end pb-2">
               {['ALL TEMPLATES', 'SAAS', 'PORTFOLIO', 'E-COMMERCE', 'EDITORIAL'].map(cat => (
-                <button key={cat} className="px-6 py-2 rounded-full bg-white text-on-surface font-label text-sm font-bold shadow-sm border border-outline hover:bg-primary hover:text-white transition-all">
+                <button key={cat} className="px-6 py-2 rounded-md bg-white text-on-surface font-label text-sm font-bold shadow-sm border border-outline hover:bg-primary hover:text-white transition-all">
                   {cat}
                 </button>
               ))}
@@ -35,10 +35,10 @@ export default function TemplatesPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-8">
           {['ALL TEMPLATES', 'E-COMMERCE'].includes(activeFilter) && (
-          <div className="group relative overflow-hidden rounded-xl bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=default'}>
+          <div className="group relative overflow-hidden rounded-md bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=default'}>
             <div className="aspect-[16/9] w-full relative bg-zinc-50 flex items-center justify-center border-b border-zinc-100 p-8">
-              <div className="w-full h-full bg-white shadow-sm border border-zinc-200 rounded-lg flex flex-col">
-                <div className="h-12 border-b flex items-center px-4"><div className="w-8 h-8 rounded-full bg-blue-100"></div><div className="ml-auto w-24 h-8 bg-blue-600 rounded-full"></div></div>
+              <div className="w-full h-full bg-white shadow-sm border border-zinc-200 rounded-md flex flex-col">
+                <div className="h-12 border-b flex items-center px-4"><div className="w-8 h-8 rounded-full bg-blue-100"></div><div className="ml-auto w-24 h-8 bg-blue-600 rounded-md"></div></div>
                 <div className="flex-1 flex flex-col items-center justify-center p-4">
                   <h1 className="text-3xl font-bold mb-2">Glycopezil Core</h1>
                   <p className="text-sm text-zinc-400">High-converting default layout</p>
@@ -50,16 +50,16 @@ export default function TemplatesPage() {
                 <h3 className="font-headline text-2xl font-bold mb-1">Glycopezil Core</h3>
                 <p className="text-zinc-500">The battle-tested supplement sales page layout.</p>
               </div>
-              <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-full text-xs font-bold">DEFAULT</span>
+              <span className="bg-primary/10 text-primary px-4 py-1.5 rounded-md text-xs font-bold">DEFAULT</span>
             </div>
           </div>
 
           )}
           {['ALL TEMPLATES', 'SAAS'].includes(activeFilter) && (
-          <div className="group relative overflow-hidden rounded-xl bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=modern'}>
+          <div className="group relative overflow-hidden rounded-md bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=modern'}>
             <div className="aspect-[16/9] w-full relative bg-zinc-900 flex items-center justify-center border-b border-zinc-800 p-8">
-              <div className="w-full h-full bg-black shadow-lg border border-zinc-800 rounded-lg flex flex-col text-white">
-                <div className="h-12 border-b border-zinc-800 flex items-center px-4"><div className="w-8 h-8 rounded-md bg-zinc-800"></div><div className="ml-auto w-24 h-8 bg-white text-black rounded-full text-xs flex items-center justify-center">Start</div></div>
+              <div className="w-full h-full bg-black shadow-lg border border-zinc-800 rounded-md flex flex-col text-white">
+                <div className="h-12 border-b border-zinc-800 flex items-center px-4"><div className="w-8 h-8 rounded-full bg-zinc-800"></div><div className="ml-auto w-24 h-8 bg-white text-black rounded-md text-xs flex items-center justify-center">Start</div></div>
                 <div className="flex-1 flex flex-col items-center justify-center p-4">
                   <h1 className="text-3xl font-bold mb-2">Modern Minimal</h1>
                   <p className="text-sm text-zinc-500">Dark mode premium aesthetic</p>
@@ -76,9 +76,9 @@ export default function TemplatesPage() {
 
           )}
           {['ALL TEMPLATES', 'EDITORIAL'].includes(activeFilter) && (
-          <div className="group relative overflow-hidden rounded-xl bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=clinical'}>
+          <div className="group relative overflow-hidden rounded-md bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=clinical'}>
             <div className="aspect-[16/9] w-full relative bg-blue-50 flex items-center justify-center border-b border-blue-100 p-8">
-              <div className="w-full h-full bg-white shadow-sm border border-blue-100 rounded-lg flex flex-col">
+              <div className="w-full h-full bg-white shadow-sm border border-blue-100 rounded-md flex flex-col">
                 <div className="h-12 border-b border-blue-50 flex items-center px-4"><div className="text-blue-600 font-bold">LOGO</div><div className="ml-auto w-24 h-8 bg-blue-600 rounded-md"></div></div>
                 <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
                   <h1 className="text-2xl font-bold text-blue-900 mb-2">Clinical Science</h1>
@@ -96,10 +96,10 @@ export default function TemplatesPage() {
 
           )}
           {['ALL TEMPLATES', 'E-COMMERCE'].includes(activeFilter) && (
-          <div className="group relative overflow-hidden rounded-xl bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=organic'}>
+          <div className="group relative overflow-hidden rounded-md bg-white transition-all hover:shadow-2xl border border-zinc-100 flex flex-col cursor-pointer" onClick={() => window.location.href = '/editor/new?layout=organic'}>
             <div className="aspect-[16/9] w-full relative bg-[#F0EBE1] flex items-center justify-center border-b border-[#E6D5C3] p-8">
-              <div className="w-full h-full bg-[#FAF6ED] shadow-sm border border-[#E6D5C3] rounded-lg flex flex-col">
-                <div className="h-12 flex items-center px-4"><div className="w-6 h-6 rounded-full bg-green-800"></div><div className="ml-auto w-24 h-8 bg-amber-600 rounded-full"></div></div>
+              <div className="w-full h-full bg-[#FAF6ED] shadow-sm border border-[#E6D5C3] rounded-md flex flex-col">
+                <div className="h-12 flex items-center px-4"><div className="w-6 h-6 rounded-full bg-green-800"></div><div className="ml-auto w-24 h-8 bg-amber-600 rounded-md"></div></div>
                 <div className="flex-1 flex flex-col items-center justify-center p-4 text-center">
                   <h1 className="text-2xl font-serif text-[#4A3320] mb-2">Earth Organic</h1>
                   <p className="text-sm text-[#6A5949]">Natural, holistic layout</p>

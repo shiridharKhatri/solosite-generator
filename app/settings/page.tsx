@@ -13,11 +13,11 @@ export default function SettingsPage() {
       <main className="pt-16 pb-20 px-8 max-w-screen-2xl mx-auto flex flex-col md:flex-row gap-16 font-body">
         
         <aside className="hidden md:flex flex-col w-64 sticky top-32 h-fit gap-y-2">
-           <button className="w-full flex items-center gap-3 px-4 py-3 text-zinc-900 font-semibold bg-white rounded-xl shadow-sm border border-zinc-100">
+           <button className="w-full flex items-center gap-3 px-4 py-3 text-zinc-900 font-semibold bg-white rounded-md shadow-sm border border-zinc-100">
              <svg className="w-5 h-5 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
              Profile
            </button>
-           <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-all">
+           <button onClick={() => signOut()} className="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 rounded-md transition-all">
              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
              Sign Out
            </button>
@@ -30,11 +30,11 @@ export default function SettingsPage() {
               <p className="text-zinc-500 text-lg max-w-2xl">Manage your editorial profile and subscription details.</p>
            </header>
 
-           <div className="bg-white rounded-xl p-10 shadow-sm border border-zinc-100">
+           <div className="bg-white rounded-md p-10 shadow-sm border border-zinc-100">
               <h2 className="text-2xl font-bold text-zinc-900 mb-8 font-headline tracking-tighter uppercase">Profile Identity</h2>
               <div className="flex items-start gap-12">
                  <div className="relative group cursor-pointer w-32 h-32 flex-shrink-0">
-                    <div className="w-full h-full rounded-xl bg-zinc-100 border border-zinc-200 flex items-center justify-center text-4xl shadow-lg group-hover:bg-zinc-200 transition-all">
+                    <div className="w-full h-full rounded-md bg-zinc-100 border border-zinc-200 flex items-center justify-center text-4xl shadow-lg group-hover:bg-zinc-200 transition-all">
                        {session?.user?.name?.[0] || 'U'}
                     </div>
                  </div>
@@ -50,11 +50,11 @@ export default function SettingsPage() {
                  </div>
               </div>
               <div className="mt-10 flex justify-end">
-                 <button className="bg-primary text-white px-8 py-3 rounded-full font-bold shadow-lg shadow-primary/20 hover:bg-primary-dim transition-all active:scale-95">Save Changes</button>
+                 <button className="bg-primary text-white px-8 py-3 rounded-md font-bold shadow-lg shadow-primary/20 hover:bg-primary-dim transition-all active:scale-95">Save Changes</button>
               </div>
            </div>
 
-           <div className="bg-white rounded-xl p-10 shadow-sm border border-zinc-100 mt-8">
+           <div className="bg-white rounded-md p-10 shadow-sm border border-zinc-100 mt-8">
               <h2 className="text-2xl font-bold text-zinc-900 mb-2 font-headline tracking-tighter uppercase">Admin Management</h2>
               <p className="text-zinc-500 mb-8 font-body">Create new administrator accounts. Only current admins can perform this action.</p>
               
@@ -89,7 +89,7 @@ export default function SettingsPage() {
                     </div>
                  </div>
                  <div className="mt-6 flex justify-end">
-                    <button type="submit" className="bg-zinc-900 text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-zinc-800 transition-all active:scale-95">Create Admin</button>
+                    <button type="submit" className="bg-zinc-900 text-white px-8 py-3 rounded-md font-bold shadow-lg hover:bg-zinc-800 transition-all active:scale-95">Create Admin</button>
                  </div>
               </form>
            </div>
