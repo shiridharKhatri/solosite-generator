@@ -35,13 +35,29 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         method: 'POST',
         body: formData,
       });
-      const data = await res.json();
-      if (data.url) {
-        onChange(data.url);
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          onChange(data.url);
+          return;
+        }
       }
+
+      // Fallback to DataURL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error('Failed to upload image', error);
-      alert('Upload failed. Ensure the server has write permissions for the uploads folder.');
+      // Fallback to DataURL even on network error
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        onChange(reader.result as string);
+      };
+      reader.readAsDataURL(file);
     }
   };
 

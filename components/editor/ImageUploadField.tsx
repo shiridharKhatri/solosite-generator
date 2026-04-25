@@ -19,11 +19,33 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      const data = await res.json();
-      if (data.url) onChange(data.url);
+      
+      if (res.ok) {
+        const data = await res.json();
+        if (data.url) {
+          onChange(data.url);
+          return;
+        }
+      }
+      
+      // Fallback: Convert to DataURL if upload fails (e.g. read-only filesystem)
+      console.warn('Server upload failed, falling back to DataURL');
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        onChange(base64String);
+      };
+      reader.readAsDataURL(file);
+      
     } catch (error) {
       console.error('Failed to upload image', error);
-      alert('Upload failed. The server might be read-only or the file is too large.');
+      // Even on error, try the DataURL fallback
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        onChange(base64String);
+      };
+      reader.readAsDataURL(file);
     } finally {
       setIsUploading(false);
     }

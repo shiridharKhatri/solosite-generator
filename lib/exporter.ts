@@ -1369,6 +1369,9 @@ ${seoBlock}
     if (data.pricing) data.pricing.forEach((p: any) => { if (p.image) imageSources.add(p.image); });
     if (data.logos) data.logos.forEach((l: string) => { if (l) imageSources.add(l); });
     if (data.footer?.trustImage) imageSources.add(data.footer.trustImage);
+    if (data.testimonials?.items) data.testimonials.items.forEach((t: any) => { if (t.image) imageSources.add(t.image); });
+    if (data.gallery?.images) data.gallery.images.forEach((img: string) => { if (img) imageSources.add(img); });
+    if (data.research?.image) imageSources.add(data.research.image);
     if (data.seo?.ogImage) imageSources.add(data.seo.ogImage);
     if (data.seo?.twitterImage) imageSources.add(data.seo.twitterImage);
     if (data.seo?.favicon) imageSources.add(data.seo.favicon);
@@ -1378,7 +1381,37 @@ ${seoBlock}
 
     for (const imgSrc of sourcesArray) {
         try {
-            if (!imgSrc || imgSrc.startsWith('data:') || imgSrc.startsWith('blob:')) continue;
+            if (!imgSrc) continue;
+
+            // Handle DataURLs (Base64)
+            if (imgSrc.startsWith('data:')) {
+                const parts = imgSrc.split(',');
+                if (parts.length < 2) continue;
+                const base64Data = parts[1];
+                const mimeType = parts[0].split(':')[1].split(';')[0];
+                let extension = mimeType.split('/')[1] || 'png';
+                if (extension === 'jpeg') extension = 'jpg';
+                
+                const filename = `uploaded_image_${imageIndex}.${extension}`;
+                
+                // Convert base64 to Uint8Array for JSZip
+                const binaryString = window.atob(base64Data);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i);
+                }
+                
+                imagesFolder?.file(filename, bytes);
+                
+                const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                const regex = new RegExp(escapedSrc, "g");
+                rawHtml = rawHtml.replace(regex, `images/${filename}`);
+                rawCss = rawCss.replace(regex, `../images/${filename}`);
+                imageIndex++;
+                continue;
+            }
+
+            if (imgSrc.startsWith('blob:')) continue;
 
             let fetchUrl = imgSrc;
             if (imgSrc.startsWith('//')) {
