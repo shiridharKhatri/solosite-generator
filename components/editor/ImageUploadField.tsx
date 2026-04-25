@@ -21,8 +21,9 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
       const data = await res.json();
       if (data.url) onChange(data.url);
-    } catch (err) {
-      console.error('Upload failed', err);
+    } catch (error) {
+      console.error('Failed to upload image', error);
+      alert('Upload failed. The server might be read-only or the file is too large.');
     } finally {
       setIsUploading(false);
     }

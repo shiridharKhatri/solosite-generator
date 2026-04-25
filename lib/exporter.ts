@@ -59,6 +59,8 @@ export async function generateProjectZip(data: any) {
 
     const alternates = seo.alternates || [];
 
+    const defaultGuaranteeDescription = `Your happiness is our highest priority. Every order of ${data.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`;
+
     // Auto-generate schema if not provided
     let schemaJSON = seo.schema || '';
     if (!schemaJSON) {
@@ -223,9 +225,7 @@ ${seoBlock}
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
-                        <a href="#features" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">Features</a>
-                        <a href="#about" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">About</a>
-                        <a href="#pricing" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">Pricing</a>
+                        ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
                         <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; white-space: nowrap;">${data.hero?.buttonText || 'Order Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
                     </div>
                 </div>
@@ -300,6 +300,49 @@ ${seoBlock}
             </div>
         </div>
     </section>
+ 
+    ${data.research ? `
+    <section id="research" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.research.title}</h2></section>
+    <section class="container-fluid py-5 sectioncolor1 border-bottom">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6 text-center text-lg-start">
+                    <h3 class="fw-bold mb-3 fs-2">${data.research.subtitle}</h3>
+                    <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${data.research.description}</p>
+                    <div class="row g-4 mt-2">
+                        ${data.research.stats.map((stat: any) => `
+                        <div class="col-4">
+                            <div class="fw-bold fs-2" style="color: ${primaryColor};">${stat.value}</div>
+                            <div class="text-muted small fw-bold">${stat.label}</div>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="p-3 bg-white border rounded shadow-sm">
+                        <img src="${data.research.image}" class="img-fluid rounded w-100" style="max-height: 400px; object-fit: contain;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : ''}
+
+    ${data.gallery ? `
+    <section id="gallery" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.gallery.title}</h2></section>
+    <section class="container-fluid py-5 sectioncolor1 border-bottom">
+        <div class="container">
+            <p class="fs-5 text-center mb-5 text-muted mx-auto" style="max-width: 700px;">${data.gallery.subtitle}</p>
+            <div class="row g-3">
+                ${data.gallery.images.map((img: any) => `
+                <div class="col-6 col-md-4">
+                  <div class="p-2 border bg-light shadow-sm" style="aspect-ratio: 16/9;">
+                    <img src="${img}" class="w-100 h-100" style="object-fit: cover; max-height: 200px;" />
+                  </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
     <!-- Money Back -->
     <section class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.guaranteeTitle || "Verified Quality"}</h2></section>
@@ -448,6 +491,12 @@ h1, h2, h3, h4, h5, h6, .logo { font-family: 'Space Grotesk', sans-serif !import
 .section-dark { background: #0a0a0a; }
 .section-darker { background: #050505; }
 .section-accent { background: linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd); }
+.accordion-button { background: transparent !important; color: white !important; box-shadow: none !important; }
+.accordion-button:not(.collapsed) { background: rgba(255,255,255,0.05) !important; color: ${secondaryColor} !important; }
+.accordion-button::after { filter: invert(1); }
+.accordion-item { background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+.nav-link { transition: color 0.3s ease; }
+.nav-link:hover { color: ${secondaryColor} !important; }
 @media (max-width: 1200px) { .container { max-width: 95% !important; } }
 @media (max-width: 992px) {
     .modern-btn { padding: 0.75rem 2rem; font-size: 0.85rem; }
@@ -478,6 +527,7 @@ ${seoBlock}
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+    <header>
     <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05);">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -491,15 +541,14 @@ ${seoBlock}
             </button>
         </div>
         <div class="collapse navbar-collapse" id="navbarNavModern">
-            <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-dark bg-lg-transparent rounded p-3 p-lg-0" style="backdrop-filter: blur(10px);">
-                <a href="#features" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">Features</a>
-                <a href="#about" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">About</a>
-                <a href="#pricing" class="nav-link fw-medium p-0 text-white-50 text-decoration-none w-100" style="font-size: 0.95rem;">Pricing</a>
+            <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-lg-transparent rounded p-3 p-lg-0" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
+                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-white text-decoration-none w-100" style="font-size: 0.95rem;">${link.label}</a>`).join('')}
                 <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-none d-lg-inline-flex text-nowrap" style="width: auto; white-space: nowrap;">${data.hero?.buttonText || 'Shop Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
             </div>
         </div>
     </div>
 </nav>
+</header>
 
     <section class="section-dark py-5" style="min-height: 80vh; display: flex; align-items: center;">
         <div class="container">
@@ -550,6 +599,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+
+
     <section id="features" class="section-darker py-5">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.featuresTitle || "Key Features"}</h2>
@@ -571,6 +622,33 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+    <!-- Research -->
+    ${data.research ? `
+    <section class="section-darker py-5 border-top border-white/5">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold fs-1 mb-4 gradient-text" style="font-size: 2.5rem;">${data.research.title}</h2>
+                    <p class="fs-5 text-white mb-4 opacity-75">${data.research.subtitle}</p>
+                    <div class="text-white-50 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
+                    <div class="row g-4">
+                        ${data.research.stats.map((stat: any) => `
+                        <div class="col-4">
+                            <div class="fw-bold fs-2" style="color: ${secondaryColor}">${stat.value}</div>
+                            <div class="text-white-50 small uppercase font-black tracking-widest" style="font-size: 10px;">${stat.label}</div>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="glass-card p-2">
+                        <img src="${data.research.image}" class="img-fluid rounded-3 w-100" style="max-height: 450px; object-fit: contain;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : ''}
 
     ${data.benefits?.items?.length ? `
     <section id="benefits" class="section-darker py-5">
@@ -597,11 +675,11 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="glass-card p-4 h-100">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="w-12 h-12 rounded-md overflow-hidden border border-white/10">
+                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid ${secondaryColor};">
                                 <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-0 text-white" style="font-size: 0.95rem;">${item.name}</h4>
+                                <h4 class="fw-bold mb-0 text-white fs-6">${item.name}</h4>
                                 <span class="text-white-50 small">${item.role || 'Verified Buyer'}</span>
                             </div>
                         </div>
@@ -616,11 +694,29 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    <!-- Gallery -->
+    ${data.gallery ? `
+    <section class="section-darker py-5 border-top border-white/5">
+        <div class="container">
+            <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2.5rem;">${data.gallery.title}</h2>
+            <p class="text-center mb-5 text-white-50" style="font-size: 1rem;">${data.gallery.subtitle}</p>
+            <div class="row g-3">
+                ${data.gallery.images.map((img: any) => `
+                <div class="col-12 col-md-4">
+                    <div class="glass-card p-1 overflow-hidden" style="aspect-ratio: 16/9;">
+                        <img src="${img}" class="w-100 h-100 rounded-3" style="object-fit: cover; max-height: 200px;" />
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
     <section class="py-5" style="background: linear-gradient(135deg, ${primaryColor}30, #0a0a0a);">
         <div class="container">
             <div class="glass-card p-5"><div class="row align-items-center g-5">
                 <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 200px;" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSubtitle || "Zero Risk"}</p></div>
-                <div class="col-lg-8"><h3 class="fw-bold mb-3 text-white" style="font-size: 1.6rem;">${data.guaranteeHeadline || "Satisfaction Guaranteed"}</h3><p class="text-white-50" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || ''}</p><a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary mt-3">Claim Your Package <i class="fa-solid fa-arrow-right"></i></a></div>
+                <div class="col-lg-8"><h3 class="fw-bold mb-3 text-white" style="font-size: 1.6rem;">${data.guaranteeHeadline || "Satisfaction Guaranteed"}</h3><p class="text-white-50" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary mt-3">Claim Your Package <i class="fa-solid fa-arrow-right"></i></a></div>
             </div></div>
         </div>
     </section>
@@ -716,6 +812,7 @@ ${seoBlock}
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+    <header>
     <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom py-3">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="index.html">
@@ -730,14 +827,13 @@ ${seoBlock}
             </div>
             <div class="collapse navbar-collapse" id="navbarNavClinical">
                 <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-light bg-lg-transparent rounded p-3 p-lg-0">
-                    <a href="#features" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">FEATURES</a>
-                    <a href="#about" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">OVERVIEW</a>
-                    <a href="#pricing" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">PRICING</a>
+                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">${link.label.toUpperCase()}</a>`).join('')}
                     <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${secondaryColor} !important; border: none; white-space: nowrap;">Order Now</a>
                 </div>
             </div>
         </div>
     </nav>
+    </header>
 
     <section id="features" class="bg-white border-bottom py-5">
         <div class="container py-lg-4">
@@ -753,13 +849,15 @@ ${seoBlock}
             <div class="row mt-5 border-top pt-4">
                 <div class="col-12">
                     <span class="data-label text-center mb-4">REGULATORY / SAFETY COMPLIANCE</span>
-                    <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5">
-                        ${(data.logos || []).map((logo: string) => `<div style="width: 60px; opacity: 0.6;"><img src="${logo}" class="img-fluid grayscale" /></div>`).join('')}
+                    <div class="d-flex justify-content-center flex-wrap gap-5 py-4 border-top border-bottom">
+                        ${(data.logos || []).map((logo: string) => `<div style="width: 80px; opacity: 0.5;"><img src="${logo}" class="img-fluid grayscale" /></div>`).join('')}
                     </div>
                 </div>
             </div>
         </div>
     </section>
+
+
 
     <section id="ingredients" class="py-5 bg-light border-bottom">
         <div class="container py-lg-4">
@@ -791,6 +889,47 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+    <!-- Research -->
+    ${data.research ? `
+    <section class="py-5 bg-light border-bottom">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <div class="clinical-header mb-4"><span class="data-label">R&D ANALYSIS</span><h2 class="fw-bold mb-0">${data.research.title}</h2></div>
+                    <p class="fs-5 text-muted mb-4">${data.research.subtitle}</p>
+                    <p class="text-muted mb-5">${data.research.description}</p>
+                    <div class="row g-4">
+                        ${data.research.stats.map((stat: any) => `
+                        <div class="col-4">
+                            <div class="fw-bold fs-2 text-primary">${stat.value}</div>
+                            <div class="data-label">${stat.label}</div>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="clinical-card p-2 shadow-sm"><img src="${data.research.image}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;" /></div>
+                </div>
+            </div>
+        </div>
+    </section>` : ''}
+
+    ${data.gallery ? `
+    <section class="py-5 bg-white border-bottom">
+        <div class="container">
+            <div class="text-center mb-5"><span class="data-label">VERIFIED PROOF</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.gallery.title}</h2><p class="text-muted mx-auto" style="max-width: 600px;">${data.gallery.subtitle}</p></div>
+            <div class="row g-3">
+                ${data.gallery.images.map((img: any) => `
+                <div class="col-6 col-md-4">
+                  <div class="clinical-card p-1 shadow-sm overflow-hidden" style="aspect-ratio: 16/9;">
+                    <img src="${img}" class="w-100 h-100 rounded" style="object-fit: cover; max-height: 200px;" />
+                  </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
     ${data.benefits?.items?.length ? `
     <section id="benefits" class="py-5 bg-light border-bottom">
@@ -886,6 +1025,17 @@ ${seoBlock}
         </div>
     </section>
 
+    <section class="py-5 bg-light border-bottom">
+        <div class="container py-lg-4">
+            <div class="p-5 bg-white border rounded shadow-sm">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 250px;" /><p class="data-label mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Security Protocol"}</p></div>
+                    <div class="col-lg-8"><h3 class="fw-bold mb-3" style="color: ${primaryColor}">${data.guaranteeHeadline || "60-Day Satisfaction Protocol"}</h3><p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="clinical-btn-primary mt-3">Order Now <i class="fa-solid fa-arrow-right"></i></a></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
 
     ${data.faq?.length ? `
     <section id="faq" class="py-5 bg-white">
@@ -961,6 +1111,7 @@ ${seoBlock}
     <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
+    <header>
     <nav class="navbar navbar-expand-lg sticky-top py-4" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px);">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
@@ -975,14 +1126,13 @@ ${seoBlock}
             </div>
             <div class="collapse navbar-collapse" id="navbarNavOrganic">
                 <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center rounded p-3 p-lg-0" style="background: rgba(250, 246, 237, 0.95);">
-                    <a href="#features" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Features</a>
-                    <a href="#about" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Nature</a>
-                    <a href="#pricing" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">Shop</a>
+                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">${link.label}</a>`).join('')}
                     <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-4 text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${primaryColor} !important; color: #FAF6ED !important; width: auto; white-space: nowrap;">Order Now</a>
                 </div>
             </div>
         </div>
     </nav>
+    </header>
 
     <section class="py-5 overflow-hidden" style="background: #FAF6ED;">
         <div class="container pt-lg-5 pb-lg-3">
@@ -1022,6 +1172,55 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+
+
+    <!-- Research -->
+    ${data.research ? `
+    <section class="py-5 bg-white border-top border-bottom" style="border-color: #FAF6ED !important;">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <h2 class="fw-bold fs-1 mb-4" style="color: #2D4A22; font-size: 2.5rem;">${data.research.title}</h2>
+                    <p class="fs-5 text-success mb-4 opacity-75 fw-bold italic">${data.research.subtitle}</p>
+                    <div class="text-muted mb-5" style="line-height: 1.9; font-size: 1.05rem;">${data.research.description}</div>
+                    <div class="row g-4 border-top pt-4">
+                        ${data.research.stats.map((stat: any) => `
+                        <div class="col-4">
+                            <div class="fw-bold fs-1" style="color: #2D4A22;">${stat.value}</div>
+                            <div class="text-muted small uppercase fw-bold">${stat.label}</div>
+                        </div>
+                        `).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="p-3" style="background: #FAF6ED; border-radius: 3rem;">
+                        <img src="${data.research.image}" class="img-fluid w-100" style="border-radius: 2.5rem; max-height: 420px; object-fit: contain;" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : ''}
+
+    ${data.gallery ? `
+    <section class="py-5" style="background-color: #FAF6ED;">
+        <div class="container">
+            <div class="text-center mb-5">
+                <div class="d-inline-block p-1 px-3 rounded-pill bg-success text-white small fw-bold mb-3">Community Trust</div>
+                <h2 class="fw-bold mb-2" style="color: #2D4A22; font-size: 2.5rem;">${data.gallery.title}</h2>
+                <p class="text-muted fs-5">${data.gallery.subtitle}</p>
+            </div>
+            <div class="row g-3">
+                ${data.gallery.images.map((img: any) => `
+                <div class="col-6 col-md-4">
+                  <div class="p-1 overflow-hidden" style="background: white; border-radius: 1.5rem; aspect-ratio: 16/9;">
+                    <img src="${img}" class="w-100 h-100" style="object-fit: cover; border-radius: 1.25rem; max-height: 200px;" />
+                  </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
     <section id="ingredients" class="py-5" style="background: #F0EBE1;">
         <div class="container py-lg-5 text-center">
@@ -1072,6 +1271,15 @@ ${seoBlock}
                 </div></div>
                 `).join('')}
             </div>
+        </div>
+    </section>
+
+    <section class="py-5" style="background: #FAF6ED;">
+        <div class="container py-lg-5">
+            <div class="organic-card p-5 bg-white"><div class="row align-items-center g-5">
+                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 220px;" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Nature's Promise"}</p></div>
+                <div class="col-lg-8"><h2 class="fw-bold mb-3 font-serif" style="color: ${primaryColor}">${data.guaranteeHeadline || "Pure Satisfaction Promise"}</h2><p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="organic-btn-primary mt-4">Order Now <i class="fa-solid fa-seedling"></i></a></div>
+            </div></div>
         </div>
     </section>
 

@@ -93,7 +93,8 @@ export const OrganicTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter, updateTestimonials, addTestimonial, removeTestimonial
+    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery, updateNavbar
   } = useStore();
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
@@ -198,11 +199,37 @@ export const OrganicTemplate: React.FC = () => {
              <EditableText tagName="span" className="fs-4 fw-bold logo" style={{ color: primary }} value={projectData.productName} onChange={() => {}} />
           </a>
           <div className="d-none d-lg-flex align-items-center gap-4">
-            {projectData.footer.links.slice(0, 3).map((link, i) => (
-              <Linkable key={i} link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
-                <EditableText tagName="span" className="nav-link cursor-pointer p-0 font-serif italic" style={{ color: secondary, fontSize: '1.1rem' }} value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
+            {projectData.navbar?.links.map((link, i) => (
+              <Linkable 
+                key={i} 
+                link={link.href} 
+                onLinkChange={(val) => {
+                  const nl = [...projectData.navbar.links];
+                  nl[i] = { ...nl[i], href: val };
+                  updateNavbar({ links: nl });
+                }}
+              >
+                <RemoveButton onClick={() => {
+                  const nl = projectData.navbar.links.filter((_, idx) => idx !== i);
+                  updateNavbar({ links: nl });
+                }} />
+                <EditableText 
+                  tagName="span" 
+                  className="nav-link cursor-pointer p-0 font-serif italic no-underline" 
+                  style={{ color: secondary, fontSize: '1.1rem' }} 
+                  value={link.label} 
+                  onChange={(val) => {
+                    const nl = [...projectData.navbar.links];
+                    nl[i] = { ...nl[i], label: val };
+                    updateNavbar({ links: nl });
+                  }} 
+                />
               </Linkable>
             ))}
+            <AddButton onClick={() => {
+              const nl = [...(projectData.navbar?.links || []), { label: "New Link", href: "#" }];
+              updateNavbar({ links: nl });
+            }} label="Link" />
             <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
               <button className="organic-btn organic-btn-primary ms-3">
                 <EditableText tagName="span" value="Shop Nature" onChange={() => {}} />
@@ -224,8 +251,8 @@ export const OrganicTemplate: React.FC = () => {
         {/* Mobile Menu */}
         {isMenuOpen && (
           <div className="d-lg-none absolute top-full left-0 w-full p-4 d-flex flex-column align-items-center gap-3 z-[999] shadow-sm animate-in slide-in-from-top duration-300 border-top" style={{ backgroundColor: 'rgba(250, 246, 237, 0.98)' }}>
-            {projectData.footer.links.slice(0, 3).map((link, i) => (
-              <EditableText key={i} tagName="span" className="fs-5 font-serif italic fw-bold no-underline cursor-pointer" style={{ color: secondary }} value={link.label} onChange={() => { }} />
+            {projectData.navbar?.links.map((link, i) => (
+              <a key={i} href={link.href} className="fs-5 font-serif italic fw-bold no-underline" style={{ color: secondary }} onClick={() => setIsMenuOpen(false)}>{link.label}</a>
             ))}
             <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
               <button className="organic-btn organic-btn-primary w-100 mt-2">
@@ -354,7 +381,6 @@ export const OrganicTemplate: React.FC = () => {
              <i className="fa-solid fa-heart mb-3 text-2xl" style={{ color: secondary }}></i>
              <EditableText tagName="h2" className="fw-bold font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Kind Words"} onChange={(val) => updateTestimonials(-1, { title: val })} />
            </div>
-
            <div className="row g-4 justify-content-center">
              {projectData.testimonials?.items.map((item, i) => (
                <div key={i} className="col-md-6 col-lg-4 relative">
@@ -375,6 +401,67 @@ export const OrganicTemplate: React.FC = () => {
            <AddButton onClick={addTestimonial} label="Story" />
         </div>
       </section>
+
+      {/* Gallery */}
+      {projectData.gallery && (
+        <section className="py-5" style={{ backgroundColor: '#FAF6ED' }}>
+          <div className="container">
+            <div className="text-center mb-5">
+              <EditableText tagName="h2" className="fw-bold mb-2" style={{ color: '#2D4A22', fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
+              <EditableText tagName="p" className="text-[#6A5949] fs-5" value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
+            </div>
+            <div className="row g-3">
+              {projectData.gallery.images.map((img, i) => (
+                <div key={i} className="col-6 col-md-4">
+                  <div className="p-1 overflow-hidden" style={{ background: 'white', borderRadius: '1.5rem', aspectRatio: '16/9' }}>
+                    <EditableImage src={img} onChange={(val) => {
+                      const ni = [...projectData.gallery!.images];
+                      ni[i] = val;
+                      updateGallery({ images: ni });
+                    }} className="w-100 h-100" style={{ objectFit: 'cover', borderRadius: '1.25rem', maxHeight: '200px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* Research */}
+      {projectData.research && (
+        <section className="py-5 bg-white border-y" style={{ borderColor: '#FAF6ED' }}>
+          <div className="container">
+            <div className="row align-items-center g-5">
+              <div className="col-lg-6">
+                <EditableText tagName="h2" className="fw-bold fs-1 mb-4" style={{ color: '#2D4A22', fontSize: '2.5rem' }} value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
+                <EditableText tagName="p" className="fs-5 text-[#2D4A22] mb-4 opacity-75 fw-bold italic" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
+                <EditableText tagName="div" className="text-[#6A5949] mb-5" style={{ lineHeight: 1.9, fontSize: '1.05rem' }} value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} />
+                <div className="row g-4 border-top pt-4" style={{ borderColor: '#FAF6ED' }}>
+                  {projectData.research.stats.map((stat, i) => (
+                    <div key={i} className="col-4">
+                      <EditableText tagName="div" className="fw-bold fs-1" style={{ color: '#2D4A22' }} value={stat.value} onChange={(val) => {
+                        const ns = [...projectData.research!.stats];
+                        ns[i] = { ...stat, value: val };
+                        updateResearch({ stats: ns });
+                      }} />
+                      <EditableText tagName="div" className="text-[#6A5949] small uppercase fw-bold" value={stat.label} onChange={(val) => {
+                        const ns = [...projectData.research!.stats];
+                        ns[i] = { ...stat, label: val };
+                        updateResearch({ stats: ns });
+                      }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="col-lg-6 text-center">
+                <div className="p-3 d-inline-block" style={{ background: '#FAF6ED', borderRadius: '3rem' }}>
+                  <EditableImage src={projectData.research.image} onChange={(val) => updateResearch({ image: val })} className="img-fluid" style={{ borderRadius: '2.5rem', maxHeight: '420px', width: 'auto', objectFit: 'contain' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
       <section className="py-5" style={{ backgroundColor: bgLight }}>
         <div className="container py-lg-5">
           <div className="row align-items-center g-5">
@@ -468,6 +555,27 @@ export const OrganicTemplate: React.FC = () => {
             ))}
           </div>
           <AddButton onClick={addPricing} label="Bundle" />
+        </div>
+      </section>
+ 
+      {/* Satisfaction Promise */}
+      <section className="py-5" style={{ backgroundColor: bgAccent }}>
+        <div className="container py-lg-5">
+          <div className="p-5 bg-white shadow-md" style={{ borderRadius: '3rem', border: `2px dashed ${bgAccent}` }}>
+            <div className="row align-items-center g-5">
+              <div className="col-lg-4 text-center">
+                <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-4 mx-auto" style={{ maxWidth: '220px' }} />
+                <EditableText tagName="p" className="fw-bold font-serif italic mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Pure Assurance"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
+              </div>
+              <div className="col-lg-8">
+                <EditableText tagName="h2" className="fw-bold mb-3 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.guaranteeHeadline || "Pure Satisfaction Promise"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
+                <EditableText tagName="p" className="text-[#6A5949]" style={{ lineHeight: 1.8, fontSize: '1.05rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
+                  <button className="organic-btn-primary mt-4">Order Now <i className="fa-solid fa-seedling"></i></button>
+                </Linkable>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 

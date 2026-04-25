@@ -66,13 +66,13 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
   const [showSettings, setShowSettings] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   return (
-    <div onContextMenu={(e) => { 
+    <div onContextMenu={(e) => {
       if (onContextMenu) {
         onContextMenu(e);
       } else {
-        e.preventDefault(); 
-        setPos({ x: e.clientX, y: e.clientY }); 
-        setShowSettings(true); 
+        e.preventDefault();
+        setPos({ x: e.clientX, y: e.clientY });
+        setShowSettings(true);
       }
     }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to set link"}>
       {children}
@@ -93,7 +93,8 @@ export const ModernTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter, updateTestimonials, addTestimonial, removeTestimonial
+    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery, updateNavbar
   } = useStore();
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
@@ -116,7 +117,8 @@ export const ModernTemplate: React.FC = () => {
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
         .modern-template { font-family: 'Inter', sans-serif; }
         .modern-template h1, .modern-template h2, .modern-template h3, .modern-template h4, .modern-template .logo { font-family: 'Space Grotesk', sans-serif !important; }
@@ -203,17 +205,43 @@ export const ModernTemplate: React.FC = () => {
                 alt="Brand Logo"
               />
             </div>
-            <EditableText tagName="span" className="fs-4 fw-bold logo gradient-text" value={projectData.productName} onChange={() => {}} />
+            <EditableText tagName="span" className="fs-4 fw-bold logo gradient-text" value={projectData.productName} onChange={() => { }} />
           </a>
           <div className="d-none d-lg-flex align-items-center gap-4">
-            {projectData.footer.links.slice(0, 3).map((link, i) => (
-              <Linkable key={i} link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
-                <EditableText tagName="span" className="nav-link fw-medium cursor-pointer p-0" style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }} value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
+            {projectData.navbar?.links.map((link, i) => (
+              <Linkable
+                key={i}
+                link={link.href}
+                onLinkChange={(val) => {
+                  const nl = [...projectData.navbar.links];
+                  nl[i] = { ...nl[i], href: val };
+                  updateNavbar({ links: nl });
+                }}
+              >
+                <RemoveButton onClick={() => {
+                  const nl = projectData.navbar.links.filter((_, idx) => idx !== i);
+                  updateNavbar({ links: nl });
+                }} />
+                <EditableText
+                  tagName="span"
+                  className="nav-link fw-medium cursor-pointer p-0 no-underline"
+                  style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}
+                  value={link.label}
+                  onChange={(val) => {
+                    const nl = [...projectData.navbar.links];
+                    nl[i] = { ...nl[i], label: val };
+                    updateNavbar({ links: nl });
+                  }}
+                />
               </Linkable>
             ))}
+            <AddButton onClick={() => {
+              const nl = [...(projectData.navbar?.links || []), { label: "New Link", href: "#" }];
+              updateNavbar({ links: nl });
+            }} label="Link" />
             <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
               <button className="modern-btn modern-btn-primary">
-                <EditableText tagName="span" value="Order Now" onChange={() => {}} />
+                <EditableText tagName="span" value="Order Now" onChange={() => { }} />
                 <IconEditor value={projectData.hero.icon || "fa-solid fa-arrow-right"} onChange={(val) => updateHero({ icon: val })} />
               </button>
             </Linkable>
@@ -221,7 +249,7 @@ export const ModernTemplate: React.FC = () => {
           <div className="d-flex align-items-center gap-2 d-lg-none">
             <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
               <button className="modern-btn modern-btn-primary py-2 px-3 text-nowrap" style={{ fontSize: '0.8rem', padding: '0.5rem 1rem', width: 'auto', whiteSpace: 'nowrap' }}>
-                <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => {}} />
+                <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => { }} />
               </button>
             </Linkable>
             <button className="border-none bg-transparent p-2" onClick={() => setIsMenuOpen(!isMenuOpen)}>
@@ -235,11 +263,11 @@ export const ModernTemplate: React.FC = () => {
         </div>
         {isMenuOpen && (
           <div className="d-lg-none w-100 p-4 d-flex flex-column align-items-center gap-3" style={{ background: 'rgba(10,10,10,0.95)', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
-            {projectData.footer.links.map((link, i) => (
-              <EditableText key={i} tagName="span" className="fs-6 fw-bold cursor-pointer" style={{ color: 'rgba(255,255,255,0.7)' }} value={link.label} onChange={() => {}} />
+            {projectData.navbar?.links.map((link, i) => (
+              <a key={i} href={link.href} className="fs-6 fw-bold no-underline" style={{ color: 'rgba(255,255,255,0.7)' }} onClick={() => setIsMenuOpen(false)}>{link.label}</a>
             ))}
             <button className="modern-btn modern-btn-primary w-100">
-              <EditableText tagName="span" value="Order Now" onChange={() => {}} />
+              <EditableText tagName="span" value="Order Now" onChange={() => { }} />
             </button>
           </div>
         )}
@@ -325,6 +353,41 @@ export const ModernTemplate: React.FC = () => {
           </div>
         </div>
       </section>
+      {/* Research */}
+      {projectData.research && (
+        <section className="section-darker py-5 border-t border-white/5">
+          <div className="container">
+            <div className="row align-items-center g-5">
+              <div className="col-lg-6">
+                <EditableText tagName="h2" className="fw-bold fs-1 mb-4 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
+                <EditableText tagName="p" className="fs-5 text-white mb-4 opacity-75" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
+                <EditableText tagName="div" className="text-white-50 mb-5" style={{ lineHeight: 1.9, fontSize: '0.95rem' }} value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} />
+                <div className="row g-4">
+                  {projectData.research.stats.map((stat, i) => (
+                    <div key={i} className="col-4">
+                      <EditableText tagName="div" className="fw-bold fs-2" style={{ color: secondary }} value={stat.value} onChange={(val) => {
+                        const ns = [...projectData.research!.stats];
+                        ns[i] = { ...stat, value: val };
+                        updateResearch({ stats: ns });
+                      }} />
+                      <EditableText tagName="div" className="text-white-50 small uppercase font-black tracking-widest" style={{ fontSize: '10px' }} value={stat.label} onChange={(val) => {
+                        const ns = [...projectData.research!.stats];
+                        ns[i] = { ...stat, label: val };
+                        updateResearch({ stats: ns });
+                      }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="glass-card p-2 text-center">
+                  <EditableImage src={projectData.research.image} onChange={(val) => updateResearch({ image: val })} className="img-fluid rounded-3" style={{ maxHeight: '450px', width: 'auto', objectFit: 'contain' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Testimonials */}
       <section className="section-dark py-5">
@@ -358,6 +421,29 @@ export const ModernTemplate: React.FC = () => {
           <AddButton onClick={addTestimonial} label="Testimonial" />
         </div>
       </section>
+
+      {/* Gallery */}
+      {projectData.gallery && (
+        <section className="section-darker py-5 border-t border-white/5">
+          <div className="container">
+            <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
+            <EditableText tagName="p" className="text-center mb-5 text-white/50" style={{ fontSize: '1rem' }} value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
+            <div className="row g-3">
+              {projectData.gallery.images.map((img, i) => (
+                <div key={i} className="col-12 col-md-4">
+                  <div className="glass-card p-1 overflow-hidden" style={{ aspectRatio: '16/9' }}>
+                    <EditableImage src={img} onChange={(val) => {
+                      const ni = [...projectData.gallery!.images];
+                      ni[i] = val;
+                      updateGallery({ images: ni });
+                    }} className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
       <section className="section-darker py-5">
         <div className="container">
           <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
@@ -395,8 +481,8 @@ export const ModernTemplate: React.FC = () => {
               </div>
               <div className="col-lg-8">
                 <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: '#fff', fontSize: '1.6rem' }} value={projectData.guaranteeHeadline || "60-Day Money Back"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
-                <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || "Your satisfaction is guaranteed."} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
-                <Linkable link={projectData.hero.buttonHref} onLinkChange={() => {}}>
+                <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                   <button className="modern-btn modern-btn-primary mt-3">Claim Your Package <i className="fa-solid fa-arrow-right"></i></button>
                 </Linkable>
               </div>
@@ -435,27 +521,27 @@ export const ModernTemplate: React.FC = () => {
             {projectData.pricing?.map((plan, i) => (
               <div key={i} className="col-12 col-md-6 col-lg-4 relative">
                 <RemoveButton onClick={() => removePricing(i)} />
-                <div className="glass-card p-4 h-100 text-center" 
-                    style={{ border: plan.isPrimary ? `2px solid ${secondary}` : undefined, transform: plan.isPrimary ? 'scale(1.03)' : undefined }}
-                    onContextMenu={(e) => {
-                      e.preventDefault();
-                      setSchemaEditor({ i, x: e.clientX, y: e.clientY });
-                    }}
-                    title="Right-click to edit Product Schema (GTIN, SKU, etc.)"
-                  >
-                    {schemaEditor?.i === i && (
-                      <>
-                        <div className="fixed inset-0 z-[99998]" onClick={() => setSchemaEditor(null)} />
-                        <SchemaEditor 
-                          plan={plan} 
-                          onClose={() => setSchemaEditor(null)} 
-                          onChange={(val) => updatePricing(i, val)} 
-                          x={schemaEditor.x} 
-                          y={schemaEditor.y} 
-                        />
-                      </>
-                    )}
-                    {plan.isPrimary && <div className="mb-3"><span className="px-3 py-1 rounded-none text-[10px] fw-bold" style={{ background: secondary, color: primary }}>BEST VALUE</span></div>}
+                <div className="glass-card p-4 h-100 text-center"
+                  style={{ border: plan.isPrimary ? `2px solid ${secondary}` : undefined, transform: plan.isPrimary ? 'scale(1.03)' : undefined }}
+                  onContextMenu={(e) => {
+                    e.preventDefault();
+                    setSchemaEditor({ i, x: e.clientX, y: e.clientY });
+                  }}
+                  title="Right-click to edit Product Schema (GTIN, SKU, etc.)"
+                >
+                  {schemaEditor?.i === i && (
+                    <>
+                      <div className="fixed inset-0 z-[99998]" onClick={() => setSchemaEditor(null)} />
+                      <SchemaEditor
+                        plan={plan}
+                        onClose={() => setSchemaEditor(null)}
+                        onChange={(val) => updatePricing(i, val)}
+                        x={schemaEditor.x}
+                        y={schemaEditor.y}
+                      />
+                    </>
+                  )}
+                  {plan.isPrimary && <div className="mb-3"><span className="px-3 py-1 rounded-none text-[10px] fw-bold" style={{ background: secondary, color: primary }}>BEST VALUE</span></div>}
                   <EditableText tagName="h4" className="fw-bold mb-2 text-uppercase" style={{ color: '#fff', fontSize: '0.95rem', letterSpacing: '2px' }} value={plan.title} onChange={(val) => updatePricing(i, { title: val })} />
                   <div className="relative my-3 group/img">
                     {/* Futuristic Multiplier Badge */}
@@ -480,7 +566,7 @@ export const ModernTemplate: React.FC = () => {
                       </div>
                     ))}
                   </div>
-                  <Linkable link={plan.buttonHref} onLinkChange={() => {}}>
+                  <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
                     <button className={`modern-btn w-100 ${plan.isPrimary ? 'modern-btn-primary' : 'modern-btn-outline'}`} style={{ justifyContent: 'center' }}>
                       <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
                     </button>
@@ -524,14 +610,14 @@ export const ModernTemplate: React.FC = () => {
           <div className="flex flex-wrap justify-center gap-6 mb-12">
             {projectData.footer.links.map((link, i) => (
               <div key={i} className="relative group/linkitem">
-                 <RemoveButton onClick={() => {
-                   const nl = [...projectData.footer.links];
-                   nl.splice(i, 1);
-                   updateFooter({ links: nl });
-                 }} />
-                 <Linkable link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
-                   <EditableText tagName="span" className="text-white/40 hover:text-white transition-colors cursor-pointer text-sm font-mono uppercase tracking-widest" value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
-                 </Linkable>
+                <RemoveButton onClick={() => {
+                  const nl = [...projectData.footer.links];
+                  nl.splice(i, 1);
+                  updateFooter({ links: nl });
+                }} />
+                <Linkable link={link.href} onLinkChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], href: val }; updateFooter({ links: nl }); }}>
+                  <EditableText tagName="span" className="text-white/40 hover:text-white transition-colors cursor-pointer text-sm font-mono uppercase tracking-widest" value={link.label} onChange={(val) => { const nl = [...projectData.footer.links]; nl[i] = { ...nl[i], label: val }; updateFooter({ links: nl }); }} />
+                </Linkable>
               </div>
             ))}
           </div>

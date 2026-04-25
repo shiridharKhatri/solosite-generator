@@ -25,6 +25,7 @@ export default function EditorPage() {
     updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery,
     isDirty, setDirty
   } = useStore();
   const [isExporting, setIsExporting] = useState(false);
@@ -49,7 +50,9 @@ export default function EditorPage() {
             const updatedData = { ...data.data };
             if (!updatedData.testimonials) updatedData.testimonials = initialProjectData.testimonials;
             if (!updatedData.about) updatedData.about = initialProjectData.about;
-            
+            if (!updatedData.research) updatedData.research = initialProjectData.research;
+            if (!updatedData.gallery) updatedData.gallery = initialProjectData.gallery;
+
             // Sanitize corrupted testimonials
             if (updatedData.testimonials?.items) {
               updatedData.testimonials.items = updatedData.testimonials.items.map((item: any, i: number) => {
@@ -62,7 +65,7 @@ export default function EditorPage() {
 
             // Sanitize missing guarantee description
             if (updatedData.guaranteeDescription === "") {
-                updatedData.guaranteeDescription = initialProjectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${updatedData.productName} comes protected by a comprehensive 60-day satisfaction promise.`;
+              updatedData.guaranteeDescription = initialProjectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${updatedData.productName} comes protected by a comprehensive 60-day satisfaction promise.`;
             }
 
             setProjectData(updatedData);
@@ -139,7 +142,7 @@ export default function EditorPage() {
         ...projectData,
         exportName: customName
       });
-      
+
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -446,8 +449,10 @@ export default function EditorPage() {
                   {[
                     { id: 'hero', name: 'Hero Section', icon: 'fa-bolt' },
                     { id: 'about', name: 'About', icon: 'fa-info-circle' },
+                    { id: 'research', name: 'Research & Science', icon: 'fa-microscope' },
                     { id: 'ingredients', name: 'Ingredients', icon: 'fa-leaf' },
                     { id: 'testimonials', name: 'Testimonials', icon: 'fa-star' },
+                    { id: 'gallery', name: 'Trust Gallery', icon: 'fa-images' },
                     { id: 'benefits', name: 'Benefits', icon: 'fa-check-circle' },
                     { id: 'pricing', name: 'Pricing Plans', icon: 'fa-tags' },
                     { id: 'faq', name: 'FAQ', icon: 'fa-question-circle' },
@@ -516,12 +521,22 @@ export default function EditorPage() {
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Primary Button</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Primary Button Text</label>
                         <input type="text" value={projectData.hero.buttonText} onChange={(e) => updateHero({ buttonText: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                       </div>
                       <div className="space-y-1.5">
-                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Secondary Button</label>
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Primary Button URL</label>
+                        <input type="text" value={projectData.hero.buttonHref} onChange={(e) => updateHero({ buttonHref: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" placeholder="#pricing" />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Secondary Button Text</label>
                         <input type="text" value={projectData.hero.secondaryButtonText} onChange={(e) => updateHero({ secondaryButtonText: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Secondary Button URL</label>
+                        <input type="text" value={projectData.hero.secondaryButtonHref} onChange={(e) => updateHero({ secondaryButtonHref: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" placeholder="order.html" />
                       </div>
                     </div>
                   </div>
@@ -667,6 +682,81 @@ export default function EditorPage() {
                   </div>
                 )}
 
+                {activeContentTab === 'research' && projectData.research && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                          <input type="text" value={projectData.research.title} onChange={(e) => updateResearch({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 font-bold text-sm" />
+                        </div>
+                        <div className="space-y-1.5">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
+                          <input type="text" value={projectData.research.subtitle} onChange={(e) => updateResearch({ subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 text-sm" />
+                        </div>
+                      </div>
+                      <ImageUploadField
+                        label="Research Image"
+                        value={projectData.research.image}
+                        onChange={(url) => updateResearch({ image: url })}
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Detailed Description</label>
+                      <textarea rows={4} value={projectData.research.description} onChange={(e) => updateResearch({ description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 text-sm" />
+                    </div>
+                    <div className="grid grid-cols-3 gap-3 pt-4">
+                      {projectData.research.stats.map((stat, idx) => (
+                        <div key={idx} className="space-y-1.5 p-3 bg-gray-50 border border-gray-100">
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Stat Label</label>
+                          <input type="text" value={stat.label} onChange={(e) => {
+                            const newStats = [...projectData.research!.stats];
+                            newStats[idx] = { ...stat, label: e.target.value };
+                            updateResearch({ stats: newStats });
+                          }} className="w-full px-2 py-1 rounded-none border border-gray-200 text-xs" />
+                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400 mt-2 block">Stat Value</label>
+                          <input type="text" value={stat.value} onChange={(e) => {
+                            const newStats = [...projectData.research!.stats];
+                            newStats[idx] = { ...stat, value: e.target.value };
+                            updateResearch({ stats: newStats });
+                          }} className="w-full px-2 py-1 rounded-none border border-gray-200 text-xs font-bold" />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {activeContentTab === 'gallery' && projectData.gallery && (
+                  <div className="space-y-4">
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                      <input type="text" value={projectData.gallery.title} onChange={(e) => updateGallery({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 font-bold text-sm" />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
+                      <input type="text" value={projectData.gallery.subtitle} onChange={(e) => updateGallery({ subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 text-sm" />
+                    </div>
+                    <div className="space-y-3 pt-4">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Gallery Images</label>
+                      <div className="grid grid-cols-3 gap-3">
+                        {projectData.gallery.images.map((img, idx) => (
+                          <div key={idx} className="space-y-2">
+                            <ImageUploadField
+                              label={`Image #${idx + 1}`}
+                              value={img}
+                              onChange={(url) => {
+                                const newImages = [...projectData.gallery!.images];
+                                newImages[idx] = url;
+                                updateGallery({ images: newImages });
+                              }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {activeContentTab === 'ingredients' && (
                   <div className="space-y-3">
                     <div className="space-y-3 pb-4 border-b border-gray-100">
@@ -730,7 +820,7 @@ export default function EditorPage() {
                             <i className="fa-solid fa-trash-can text-[10px]"></i>
                           </button>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                           <div className="space-y-1.5">
                             <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Plan Title</label>
                             <input type="text" value={plan.title} onChange={(e) => updatePricing(idx, { title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
@@ -740,14 +830,38 @@ export default function EditorPage() {
                             <input type="text" value={plan.quantity || ''} onChange={(e) => updatePricing(idx, { quantity: e.target.value })} placeholder="6 Bottles" className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
                           <div className="space-y-1.5">
-                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Price</label>
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Price Per Bottle</label>
                             <input type="text" value={plan.price} onChange={(e) => updatePricing(idx, { price: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                           </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Button Text</label>
+                            <input type="text" value={plan.buttonText} onChange={(e) => updatePricing(idx, { buttonText: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                          </div>
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Button URL</label>
+                            <input type="text" value={plan.buttonHref} onChange={(e) => updatePricing(idx, { buttonHref: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-2 gap-3">
                           <ImageUploadField
-                            label="Image (Optional)"
+                            label="Plan Image"
                             value={plan.image || ''}
                             onChange={(url) => updatePricing(idx, { image: url })}
                           />
+                          <div className="space-y-1.5">
+                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Options</label>
+                            <div className="flex items-center gap-2 h-[42px]">
+                              <input
+                                type="checkbox"
+                                checked={plan.isPrimary}
+                                onChange={(e) => updatePricing(idx, { isPrimary: e.target.checked })}
+                                className="w-4 h-4 rounded-none border-gray-200 text-purple-600 focus:ring-purple-500"
+                              />
+                              <span className="text-xs font-bold text-gray-700">Mark as Best Value</span>
+                            </div>
+                          </div>
                         </div>
                         <div className="space-y-1.5">
                           <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Features (one per line)</label>
@@ -803,6 +917,42 @@ export default function EditorPage() {
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Company Info / Disclaimer</label>
                       <textarea rows={4} value={projectData.footer.companyInfo} onChange={(e) => updateFooter({ companyInfo: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                    </div>
+                    <ImageUploadField
+                      label="Trust Badge / Guarantee Image"
+                      value={projectData.footer.trustImage || ''}
+                      onChange={(url) => updateFooter({ trustImage: url })}
+                    />
+                    <div className="space-y-3">
+                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Footer Links</label>
+                      <div className="space-y-2">
+                        {projectData.footer.links.map((link, lIdx) => (
+                          <div key={lIdx} className="grid grid-cols-2 gap-2">
+                            <input
+                              type="text"
+                              value={link.label}
+                              onChange={(e) => {
+                                const newLinks = [...projectData.footer.links];
+                                newLinks[lIdx] = { ...newLinks[lIdx], label: e.target.value };
+                                updateFooter({ links: newLinks });
+                              }}
+                              className="px-3 py-2 rounded-none border border-gray-200 text-xs font-bold"
+                              placeholder="Label"
+                            />
+                            <input
+                              type="text"
+                              value={link.href}
+                              onChange={(e) => {
+                                const newLinks = [...projectData.footer.links];
+                                newLinks[lIdx] = { ...newLinks[lIdx], href: e.target.value };
+                                updateFooter({ links: newLinks });
+                              }}
+                              className="px-3 py-2 rounded-none border border-gray-200 text-xs font-bold"
+                              placeholder="URL"
+                            />
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                 )}

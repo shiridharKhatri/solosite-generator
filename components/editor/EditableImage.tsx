@@ -41,6 +41,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       }
     } catch (error) {
       console.error('Failed to upload image', error);
+      alert('Upload failed. Ensure the server has write permissions for the uploads folder.');
     }
   };
 

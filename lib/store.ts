@@ -81,6 +81,9 @@ interface ProjectData {
     links: { label: string; href: string }[];
     trustImage?: string;
   };
+  navbar: {
+    links: { label: string; href: string }[];
+  };
   seo?: {
     title: string;
     description: string;
@@ -141,6 +144,18 @@ interface ProjectData {
   guaranteeDescription?: string;
   faqTitle?: string;
   footerHeadline?: string;
+  research?: {
+    title: string;
+    subtitle: string;
+    description: string;
+    image: string;
+    stats: { label: string; value: string }[];
+  };
+  gallery?: {
+    title: string;
+    subtitle: string;
+    images: string[];
+  };
 }
 
 interface EditorState {
@@ -172,6 +187,9 @@ interface EditorState {
   updateTestimonials: (index: number, testimonial: Partial<ProjectData['testimonials'] & ProjectData['testimonials']['items'][0]>) => void;
   addTestimonial: () => void;
   removeTestimonial: (index: number) => void;
+  updateResearch: (research: Partial<ProjectData['research']>) => void;
+  updateGallery: (gallery: Partial<ProjectData['gallery']>) => void;
+  updateNavbar: (navbar: Partial<ProjectData['navbar']>) => void;
   updateProjectData: (data: Partial<ProjectData>) => void;
   isDirty: boolean;
   setDirty: (dirty: boolean) => void;
@@ -450,6 +468,26 @@ export const initialProjectData: ProjectData = {
     ],
     trustImage: "/image/money-back-guarantee-..webp"
   },
+  research: {
+    title: "The Science of Blood Support",
+    subtitle: "Clinically-focused formulation for maximum metabolic impact.",
+    description: "Glycopezil is built on a foundation of scientific research into botanical insulin-mimetics and glucose transporters. Our formula combines ancient wisdom with modern extraction techniques to deliver a product that doesn't just work, but excels in purity and bioavailability.",
+    image: "/image/banner-img.webp",
+    stats: [
+      { label: "Purity Level", value: "99.9%" },
+      { label: "Bioavailability", value: "High" },
+      { label: "Safety Tested", value: "100%" }
+    ]
+  },
+  gallery: {
+    title: "Global Community Trust",
+    subtitle: "Join thousands who have already taken the first step toward better wellness.",
+    images: [
+      "/image/index-img.webp",
+      "/image/banner-img.webp",
+      "/image/bottle-snap.webp"
+    ]
+  },
   theme: {
     primary: "#2C0D67",
     secondary: "#fbbf24"
@@ -464,6 +502,14 @@ export const initialProjectData: ProjectData = {
     ogImage: "https://www.glycopezil-official.us/assets/image/index-img.webp",
     ogType: "website",
     twitterCard: "summary_large_image"
+  },
+  navbar: {
+    links: [
+      { label: "Features", href: "#features" },
+      { label: "About", href: "#about" },
+      { label: "Pricing", href: "#pricing" },
+      { label: "FAQ", href: "#faq" }
+    ]
   }
 };
 
@@ -641,7 +687,7 @@ export const useStore = create<EditorState>((set) => ({
     projectData: state.projectData ? { ...state.projectData, ...data } : null,
     isDirty: true
   })),
-  updateTestimonials: (index, testimonial) => set((state) => {
+  updateTestimonials: (index: number, testimonial: Partial<ProjectData['testimonials'] & ProjectData['testimonials']['items'][0]>) => set((state) => {
     if (!state.projectData || !state.projectData.testimonials) return state;
     const newItems = [...state.projectData.testimonials.items];
     if (index === -1) {
@@ -688,4 +734,17 @@ export const useStore = create<EditorState>((set) => ({
       isDirty: true
     };
   }),
+
+  updateResearch: (research) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, research: { ...state.projectData.research, ...research } as any } : null,
+    isDirty: true
+  })),
+  updateGallery: (gallery) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, gallery: { ...state.projectData.gallery, ...gallery } as any } : null,
+    isDirty: true
+  })),
+  updateNavbar: (navbar) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, navbar: { ...state.projectData.navbar, ...navbar } } : null,
+    isDirty: true
+  })),
 }));

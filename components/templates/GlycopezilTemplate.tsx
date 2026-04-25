@@ -103,7 +103,8 @@ export const GlycopezilTemplate: React.FC = () => {
     updateBenefit, addBenefit, removeBenefit,
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
-    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial
+    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery, updateNavbar
   } = useStore();
 
   // Add Item Button inside to access projectData
@@ -426,26 +427,36 @@ export const GlycopezilTemplate: React.FC = () => {
             </a>
 
             <div className="d-none d-lg-flex align-items-center gap-4">
-              {projectData.footer.links.slice(0, 3).map((link, i) => (
-                <div key={i} className="nav-item">
-                  <Linkable link={link.href} onLinkChange={(val) => {
-                    const newLinks = [...projectData.footer.links];
-                    newLinks[i] = { ...newLinks[i], href: val };
-                    updateFooter({ links: newLinks });
-                  }}>
-                    <EditableText
-                      tagName="span"
-                      className="nav-link text-dark fs-5 fw-bold cursor-pointer p-0"
-                      value={link.label}
-                      onChange={(val) => {
-                        const newLinks = [...projectData.footer.links];
-                        newLinks[i] = { ...newLinks[i], label: val };
-                        updateFooter({ links: newLinks });
-                      }}
-                    />
-                  </Linkable>
-                </div>
+              {projectData.navbar?.links.map((link, i) => (
+                <Linkable 
+                  key={i} 
+                  link={link.href} 
+                  onLinkChange={(val) => {
+                    const nl = [...projectData.navbar.links];
+                    nl[i] = { ...nl[i], href: val };
+                    updateNavbar({ links: nl });
+                  }}
+                >
+                  <RemoveButton onClick={() => {
+                    const nl = projectData.navbar.links.filter((_, idx) => idx !== i);
+                    updateNavbar({ links: nl });
+                  }} />
+                  <EditableText 
+                    tagName="span" 
+                    className="nav-link text-dark fs-5 fw-bold cursor-pointer p-0 no-underline" 
+                    value={link.label} 
+                    onChange={(val) => {
+                      const nl = [...projectData.navbar.links];
+                      nl[i] = { ...nl[i], label: val };
+                      updateNavbar({ links: nl });
+                    }} 
+                  />
+                </Linkable>
               ))}
+              <AddButton onClick={() => {
+                const nl = [...(projectData.navbar?.links || []), { label: "New Link", href: "#" }];
+                updateNavbar({ links: nl });
+              }} label="Link" />
               <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
                 <button className="btn-custom-pill">
                   <EditableText tagName="span" value="Order Now" onChange={() => { }} />
@@ -469,8 +480,8 @@ export const GlycopezilTemplate: React.FC = () => {
           {/* Mobile Menu */}
           {isMenuOpen && (
             <div className="d-lg-none absolute top-full left-0 w-full bg-white border-bottom p-4 d-flex flex-column align-items-center gap-3 z-[999] animate-in slide-in-from-top duration-300">
-              {projectData.footer.links.map((link, i) => (
-                <EditableText key={i} tagName="span" className="fs-5 fw-bold text-dark no-underline cursor-pointer" value={link.label} onChange={() => { }} />
+              {projectData.navbar?.links.map((link, i) => (
+                <a key={i} href={link.href} className="fs-5 fw-bold text-dark no-underline cursor-pointer" onClick={() => setIsMenuOpen(false)}>{link.label}</a>
               ))}
               <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                 <button className="btn-custom-pill w-100">
@@ -637,6 +648,46 @@ export const GlycopezilTemplate: React.FC = () => {
         </div>
       </section>
 
+      {/* Research */}
+      {projectData.research && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor">
+            <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
+          </section>
+          <section className="container-fluid py-5 bg-light">
+            <div className="container">
+              <div className="row align-items-center g-5">
+                <div className="col-lg-6">
+                  <EditableText tagName="h3" className="fw-bold fs-2 mb-3" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
+                  <EditableText tagName="div" className="fs-5 text-muted mb-5" value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} style={{ whiteSpace: 'pre-line' }} />
+                  <div className="row g-4 pt-4 border-top">
+                    {projectData.research.stats.map((stat, i) => (
+                      <div key={i} className="col-4">
+                        <EditableText tagName="div" className="fw-bold fs-2" style={{ color: projectData.theme?.primary }} value={stat.value} onChange={(val) => {
+                          const ns = [...projectData.research!.stats];
+                          ns[i] = { ...stat, value: val };
+                          updateResearch({ stats: ns });
+                        }} />
+                        <EditableText tagName="div" className="text-muted small fw-bold uppercase" value={stat.label} onChange={(val) => {
+                          const ns = [...projectData.research!.stats];
+                          ns[i] = { ...stat, label: val };
+                          updateResearch({ stats: ns });
+                        }} />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="col-lg-6 text-center">
+                  <div className="p-2 bg-white border shadow-sm d-inline-block">
+                    <EditableImage src={projectData.research.image} onChange={(val) => updateResearch({ image: val })} className="img-fluid" style={{ maxHeight: '400px', width: 'auto', objectFit: 'contain' }} />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
+      )}
+
       {/* Benefits Section */}
       <section className="container-fluid text-center mt-0 sectioncolor" id="Benefits">
         <EditableText
@@ -719,7 +770,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 tagName="p"
                 className="fs-5 text-gray-700 leading-relaxed"
                 style={{ textAlign: 'left' }}
-                value={projectData.guaranteeDescription || "Your happiness is our highest priority. Every order of Glycopezil comes protected by a comprehensive 60-day satisfaction promise."}
+                value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}
                 onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
               />
               <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
@@ -783,6 +834,33 @@ export const GlycopezilTemplate: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Gallery */}
+      {projectData.gallery && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor">
+            <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
+          </section>
+          <section className="container-fluid py-5 bg-white">
+            <div className="container">
+              <EditableText tagName="p" className="text-center fs-5 mb-5 text-muted" value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
+              <div className="row g-3">
+                {projectData.gallery.images.map((img, i) => (
+                  <div key={i} className="col-6 col-md-4">
+                    <div className="p-2 border bg-light shadow-sm" style={{ aspectRatio: '16/9' }}>
+                      <EditableImage src={img} onChange={(val) => {
+                        const ni = [...projectData.gallery!.images];
+                        ni[i] = val;
+                        updateGallery({ images: ni });
+                      }} className="w-100 h-100" style={{ objectFit: 'cover', maxHeight: '200px' }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
 
       {/* Testimonials Section */}
