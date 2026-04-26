@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
-import { useStore } from '@/lib/store';
+import { useStore, type ProjectData } from '@/lib/store';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
@@ -87,15 +87,25 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
 
 export const OrganicTemplate: React.FC = () => {
   const {
-    projectData, updateHero, updateAbout,
-    updateFeature, addFeature, removeFeature,
-    updateIngredient, addIngredient, removeIngredient,
-    updateBenefit, addBenefit, removeBenefit,
-    updateFAQ, addFAQ, removeFAQ,
-    updatePricing, addPricing, removePricing,
-    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar
+    projectData, updateHero, updateAbout, updateFeature, addFeature, removeFeature,
+    updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
+    updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
+    updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery, updateNavbar,
+    updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
+    showLegalModal, setShowLegalModal
   } = useStore();
+
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
+    <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+      <button
+        onClick={() => updateSectionVisibility(sectionKey, false)}
+        className="bg-red-500/80 hover:bg-red-500 text-white px-2 py-1 text-[10px] font-bold rounded-none uppercase flex items-center gap-1 shadow-lg border-none backdrop-blur-sm transition-all"
+      >
+        <i className="fa-solid fa-eye-slash"></i> Hide Section
+      </button>
+    </div>
+  );
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
     <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-[#4A3320] bg-transparent hover:bg-[#E6D5C3] text-sm font-semibold py-2 px-6 rounded-none transition-colors flex items-center gap-2 mx-auto my-8 border border-[#4A3320] border-dashed">
@@ -106,6 +116,24 @@ export const OrganicTemplate: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [schemaEditor, setSchemaEditor] = useState<{ i: number, x: number, y: number } | null>(null);
+  const [proofIndex, setProofIndex] = useState(0);
+  const [showProof, setShowProof] = useState(false);
+  const [showProofSettings, setShowProofSettings] = useState(false);
+
+  useEffect(() => {
+    const sp = projectData?.socialProof;
+    if (!sp || !sp.enabled || !sp.items?.length) return;
+
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 500) {
+        setProofIndex((prev) => (prev + 1) % sp.items.length);
+        setShowProof(true);
+        setTimeout(() => setShowProof(false), sp.displayTime || 5000);
+      }
+    }, sp.interval || 8000);
+
+    return () => clearInterval(interval);
+  }, [projectData?.socialProof]);
 
   if (!projectData) return null;
 
@@ -311,7 +339,7 @@ export const OrganicTemplate: React.FC = () => {
             <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
               {[0, 1, 2, 3, 4].map((i) => (
                 <div key={i} style={{ width: '70px' }}>
-                  <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; useStore.getState().updateProjectData({ logos: nl }); }} className="img-fluid" style={{ filter: 'opacity(0.7) sepia(0.5) hue-rotate(-30deg)' }} />
+                  <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} className="img-fluid" style={{ filter: 'opacity(0.7) sepia(0.5) hue-rotate(-30deg)' }} />
                 </div>
               ))}
             </div>
@@ -319,8 +347,10 @@ export const OrganicTemplate: React.FC = () => {
       </section>
 
       {/* Ingredients Grid */}
-      <section className="py-5" style={{ backgroundColor: bgAccent }}>
-        <div className="container py-lg-5">
+      {projectData.sections?.ingredients && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+          <SectionSettings sectionKey="ingredients" />
+          <div className="container py-lg-5">
            <div className="text-center mb-5 max-w-[600px] mx-auto">
              <i className="fa-solid fa-leaf mb-3 text-2xl" style={{ color: secondary }}></i>
              <EditableText tagName="h2" className="fw-bold mb-3" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.ingredients.title || "From the Earth"} onChange={(val) => updateIngredient(-1, { title: val })} />
@@ -344,10 +374,13 @@ export const OrganicTemplate: React.FC = () => {
           <AddButton onClick={addIngredient} label="Botanical" />
         </div>
       </section>
+      )}
 
       {/* Benefits - Why it Works */}
-      <section className="py-5" style={{ backgroundColor: '#ffffff' }}>
-        <div className="container py-lg-5">
+      {projectData.sections?.benefits && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: '#ffffff' }}>
+          <SectionSettings sectionKey="benefits" />
+          <div className="container py-lg-5">
            <div className="text-center mb-5 max-w-[700px] mx-auto">
              <i className="fa-solid fa-sun mb-3 text-2xl" style={{ color: secondary }}></i>
              <EditableText tagName="h2" className="fw-bold mb-3 font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.benefits.title || "The Gift of Vitality"} onChange={(val) => updateBenefit(-1, { title: val })} />
@@ -373,10 +406,13 @@ export const OrganicTemplate: React.FC = () => {
            <AddButton onClick={addBenefit} label="Benefit" />
         </div>
       </section>
+      )}
 
       {/* Testimonials - Voices of Harmony */}
-      <section className="py-5" style={{ backgroundColor: bgAccent }}>
-        <div className="container py-lg-5">
+      {projectData.sections?.testimonials && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+          <SectionSettings sectionKey="testimonials" />
+          <div className="container py-lg-5">
            <div className="text-center mb-5">
              <i className="fa-solid fa-heart mb-3 text-2xl" style={{ color: secondary }}></i>
              <EditableText tagName="h2" className="fw-bold font-serif" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Kind Words"} onChange={(val) => updateTestimonials(-1, { title: val })} />
@@ -401,10 +437,12 @@ export const OrganicTemplate: React.FC = () => {
            <AddButton onClick={addTestimonial} label="Story" />
         </div>
       </section>
+      )}
 
       {/* Gallery */}
-      {projectData.gallery && (
-        <section className="py-5" style={{ backgroundColor: '#FAF6ED' }}>
+      {projectData.sections?.gallery && projectData.gallery && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: '#FAF6ED' }}>
+          <SectionSettings sectionKey="gallery" />
           <div className="container">
             <div className="text-center mb-5">
               <EditableText tagName="h2" className="fw-bold mb-2" style={{ color: '#2D4A22', fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
@@ -428,8 +466,9 @@ export const OrganicTemplate: React.FC = () => {
       )}
 
       {/* Research */}
-      {projectData.research && (
-        <section className="py-5 bg-white border-y" style={{ borderColor: '#FAF6ED' }}>
+      {projectData.sections?.research && projectData.research && (
+        <section className="py-5 bg-white border-y group/section relative" style={{ borderColor: '#FAF6ED' }}>
+          <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
@@ -462,8 +501,11 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
-      <section className="py-5" style={{ backgroundColor: bgLight }}>
-        <div className="container py-lg-5">
+
+      {projectData.sections?.about && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: bgLight }}>
+          <SectionSettings sectionKey="about" />
+          <div className="container py-lg-5">
           <div className="row align-items-center g-5">
              <div className="col-12 col-lg-5">
                 <div className="position-relative">
@@ -478,13 +520,14 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Pricing - Botanical Garden Theme */}
       <section className="py-5" style={{ backgroundColor: '#ffffff' }} id="pricing">
         <div className="container py-lg-5">
           <div className="text-center mb-5">
              <i className="fa-solid fa-basket-shopping mb-3 text-2xl" style={{ color: secondary }}></i>
-             <EditableText tagName="h2" className="fw-bold" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.pricingTitle || "Bountiful Harvests"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
+             <EditableText tagName="h2" className="fw-bold" style={{ color: primary, fontSize: '2.5rem' }} value={projectData.pricingTitle || "Bountiful Harvests"} onChange={(val) => updateProjectData({ pricingTitle: val })} />
           </div>
 
           <div className="row g-4 justify-content-center">
@@ -565,11 +608,11 @@ export const OrganicTemplate: React.FC = () => {
             <div className="row align-items-center g-5">
               <div className="col-lg-4 text-center">
                 <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-4 mx-auto" style={{ maxWidth: '220px' }} />
-                <EditableText tagName="p" className="fw-bold font-serif italic mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Pure Assurance"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
+                <EditableText tagName="p" className="fw-bold font-serif italic mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Pure Assurance"} onChange={(val) => updateProjectData({ guaranteeSubtitle: val })} />
               </div>
               <div className="col-lg-8">
-                <EditableText tagName="h2" className="fw-bold mb-3 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.guaranteeHeadline || "Pure Satisfaction Promise"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
-                <EditableText tagName="p" className="text-[#6A5949]" style={{ lineHeight: 1.8, fontSize: '1.05rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                <EditableText tagName="h2" className="fw-bold mb-3 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.guaranteeHeadline || "Pure Satisfaction Promise"} onChange={(val) => updateProjectData({ guaranteeHeadline: val })} />
+                <EditableText tagName="p" className="text-[#6A5949]" style={{ lineHeight: 1.8, fontSize: '1.05rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => updateProjectData({ guaranteeDescription: val })} />
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                   <button className="organic-btn-primary mt-4">Order Now <i className="fa-solid fa-seedling"></i></button>
                 </Linkable>
@@ -580,9 +623,11 @@ export const OrganicTemplate: React.FC = () => {
       </section>
 
       {/* FAQ */}
-      <section className="py-5" style={{ backgroundColor: bgAccent }}>
-        <div className="container max-w-[800px] mx-auto py-lg-4">
-          <EditableText tagName="h2" className="text-center fw-bold mb-5 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.faqTitle || "Wisdom & Questions"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />
+      {projectData.sections?.faq && (
+        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+          <SectionSettings sectionKey="faq" />
+          <div className="container max-w-[800px] mx-auto py-lg-4">
+          <EditableText tagName="h2" className="text-center fw-bold mb-5 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.faqTitle || "Wisdom & Questions"} onChange={(val) => updateProjectData({ faqTitle: val })} />
           
           <div className="d-flex flex-column gap-3">
             {projectData.faq?.map((item, i) => (
@@ -605,12 +650,13 @@ export const OrganicTemplate: React.FC = () => {
           <AddButton onClick={addFAQ} label="Question" />
         </div>
       </section>
+      )}
 
       {/* Footer */}
       <footer className="py-5 text-center" style={{ backgroundColor: primary, color: '#FAF6ED' }}>
          <div className="container">
            <i className="fa-solid fa-seedling text-3xl mb-4" style={{ color: secondary }}></i>
-           <EditableText tagName="h2" className="fw-bold mb-4 font-serif" style={{ fontSize: '1.8rem' }} value={projectData.footerHeadline || "Back to Nature"} onChange={(val) => useStore.getState().updateProjectData({ footerHeadline: val })} />
+           <EditableText tagName="h2" className="fw-bold mb-4 font-serif" style={{ fontSize: '1.8rem' }} value={projectData.footerHeadline || "Back to Nature"} onChange={(val) => updateProjectData({ footerHeadline: val })} />
            <EditableText tagName="p" className="mx-auto mb-5 text-center" style={{ maxWidth: '600px', opacity: 0.8, fontSize: '0.95rem', lineHeight: 1.8 }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
            
            <div className="d-flex justify-content-center flex-wrap gap-4 mb-4">
@@ -635,6 +681,152 @@ export const OrganicTemplate: React.FC = () => {
            <p className="opacity-50 text-sm mb-0">© {new Date().getFullYear()} {projectData.productName}. Cultivated with care.</p>
          </div>
       </footer>
+
+      {/* Purchase Proof Popup */}
+      {projectData.socialProof?.enabled && (
+        <div
+          className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-[#8A7969]/50 transition-all`}
+          onClick={() => setShowProofSettings(true)}
+        >
+          <div className="absolute -top-10 left-0 bg-[#4A3320] text-[#FAF6ED] text-[9px] font-bold px-2 py-1.5 rounded-none opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
+            <i className="fa-solid fa-gear mr-1"></i> Popup Settings
+          </div>
+          <div className="flex-shrink-0 w-12 h-12 rounded-[15px] bg-[#FAF6ED] border border-[#E6D5C3] overflow-hidden">
+            <img
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
+              className="w-100 h-100 object-contain"
+              alt="Product"
+            />
+          </div>
+          <div className="flex flex-col text-left">
+            <div className="text-[#8A7969] text-[8px] mb-1">
+              {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+            </div>
+            <div className="text-[#4A3320] text-xs leading-tight font-serif">
+              <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
+              <span className="opacity-70">{projectData.socialProof?.items[proofIndex]?.content}</span>
+            </div>
+            <small className="text-[#8A7969] text-[9px] mt-1 font-sans italic font-bold uppercase tracking-wider">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Customer</small>
+          </div>
+        </div>
+      )}
+
+      {/* Social Proof Settings Modal */}
+      {showProofSettings && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-[#4A3320]/60 backdrop-blur-sm" onClick={() => setShowProofSettings(false)}></div>
+          <div className="bg-[#FAF6ED] w-full max-w-xl rounded-none shadow-2xl z-10 overflow-hidden border border-[#E6D5C3]">
+            <div className="p-4 border-b border-[#E6D5C3] d-flex justify-content-between align-items-center bg-[#F0EBE1]">
+              <h3 className="m-0 fs-6 fw-bold text-[#4A3320] uppercase tracking-widest font-serif">Widget Configuration</h3>
+              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-[#8A7969] hover:text-[#4A3320]">
+                <i className="fa-solid fa-times fs-5"></i>
+              </button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+              <div className="flex items-center justify-between p-3 bg-white border border-[#E6D5C3]">
+                <span className="text-xs font-bold text-[#8A7969] uppercase">Display Widget</span>
+                <button
+                  onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
+                  className={`px-4 py-1.5 rounded-none text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-[#8A7969] text-white' : 'bg-[#E6D5C3] text-[#8A7969]'}`}
+                >
+                  {projectData.socialProof?.enabled ? 'ENABLED' : 'DISABLED'}
+                </button>
+              </div>
+
+              <div className="row g-3 text-left">
+                <div className="col-md-6 text-left">
+                  <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">Show Time (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white border border-[#E6D5C3] text-[#4A3320] text-sm outline-none focus:border-[#8A7969]" value={projectData.socialProof?.displayTime} onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })} />
+                </div>
+                <div className="col-md-6 text-left">
+                  <label className="text-[10px] font-bold text-[#8A7969] uppercase mb-1 block">Gap Time (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white border border-[#E6D5C3] text-[#4A3320] text-sm outline-none focus:border-[#8A7969]" value={projectData.socialProof?.interval} onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })} />
+                </div>
+              </div>
+
+              <div className="space-y-4 text-left">
+                <label className="text-[10px] font-bold text-[#8A7969] uppercase block mb-1">Customer Notifications</label>
+                {(projectData.socialProof?.items || []).map((item, idx) => (
+                  <div key={idx} className="p-3 bg-white border border-[#E6D5C3] relative group/item">
+                    <button 
+                      onClick={() => {
+                        const ni = [...(projectData.socialProof?.items || [])];
+                        ni.splice(idx, 1);
+                        updateSocialProof({ items: ni });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-none flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none"
+                    >
+                      <i className="fa-solid fa-times text-[10px]"></i>
+                    </button>
+                    <div className="row g-2">
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-[#8A7969] uppercase block mb-1">Name</label>
+                        <input type="text" className="w-full p-1.5 bg-[#FAF6ED] border border-[#E6D5C3] text-[#4A3320] text-[11px] outline-none" value={item.name} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], name: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-[#8A7969] uppercase block mb-1">From</label>
+                        <input type="text" className="w-full p-1.5 bg-[#FAF6ED] border border-[#E6D5C3] text-[#4A3320] text-[11px] outline-none" value={item.location} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], location: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-12">
+                        <label className="text-[9px] font-bold text-[#8A7969] uppercase block mb-1">Purchase Content</label>
+                        <input type="text" className="w-full p-1.5 bg-[#FAF6ED] border border-[#E6D5C3] text-[#4A3320] text-[11px] outline-none" value={item.content} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], content: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-[#8A7969] uppercase block mb-1">Timestamp</label>
+                        <input type="text" className="w-full p-1.5 bg-[#FAF6ED] border border-[#E6D5C3] text-[#4A3320] text-[11px] outline-none" value={item.timeAgo} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], timeAgo: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-[#8A7969] uppercase block mb-1">Image URL</label>
+                        <input type="text" className="w-full p-1.5 bg-[#FAF6ED] border border-[#E6D5C3] text-[#4A3320] text-[11px] outline-none" value={item.image} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => {
+                    const ni = [...(projectData.socialProof?.items || []), { name: "New Gardener", location: "Portland", content: "bought 3 jars", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
+                    updateSocialProof({ items: ni });
+                  }}
+                  className="w-full py-2 bg-white text-[#8A7969] text-[10px] font-bold uppercase border border-[#E6D5C3] hover:bg-[#F0EBE1] transition-all mt-2"
+                >
+                  <i className="fa-solid fa-plus mr-1"></i> Add Record
+                </button>
+              </div>
+            </div>
+            <div className="p-4 border-t border-[#E6D5C3] text-right bg-[#F0EBE1]">
+              <button onClick={() => setShowProofSettings(false)} className="bg-[#4A3320] text-white px-6 py-2 text-[10px] font-bold uppercase tracking-widest border-none hover:opacity-90 transition-all">Save Changes</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Scroll Button */}
+      <button
+        className="position-fixed bottom-8 right-8 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center text-black z-50 border-none transition-all hover:-translate-y-2 shadow-xl border-2 border-black"
+        style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        <i className="fa-solid fa-arrow-up fs-4"></i>
+      </button>
     </div>
   );
 };

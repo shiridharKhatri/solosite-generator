@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-interface ProjectData {
+export interface ProjectData {
   productName: string;
   hero: {
     title: string;
@@ -158,11 +158,15 @@ interface ProjectData {
   };
   socialProof?: {
     enabled: boolean;
-    names: string[];
-    locations: string[];
-    products: string[];
     interval: number;
     displayTime: number;
+    items: {
+      name: string;
+      location: string;
+      content: string; // e.g. "purchased 6 bottles"
+      timeAgo: string; // e.g. "5 minutes ago"
+      image?: string;
+    }[];
   };
   sections?: {
     features: boolean;
@@ -175,6 +179,12 @@ interface ProjectData {
     faq: boolean;
     gallery: boolean;
   };
+  legalPages?: {
+    privacyPolicy: string;
+    termsAndConditions: string;
+    disclaimer: string;
+  };
+  orderLink?: string;
 }
 
 interface EditorState {
@@ -210,8 +220,12 @@ interface EditorState {
   updateGallery: (gallery: Partial<ProjectData['gallery']>) => void;
   updateNavbar: (navbar: Partial<ProjectData['navbar']>) => void;
   updateSocialProof: (proof: Partial<ProjectData['socialProof']>) => void;
-  updateSectionVisibility: (section: keyof ProjectData['sections'], visible: boolean) => void;
+  updateSectionVisibility: (section: keyof NonNullable<ProjectData['sections']>, visible: boolean) => void;
+  updateLegalPage: (page: keyof NonNullable<ProjectData['legalPages']>, content: string) => void;
+  updateOrderLink: (link: string) => void;
   updateProjectData: (data: Partial<ProjectData>) => void;
+  showLegalModal: boolean;
+  setShowLegalModal: (show: boolean) => void;
   isDirty: boolean;
   setDirty: (dirty: boolean) => void;
 }
@@ -534,11 +548,15 @@ export const initialProjectData: ProjectData = {
   },
   socialProof: {
     enabled: true,
-    names: ["James", "Michael", "Harper Lewis", "Sophia Mitchell", "Ella Carter", "Chris", "Mark", "Brian", "Anthony", "Isabella Reed"],
-    locations: ["California", "Texas", "Florida", "New York", "Illinois", "Ohio", "Austin", "Denver, Colorado", "Michigan", "Pennsylvania"],
-    products: ["1 bottle", "2 bottles", "3 bottles", "6 bottles"],
     interval: 8000,
-    displayTime: 5000
+    displayTime: 5000,
+    items: [
+      { name: "Anthony", location: "Ohio", content: "purchased 6 bottles", timeAgo: "5 minutes ago", image: "/image/bottle-snap.webp" },
+      { name: "Sarah", location: "California", content: "purchased 3 bottles", timeAgo: "12 minutes ago", image: "/image/bottle-snap.webp" },
+      { name: "Michael", location: "Texas", content: "purchased 1 bottle", timeAgo: "24 minutes ago", image: "/image/bottle-snap.webp" },
+      { name: "James", location: "Florida", content: "purchased 6 bottles", timeAgo: "45 minutes ago", image: "/image/bottle-snap.webp" },
+      { name: "Emily", location: "New York", content: "purchased 3 bottles", timeAgo: "1 hour ago", image: "/image/bottle-snap.webp" }
+    ]
   },
   sections: {
     features: true,
@@ -550,7 +568,13 @@ export const initialProjectData: ProjectData = {
     testimonials: true,
     faq: true,
     gallery: true
-  }
+  },
+  legalPages: {
+    privacyPolicy: "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from this site...",
+    termsAndConditions: "By accessing this website, we assume you accept these terms and conditions. Do not continue to use this site if you do not agree to take all of the terms and conditions stated on this page...",
+    disclaimer: "The information provided on this website is for educational purposes only and is not intended as a substitute for professional medical advice..."
+  },
+  orderLink: "https://glycopezil.com/gpz-lp-buy-aff/?aff_id=1343&subid=unika-solo"
 };
 
 export const useStore = create<EditorState>((set) => ({
@@ -805,4 +829,20 @@ export const useStore = create<EditorState>((set) => ({
       isDirty: true
     };
   }),
+  updateLegalPage: (page, content) => set((state) => {
+    if (!state.projectData) return state;
+    return {
+      projectData: {
+        ...state.projectData,
+        legalPages: { ...state.projectData.legalPages, [page]: content } as any
+      },
+      isDirty: true
+    };
+  }),
+  updateOrderLink: (link) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, orderLink: link } : null,
+    isDirty: true
+  })),
+  showLegalModal: false,
+  setShowLegalModal: (show: boolean) => set({ showLegalModal: show }),
 }));

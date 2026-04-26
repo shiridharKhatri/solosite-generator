@@ -26,6 +26,7 @@ export default function EditorPage() {
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateGallery,
+    showLegalModal, setShowLegalModal, updateOrderLink, updateLegalPage,
     isDirty, setDirty
   } = useStore();
   const [isExporting, setIsExporting] = useState(false);
@@ -244,6 +245,19 @@ export default function EditorPage() {
                     <div className="text-[10px] text-red-400">Overwrite with official data</div>
                   </div>
                 </button>
+                <div className="h-px bg-gray-100 my-2"></div>
+                <button
+                  onClick={() => { setShowLegalModal(true); setActiveDropdown(null); }}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-none hover:bg-emerald-50 text-left transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-none bg-emerald-50 flex items-center justify-center text-emerald-500 group-hover:bg-emerald-500 group-hover:text-white transition-colors">
+                    <i className="fa-solid fa-file-shield text-xs"></i>
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-gray-900">Legal Pages</div>
+                    <div className="text-[10px] text-gray-500">Edit policies & disclaimer</div>
+                  </div>
+                </button>
                 <div className="h-px bg-gray-50 my-2"></div>
                 <div className="px-4 py-2">
                   <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Project Info</div>
@@ -456,15 +470,16 @@ export default function EditorPage() {
                     { id: 'benefits', name: 'Benefits', icon: 'fa-check-circle' },
                     { id: 'pricing', name: 'Pricing Plans', icon: 'fa-tags' },
                     { id: 'faq', name: 'FAQ', icon: 'fa-question-circle' },
+                    { id: 'order', name: 'Order Page (Link)', icon: 'fa-shopping-cart' },
                     { id: 'footer', name: 'Footer', icon: 'fa-shoe-prints' },
                   ].map((tab) => (
                     <button
                       key={tab.id}
                       onClick={() => setActiveContentTab(tab.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-none text-sm font-bold transition-all ${activeContentTab === tab.id ? 'bg-white text-purple-600 shadow-sm border border-gray-100' : 'text-gray-500 hover:bg-white/50 hover:text-gray-900'}`}
+                      className={`w-full flex items-center gap-3 px-3 py-2 rounded-none text-[11px] font-bold transition-all ${activeContentTab === tab.id ? 'bg-white text-purple-600 shadow-sm border border-gray-100' : 'text-gray-500 hover:bg-white/50 hover:text-gray-900'}`}
                     >
-                      <i className={`fa-solid ${tab.icon} w-5 text-center`}></i>
-                      {tab.name}
+                      <i className={`fa-solid ${tab.icon} w-4 text-center text-[10px]`}></i>
+                      <span className="truncate">{tab.name}</span>
                     </button>
                   ))}
                 </div>
@@ -912,6 +927,58 @@ export default function EditorPage() {
                   </div>
                 )}
 
+                {activeContentTab === 'order' && (
+                  <div className="space-y-6">
+                    <div className="bg-blue-50 p-4 border border-blue-100 flex items-start gap-4">
+                      <div className="w-10 h-10 bg-blue-500 text-white flex items-center justify-center shrink-0">
+                        <i className="fa-solid fa-info-circle text-xl"></i>
+                      </div>
+                      <div>
+                        <div className="text-xs font-bold text-blue-900 mb-1">Dynamic Order Page</div>
+                        <div className="text-[11px] text-blue-700 leading-relaxed">
+                          Your exported site will include an <strong>order.html</strong> file.
+                          When users click on "Buy Now" or "Order" buttons, they will be redirected to the link below.
+                          This is perfect for affiliate links or external checkout pages.
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Redirect Destination URL</label>
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 relative">
+                          <i className="fa-solid fa-link absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[10px]"></i>
+                          <input
+                            type="url"
+                            value={projectData.orderLink || ''}
+                            onChange={(e) => updateOrderLink(e.target.value)}
+                            placeholder="https://glycopezil.com/..."
+                            className="w-full pl-9 pr-4 py-3 rounded-none border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all font-bold text-gray-900 text-sm"
+                          />
+                        </div>
+                      </div>
+                      <p className="text-[10px] text-gray-400 italic">Example: https://your-affiliate-link.com/?id=123</p>
+                    </div>
+
+                    <div className="pt-6 border-t border-gray-100">
+                      <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4">Preview of order.html</div>
+                      <div className="bg-gray-900 p-4 font-mono text-[11px] text-gray-300 overflow-x-auto whitespace-pre">
+                        {`<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <meta http-equiv="Refresh" content="0; URL=${projectData.orderLink || '#'}" />
+  <title>${projectData.productName} | Order Page</title>
+</head>
+<body>
+  <a href="${projectData.orderLink || '#'}">Redirecting...</a>
+</body>
+</html>`}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {activeContentTab === 'footer' && (
                   <div className="space-y-3">
                     <div className="space-y-1.5">
@@ -1130,6 +1197,62 @@ export default function EditorPage() {
         </div>
       )
       }
-    </div >
+      {/* Legal Pages Modal */}
+      {showLegalModal && projectData && (
+        <div className="fixed inset-0 z-[30000] flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowLegalModal(false)}></div>
+          <div className="bg-white w-full max-w-4xl rounded-none shadow-2xl z-[30001] overflow-hidden flex flex-col max-h-[90vh] relative animate-in zoom-in-95 duration-200">
+            <div className="bg-gray-50 p-4 border-b flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <i className="fa-solid fa-scale-balanced text-blue-600 text-xl"></i>
+                <h3 className="m-0 text-sm font-black text-gray-900 uppercase tracking-tight">Legal Pages Content</h3>
+              </div>
+              <button onClick={() => setShowLegalModal(false)} className="w-8 h-8 rounded-none hover:bg-gray-100 flex items-center justify-center transition-colors">
+                <i className="fa-solid fa-xmark text-gray-400"></i>
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto space-y-6 bg-white custom-scrollbar">
+              <div className="grid grid-cols-12 gap-5">
+                <div className="col-span-12 space-y-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Privacy Policy</label>
+                  <textarea
+                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
+                    value={projectData.legalPages?.privacyPolicy}
+                    onChange={(e) => updateLegalPage('privacyPolicy', e.target.value)}
+                    placeholder="Enter your Privacy Policy content here..."
+                  />
+                </div>
+                <div className="col-span-12 space-y-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Terms & Conditions</label>
+                  <textarea
+                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
+                    value={projectData.legalPages?.termsAndConditions}
+                    onChange={(e) => updateLegalPage('termsAndConditions', e.target.value)}
+                    placeholder="Enter your Terms & Conditions here..."
+                  />
+                </div>
+                <div className="col-span-12 space-y-1.5">
+                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Disclaimer</label>
+                  <textarea
+                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
+                    value={projectData.legalPages?.disclaimer}
+                    onChange={(e) => updateLegalPage('disclaimer', e.target.value)}
+                    placeholder="Enter medical/legal disclaimers here..."
+                  />
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 border-t flex justify-end gap-3">
+              <button
+                onClick={() => setShowLegalModal(false)}
+                className="bg-black text-white px-8 py-2.5 text-xs font-black uppercase tracking-widest border-none hover:scale-[1.02] active:scale-[0.98] transition-all shadow-lg"
+              >
+                Save Legal Changes
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

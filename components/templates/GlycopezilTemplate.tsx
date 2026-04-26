@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
-import { useStore } from '@/lib/store';
+import { useStore, type ProjectData } from '@/lib/store';
 
 // Helper for Context Menu (Right Click)
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => {
@@ -89,9 +89,9 @@ const IconEditor = ({ value, onChange, className = "" }: { value: string; onChan
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
   <button
     onClick={(e) => { e.stopPropagation(); onClick(); }}
-    className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-none flex items-center justify-center transition-all z-20 hover:scale-110 border-none"
+    className="absolute -top-3 -right-3 bg-red-500 text-white w-5 h-5 rounded-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 hover:scale-110 border-none shadow-lg"
   >
-    <i className="fa-solid fa-trash-can text-[10px]"></i>
+    <i className="fa-solid fa-xmark text-[10px]"></i>
   </button>
 );
 
@@ -105,7 +105,8 @@ export const GlycopezilTemplate: React.FC = () => {
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateGallery, updateNavbar,
-    updateSocialProof, updateSectionVisibility
+    updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
+    showLegalModal, setShowLegalModal
   } = useStore();
 
   // Add Item Button inside to access projectData
@@ -119,7 +120,7 @@ export const GlycopezilTemplate: React.FC = () => {
     </button>
   );
 
-  const SectionSettings = ({ sectionKey }: { sectionKey: keyof ProjectData['sections'] }) => (
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
     <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
       <button
         onClick={() => updateSectionVisibility(sectionKey, false)}
@@ -130,27 +131,18 @@ export const GlycopezilTemplate: React.FC = () => {
     </div>
   );
 
-  const [proof, setProof] = useState<{ name: string; state: string; bottleCount: string; timeAgo: number } | null>(null);
+  const [proofIndex, setProofIndex] = useState(0);
   const [showProof, setShowProof] = useState(false);
   const [showProofSettings, setShowProofSettings] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
     const sp = projectData?.socialProof;
-    if (!sp || !sp.enabled) return;
-
-    const names = sp.names.length > 0 ? sp.names : ["James", "Michael", "Chris"];
-    const locations = sp.locations.length > 0 ? sp.locations : ["California", "Texas", "Austin"];
-    const bottles = sp.products.length > 0 ? sp.products : ["2 bottles", "3 bottles"];
+    if (!sp || !sp.enabled || !sp.items?.length) return;
 
     const interval = setInterval(() => {
       if (typeof window !== 'undefined' && window.innerWidth >= 500) {
-        setProof({
-          name: names[Math.floor(Math.random() * names.length)],
-          state: locations[Math.floor(Math.random() * locations.length)],
-          bottleCount: bottles[Math.floor(Math.random() * bottles.length)],
-          timeAgo: Math.floor(Math.random() * 10) + 1
-        });
+        setProofIndex((prev) => (prev + 1) % sp.items.length);
         setShowProof(true);
         setTimeout(() => setShowProof(false), sp.displayTime || 5000);
       }
@@ -160,32 +152,6 @@ export const GlycopezilTemplate: React.FC = () => {
   }, [projectData?.socialProof]);
 
   if (!projectData) return null;
-
-  const renderStars = (rating: number) => {
-    const percentage = (rating / 5) * 100;
-    const starSVG = <svg viewBox="0 0 24 24" width="24" height="24" xmlns="http://www.w3.org/2000/svg"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" /></svg>;
-
-    return (
-      <div className="yasr-stars-container" style={{ display: 'inline-flex', position: 'relative', lineHeight: 1, verticalAlign: 'middle' }}>
-        <div style={{ display: 'flex', gap: '2px' }}>
-          <span style={{ fill: '#e4e4e4' }}>{starSVG}</span>
-          <span style={{ fill: '#e4e4e4' }}>{starSVG}</span>
-          <span style={{ fill: '#e4e4e4' }}>{starSVG}</span>
-          <span style={{ fill: '#e4e4e4' }}>{starSVG}</span>
-          <span style={{ fill: '#e4e4e4' }}>{starSVG}</span>
-        </div>
-        <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', overflow: 'hidden', whiteSpace: 'nowrap', width: `${percentage}%` }}>
-          <div style={{ display: 'flex', gap: '2px', width: 'max-content' }}>
-            <span style={{ fill: '#fdbb02' }}>{starSVG}</span>
-            <span style={{ fill: '#fdbb02' }}>{starSVG}</span>
-            <span style={{ fill: '#fdbb02' }}>{starSVG}</span>
-            <span style={{ fill: '#fdbb02' }}>{starSVG}</span>
-            <span style={{ fill: '#fdbb02' }}>{starSVG}</span>
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   return (
     <div className="glycopezil-template relative overflow-x-hidden bg-white">
@@ -281,10 +247,11 @@ export const GlycopezilTemplate: React.FC = () => {
             position: fixed;
             bottom: 20px;
             left: 20px;
-            background: #ffffff;
+            background: #111;
+            color: #fff;
             border-radius: 12px;
             padding: 15px 18px;
-            border: 1px solid #eee;
+            border: 1px solid #333;
             font-size: 14px;
             max-width: 320px;
             z-index: 9999;
@@ -444,9 +411,9 @@ export const GlycopezilTemplate: React.FC = () => {
 
             <div className="d-none d-lg-flex align-items-center gap-4">
               {projectData.navbar?.links.map((link, i) => (
-                <Linkable 
-                  key={i} 
-                  link={link.href} 
+                <Linkable
+                  key={i}
+                  link={link.href}
                   onLinkChange={(val) => {
                     const nl = [...projectData.navbar.links];
                     nl[i] = { ...nl[i], href: val };
@@ -457,15 +424,15 @@ export const GlycopezilTemplate: React.FC = () => {
                     const nl = projectData.navbar.links.filter((_, idx) => idx !== i);
                     updateNavbar({ links: nl });
                   }} />
-                  <EditableText 
-                    tagName="span" 
-                    className="nav-link text-dark fs-5 fw-bold cursor-pointer p-0 no-underline" 
-                    value={link.label} 
+                  <EditableText
+                    tagName="span"
+                    className="nav-link text-dark fs-5 fw-bold cursor-pointer p-0 no-underline"
+                    value={link.label}
                     onChange={(val) => {
                       const nl = [...projectData.navbar.links];
                       nl[i] = { ...nl[i], label: val };
                       updateNavbar({ links: nl });
-                    }} 
+                    }}
                   />
                 </Linkable>
               ))}
@@ -1000,7 +967,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div
                   className={`h-100 border-0 transition-all duration-500 rounded-[2rem] p-4 text-center bg-white group hover:-translate-y-2`}
                   style={{
-                    border: plan.isPrimary ? `2px solid \${projectData.theme?.secondary}` : '1px solid #efefef',
+                    border: plan.isPrimary ? `2px solid ${projectData.theme?.secondary}` : '1px solid #efefef',
                     transform: plan.isPrimary ? 'scale(1.04)' : 'scale(1.0)'
                   }}
                 >
@@ -1196,12 +1163,18 @@ export const GlycopezilTemplate: React.FC = () => {
               {visible ? 'Hide' : 'Add'} {key}
             </button>
           ))}
+          <button
+            onClick={() => setShowLegalModal(true)}
+            className="px-4 py-2 text-[10px] font-bold rounded-none uppercase transition-all flex items-center gap-2 bg-blue-600 text-white hover:scale-105 border-none shadow-sm"
+          >
+            <i className="fa-solid fa-file-contract"></i> Edit Legal Pages
+          </button>
         </div>
       </div>
 
       {/* Purchase Proof Popup */}
       {projectData.socialProof?.enabled && (
-        <div 
+        <div
           className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-400 transition-colors`}
           onClick={() => setShowProofSettings(true)}
           title="Click to customize social proof"
@@ -1209,17 +1182,22 @@ export const GlycopezilTemplate: React.FC = () => {
           <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
             <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
           </div>
-          <img
-            src={projectData.hero.image || '/image/banner-img.webp'}
-            style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'contain' }}
-            alt="Product"
-          />
+          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/5">
+            <img
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
+              className="w-100 h-100 object-contain"
+              alt="Product"
+            />
+          </div>
           <div className="flex flex-col">
-            <div className="text-warning mb-1">{renderStars(4.8)}</div>
-            <div className="text-dark leading-tight">
-              <strong>{proof?.name}</strong> from <strong>{proof?.state}</strong> purchased <strong>{proof?.bottleCount}</strong>
+            <div className="text-yellow-500 text-[8px] mb-1">
+              {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
             </div>
-            <small className="text-gray-500 mt-1">{proof?.timeAgo} minutes ago</small>
+            <div className="text-white/90 text-xs leading-tight">
+              <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
+              {projectData.socialProof?.items[proofIndex]?.content}
+            </div>
+            <small className="text-white/30 text-[9px] mt-1 font-bold uppercase tracking-wider">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Buyer</small>
           </div>
         </div>
       )}
@@ -1238,7 +1216,7 @@ export const GlycopezilTemplate: React.FC = () => {
             <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
               <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 mb-4">
                 <span className="text-sm font-bold text-blue-900">Enable Social Proof Widget</span>
-                <button 
+                <button
                   onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
                   className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}
                 >
@@ -1249,8 +1227,8 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="row g-3">
                 <div className="col-md-6">
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Display Duration (ms)</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                     value={projectData.socialProof?.displayTime}
                     onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })}
@@ -1258,47 +1236,85 @@ export const GlycopezilTemplate: React.FC = () => {
                 </div>
                 <div className="col-md-6">
                   <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Interval Between (ms)</label>
-                  <input 
-                    type="number" 
+                  <input
+                    type="number"
                     className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
                     value={projectData.socialProof?.interval}
                     onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })}
                   />
                 </div>
               </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Names (one per line)</label>
-                <textarea 
-                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                  value={projectData.socialProof?.names.join('\n')}
-                  onChange={(e) => updateSocialProof({ names: e.target.value.split('\n').filter(s => s.trim()) })}
-                  placeholder="James&#10;Michael&#10;Chris..."
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Locations (one per line)</label>
-                <textarea 
-                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                  value={projectData.socialProof?.locations.join('\n')}
-                  onChange={(e) => updateSocialProof({ locations: e.target.value.split('\n').filter(s => s.trim()) })}
-                  placeholder="Texas&#10;California&#10;New York..."
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Products/Purchase Info (one per line)</label>
-                <textarea 
-                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
-                  value={projectData.socialProof?.products.join('\n')}
-                  onChange={(e) => updateSocialProof({ products: e.target.value.split('\n').filter(s => s.trim()) })}
-                  placeholder="1 bottle&#10;3 bottles&#10;Buy 1 Get 1..."
-                />
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold text-white/30 uppercase block mb-1">Entries</label>
+                {(projectData.socialProof?.items || []).map((item, idx) => (
+                  <div key={idx} className="p-3 bg-white/5 border border-white/10 relative group/item">
+                    <button
+                      onClick={() => {
+                        const ni = [...(projectData.socialProof?.items || [])];
+                        ni.splice(idx, 1);
+                        updateSocialProof({ items: ni });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none"
+                    >
+                      <i className="fa-solid fa-times text-[10px]"></i>
+                    </button>
+                    <div className="row g-2">
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Name</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.name} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], name: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">From</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.location} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], location: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-12">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Content</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.content} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], content: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Time</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.timeAgo} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], timeAgo: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Image URL</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.image} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button
+                  onClick={() => {
+                    const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
+                    updateSocialProof({ items: ni });
+                  }}
+                  className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-[10px] font-bold uppercase border border-blue-500/30 transition-all mt-2"
+                >
+                  <i className="fa-solid fa-plus mr-1"></i> Add Entry
+                </button>
               </div>
             </div>
             <div className="bg-gray-50 p-4 border-top text-right">
-              <button 
+              <button
                 onClick={() => setShowProofSettings(false)}
                 className="bg-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider border-none hover:bg-black transition-all"
               >
@@ -1311,7 +1327,8 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Scroll Button */}
       <button
-        className="position-fixed bottom-4 right-4 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-none flex items-center justify-center text-black z-50 border-none transition-transform hover:-translate-y-2 border-2 border-black"
+        className="position-fixed bottom-8 right-8 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center text-black z-50 border-none transition-all hover:-translate-y-2 shadow-xl border-2 border-black"
+        style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
       >
         <i className="fa-solid fa-arrow-up fs-4"></i>

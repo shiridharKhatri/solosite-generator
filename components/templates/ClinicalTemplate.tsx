@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
-import { useStore } from '@/lib/store';
+import { useStore, type ProjectData } from '@/lib/store';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
@@ -87,15 +87,25 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
 
 export const ClinicalTemplate: React.FC = () => {
   const {
-    projectData, updateHero, updateAbout,
-    updateFeature, addFeature, removeFeature,
-    updateIngredient, addIngredient, removeIngredient,
-    updateBenefit, addBenefit, removeBenefit,
-    updateFAQ, addFAQ, removeFAQ,
-    updatePricing, addPricing, removePricing,
-    updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar
+    projectData, updateHero, updateAbout, updateFeature, addFeature, removeFeature,
+    updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
+    updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
+    updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
+    updateResearch, updateGallery, updateNavbar,
+    updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
+    showLegalModal, setShowLegalModal
   } = useStore();
+
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
+    <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+      <button
+        onClick={() => updateSectionVisibility(sectionKey, false)}
+        className="bg-red-500/80 hover:bg-red-500 text-white px-2 py-1 text-[10px] font-bold rounded uppercase flex items-center gap-1 shadow-lg border-none backdrop-blur-sm transition-all"
+      >
+        <i className="fa-solid fa-eye-slash"></i> Hide Section
+      </button>
+    </div>
+  );
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
     <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-blue-900 bg-blue-50 hover:bg-blue-100 text-sm font-semibold py-2 px-6 rounded transition-colors flex items-center gap-2 mx-auto my-8 border border-blue-200">
@@ -105,6 +115,24 @@ export const ClinicalTemplate: React.FC = () => {
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [schemaEditor, setSchemaEditor] = useState<{ i: number, x: number, y: number } | null>(null);
+  const [proofIndex, setProofIndex] = useState(0);
+  const [showProof, setShowProof] = useState(false);
+  const [showProofSettings, setShowProofSettings] = useState(false);
+
+  useEffect(() => {
+    const sp = projectData?.socialProof;
+    if (!sp || !sp.enabled || !sp.items?.length) return;
+
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 500) {
+        setProofIndex((prev) => (prev + 1) % sp.items.length);
+        setShowProof(true);
+        setTimeout(() => setShowProof(false), sp.displayTime || 5000);
+      }
+    }, sp.interval || 8000);
+
+    return () => clearInterval(interval);
+  }, [projectData?.socialProof]);
 
   if (!projectData) return null;
 
@@ -128,6 +156,28 @@ export const ClinicalTemplate: React.FC = () => {
           border-radius: 8px;
           box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
           transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .purchase-proof {
+          position: fixed;
+          bottom: 30px;
+          left: 30px;
+          background: #ffffff;
+          border-radius: 8px;
+          padding: 12px 16px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          font-size: 13px;
+          max-width: 320px;
+          z-index: 9999;
+          transform: translateX(-150%);
+          transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          border-left: 4px solid ${secondary};
+        }
+        .purchase-proof.active {
+          transform: translateX(0);
         }
         .clinical-card:hover {
           transform: translateY(-2px);
@@ -299,7 +349,7 @@ export const ClinicalTemplate: React.FC = () => {
               <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5">
                 {[0, 1, 2, 3, 4].map((i) => (
                   <div key={i} className="opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" style={{ width: '60px' }}>
-                    <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; useStore.getState().updateProjectData({ logos: nl }); }} className="img-fluid" />
+                    <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} className="img-fluid" />
                   </div>
                 ))}
               </div>
@@ -309,10 +359,12 @@ export const ClinicalTemplate: React.FC = () => {
       </section>
 
       {/* Structured Features Grid */}
-      <section className="py-5 bg-slate-50 border-b border-slate-200">
-        <div className="container py-lg-4">
+      {projectData.sections?.features && (
+        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="features" />
+          <div className="container py-lg-4">
           <span className="data-label text-center mb-2">EFFICACY METRICS</span>
-          <EditableText tagName="h2" className="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style={{ color: primary }} value={projectData.featuresTitle || "Core Tolerances"} onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })} />
+          <EditableText tagName="h2" className="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style={{ color: primary }} value={projectData.featuresTitle || "Core Tolerances"} onChange={(val) => updateProjectData({ featuresTitle: val })} />
 
           <div className="row g-4">
             {projectData.features?.map((feature, i) => (
@@ -333,9 +385,12 @@ export const ClinicalTemplate: React.FC = () => {
           <AddButton onClick={addFeature} label="Metric" />
         </div>
       </section>
+      )}
 
-      <section className="bg-white py-4 border-b border-slate-200">
-        <div className="container max-w-[1100px] mx-auto">
+      {projectData.sections?.about && (
+        <section className="bg-white py-4 border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="about" />
+          <div className="container max-w-[1100px] mx-auto">
           <div className="clinical-header mb-4">
             <span className="data-label">PROTOCOL SUMMARY</span>
             <EditableText tagName="h2" className="fw-bold mb-0" style={{ color: primary, fontSize: '2.3rem' }} value={projectData.about.title || "The Formula"} onChange={(val) => updateAbout({ title: val })} />
@@ -361,12 +416,14 @@ export const ClinicalTemplate: React.FC = () => {
               <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} className="text-slate-700 font-serif" style={{ lineHeight: '1.7', fontSize: '1.05rem', whiteSpace: 'pre-line', textAlign: 'justify' }} />
             </div>
           </div>
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* Research */}
-      {projectData.research && (
-        <section className="py-5 bg-slate-50 border-b border-slate-200">
+      {projectData.sections?.research && projectData.research && (
+        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-7">
@@ -402,8 +459,10 @@ export const ClinicalTemplate: React.FC = () => {
       )}
 
       {/* Ingredients - Lab Report Style */}
-      <section className="py-5 bg-slate-50 border-b border-slate-200">
-        <div className="container py-lg-4">
+      {projectData.sections?.ingredients && (
+        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="ingredients" />
+          <div className="container py-lg-4">
           <div className="text-center mb-5">
             <span className="data-label">COMPOUND ANALYSIS</span>
             <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.ingredients.title || "Active Constituents"} onChange={(val) => updateIngredient(-1, { title: val })} />
@@ -428,13 +487,14 @@ export const ClinicalTemplate: React.FC = () => {
           <AddButton onClick={addIngredient} label="Constituent" />
         </div>
       </section>
+      )}
 
       {/* Pricing - Tiered Authorization Plans */}
       <section className="bg-white py-5 border-b border-slate-200" id="pricing">
         <div className="container py-lg-5">
           <div className="text-center mb-5">
             <span className="data-label">DISTRIBUTION TIERS</span>
-            <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.pricingTitle || "Select Supply"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
+            <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.pricingTitle || "Select Supply"} onChange={(val) => updateProjectData({ pricingTitle: val })} />
           </div>
 
           <div className="row g-4 justify-content-center max-w-[1000px] mx-auto">
@@ -507,8 +567,10 @@ export const ClinicalTemplate: React.FC = () => {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-5 bg-white border-b border-slate-200">
-        <div className="container py-lg-4">
+      {projectData.sections?.benefits && (
+        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="benefits" />
+          <div className="container py-lg-4">
           <div className="text-center mb-5">
             <span className="data-label">OUTCOME ANALYSIS</span>
             <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.benefits.title || "Expected Results"} onChange={(val) => updateBenefit(-1, { title: val })} />
@@ -533,10 +595,13 @@ export const ClinicalTemplate: React.FC = () => {
           <AddButton onClick={addBenefit} label="Benefit" />
         </div>
       </section>
+      )}
 
       {/* Testimonials Section */}
-      <section className="py-5 bg-slate-50 border-b border-slate-200">
-        <div className="container py-lg-4">
+      {projectData.sections?.testimonials && (
+        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="testimonials" />
+          <div className="container py-lg-4">
           <div className="text-center mb-5">
             <span className="data-label">PATIENT CASE STUDIES</span>
             <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.testimonials?.title || "Verification Records"} onChange={(val) => updateTestimonials(-1, { title: val })} />
@@ -561,10 +626,12 @@ export const ClinicalTemplate: React.FC = () => {
           <AddButton onClick={addTestimonial} label="Case Study" />
         </div>
       </section>
+      )}
 
       {/* Gallery */}
-      {projectData.gallery && (
-        <section className="py-5 bg-white border-b border-slate-200">
+      {projectData.sections?.gallery && projectData.gallery && (
+        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="gallery" />
           <div className="container">
             <div className="clinical-header mb-5 text-center">
               <span className="data-label">VERIFIED RESULTS GALLERY</span>
@@ -594,11 +661,11 @@ export const ClinicalTemplate: React.FC = () => {
             <div className="row align-items-center g-5">
               <div className="col-lg-4 text-center">
                 <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-3 mx-auto" style={{ maxWidth: '250px' }} />
-                <EditableText tagName="p" className="data-label mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Security Protocol"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
+                <EditableText tagName="p" className="data-label mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Security Protocol"} onChange={(val) => updateProjectData({ guaranteeSubtitle: val })} />
               </div>
               <div className="col-lg-8">
-                <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: primary, fontSize: '1.8rem' }} value={projectData.guaranteeHeadline || "60-Day Satisfaction Protocol"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
-                <EditableText tagName="p" className="text-slate-500" style={{ lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: primary, fontSize: '1.8rem' }} value={projectData.guaranteeHeadline || "60-Day Satisfaction Protocol"} onChange={(val) => updateProjectData({ guaranteeHeadline: val })} />
+                <EditableText tagName="p" className="text-slate-500" style={{ lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => updateProjectData({ guaranteeDescription: val })} />
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                   <button className="clinical-btn-primary mt-3">Order Now <i className="fa-solid fa-arrow-right"></i></button>
                 </Linkable>
@@ -609,11 +676,13 @@ export const ClinicalTemplate: React.FC = () => {
       </section>
 
       {/* FAQ Section */}
-      <section className="py-5 bg-white border-b border-slate-200">
-        <div className="container py-lg-4 max-w-[800px]">
+      {projectData.sections?.faq && (
+        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+          <SectionSettings sectionKey="faq" />
+          <div className="container py-lg-4 max-w-[800px]">
           <div className="text-center mb-5">
             <span className="data-label">TECHNICAL INQUIRIES</span>
-            <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.faqTitle || "Protocol FAQ"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />
+            <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.faqTitle || "Protocol FAQ"} onChange={(val) => updateProjectData({ faqTitle: val })} />
           </div>
           <div className="space-y-4">
             {projectData.faq.map((item, i) => (
@@ -627,11 +696,12 @@ export const ClinicalTemplate: React.FC = () => {
           <AddButton onClick={addFAQ} label="Question" />
         </div>
       </section>
+      )}
 
       {/* Footer - Minimal Info */}
       <footer className="bg-slate-900 text-slate-300 py-5 font-mono text-sm">
         <div className="container text-center">
-          <EditableText tagName="h2" className="fw-bold mb-2 text-white font-sans" style={{ fontSize: '1.2rem' }} value={projectData.footerHeadline || "End of Document"} onChange={(val) => useStore.getState().updateProjectData({ footerHeadline: val })} />
+          <EditableText tagName="h2" className="fw-bold mb-2 text-white font-sans" style={{ fontSize: '1.2rem' }} value={projectData.footerHeadline || "End of Document"} onChange={(val) => updateProjectData({ footerHeadline: val })} />
           <EditableText tagName="p" className="mx-auto mb-4 opacity-60 text-xs" style={{ maxWidth: '600px' }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
 
           <div className="d-flex flex-wrap justify-content-center gap-4 mb-4 border-y border-slate-800 py-3">
@@ -654,6 +724,152 @@ export const ClinicalTemplate: React.FC = () => {
           <p className="opacity-40 text-[10px]">© {new Date().getFullYear()} {projectData.productName}. DOC_REV_A.</p>
         </div>
       </footer>
+
+      {/* Purchase Proof Popup */}
+      {projectData.socialProof?.enabled && (
+        <div
+          className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-500/50 transition-all`}
+          onClick={() => setShowProofSettings(true)}
+        >
+          <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
+            <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
+          </div>
+          <div className="flex-shrink-0 w-12 h-12 rounded bg-slate-50 border border-slate-100 overflow-hidden">
+            <img
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
+              className="w-100 h-100 object-contain"
+              alt="Product"
+            />
+          </div>
+          <div className="flex flex-col">
+            <div className="text-yellow-500 text-[8px] mb-1">
+              {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+            </div>
+            <div className="text-slate-800 text-xs leading-tight">
+              <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
+              <span className="text-slate-500">{projectData.socialProof?.items[proofIndex]?.content}</span>
+            </div>
+            <small className="text-slate-400 text-[9px] mt-1 uppercase tracking-wider font-bold">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Protocol</small>
+          </div>
+        </div>
+      )}
+
+      {/* Social Proof Settings Modal */}
+      {showProofSettings && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setShowProofSettings(false)}></div>
+          <div className="bg-white w-full max-w-xl rounded shadow-2xl z-10 overflow-hidden border border-slate-200">
+            <div className="p-4 border-b border-slate-100 d-flex justify-content-between align-items-center bg-slate-50">
+              <h3 className="m-0 fs-6 fw-bold text-slate-800 uppercase tracking-widest">Popup Configuration</h3>
+              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-slate-400 hover:text-slate-600">
+                <i className="fa-solid fa-times fs-5"></i>
+              </button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+              <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200">
+                <span className="text-xs font-bold text-slate-500 uppercase">Display Widget</span>
+                <button
+                  onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
+                  className={`px-4 py-1.5 rounded text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'}`}
+                >
+                  {projectData.socialProof?.enabled ? 'ACTIVE' : 'INACTIVE'}
+                </button>
+              </div>
+
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Display Duration (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.displayTime} onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })} />
+                </div>
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Interval (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.interval} onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })} />
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Items to Cycle</label>
+                {(projectData.socialProof?.items || []).map((item, idx) => (
+                  <div key={idx} className="p-3 bg-slate-50 border border-slate-200 relative group/item">
+                    <button 
+                      onClick={() => {
+                        const ni = [...(projectData.socialProof?.items || [])];
+                        ni.splice(idx, 1);
+                        updateSocialProof({ items: ni });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none"
+                    >
+                      <i className="fa-solid fa-times text-[10px]"></i>
+                    </button>
+                    <div className="row g-2">
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Name</label>
+                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.name} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], name: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Location</label>
+                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.location} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], location: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-12">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Content</label>
+                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.content} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], content: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Time</label>
+                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.timeAgo} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], timeAgo: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Image</label>
+                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.image} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => {
+                    const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
+                    updateSocialProof({ items: ni });
+                  }}
+                  className="w-full py-2 bg-blue-50 text-blue-600 text-[10px] font-bold uppercase border border-blue-200 hover:bg-blue-100 transition-all mt-2"
+                >
+                  <i className="fa-solid fa-plus mr-1"></i> Add Entry
+                </button>
+              </div>
+            </div>
+            <div className="p-4 border-t border-slate-100 text-right bg-slate-50">
+              <button onClick={() => setShowProofSettings(false)} className="bg-slate-900 text-white px-6 py-2 text-[10px] font-bold uppercase tracking-widest border-none hover:bg-slate-800 transition-all">Apply Settings</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Scroll Button */}
+      <button
+        className="position-fixed bottom-8 right-8 w-14 h-14 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center text-black z-50 border-none transition-all hover:-translate-y-2 shadow-xl border-2 border-black"
+        style={{ boxShadow: '0 10px 20px rgba(0,0,0,0.15)' }}
+        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      >
+        <i className="fa-solid fa-arrow-up fs-4"></i>
+      </button>
     </div>
   );
 };

@@ -10,10 +10,9 @@ export async function GET(req: NextRequest) {
   console.log("API GET Session:", session);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  await connectDB();
-  const id = req.nextUrl.searchParams.get("id");
-
   try {
+    await connectDB();
+    const id = req.nextUrl.searchParams.get("id");
     if (id) {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json({ error: "Invalid Project ID format" }, { status: 400 });

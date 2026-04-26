@@ -7,19 +7,79 @@ export async function generateProjectZip(data: any) {
 
     // Sitemap & Robots
     const baseUrl = data.seo?.canonicalUrl || 'https://example.com';
+    const legalPageLinks = [
+        'privacy-policy.html',
+        'disclaimer.html',
+        'terms-and-conditions.html'
+    ].filter(id => {
+        const key = id.replace('.html', '').replace(/-([a-z])/g, (g) => g[1].toUpperCase()) as keyof typeof data.legalPages;
+        return !!data.legalPages?.[key];
+    });
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>${baseUrl}/index.html</loc><priority>1.0</priority></url>
-  <url><loc>${baseUrl}/privacy-policy.html</loc><priority>0.5</priority></url>
-  <url><loc>${baseUrl}/disclaimer.html</loc><priority>0.5</priority></url>
-  <url><loc>${baseUrl}/terms-and-conditions.html</loc><priority>0.5</priority></url>
+${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5</priority></url>`).join('\n')}
 </urlset>`;
     zip.file("sitemap.xml", sitemap);
     zip.file("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${baseUrl}/sitemap.xml`);
 
+    // Order Page (order.html) - Professional high-trust redirect
+    const orderLink = data.orderLink || 'https://example.com';
+    const orderHtml = `<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta http-equiv="Refresh" content="1.5; URL=${orderLink}" />
+    <title>Redirecting to Checkout | ${data.productName}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .spinner { border: 3px solid rgba(0,0,0,0.1); border-top-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-slate-50 flex items-center justify-center min-h-screen font-sans antialiased text-slate-900">
+    <div class="max-w-sm w-full mx-auto p-8 text-center fade-in">
+        <div class="mb-8 flex justify-center">
+            <div class="spinner"></div>
+        </div>
+        
+        <h1 class="text-xl font-bold mb-2 tracking-tight">Securing Your Connection</h1>
+        <p class="text-slate-500 text-sm leading-relaxed mb-6">
+            Please wait while we securely transfer you to the official checkout page for <strong>${data.productName}</strong>.
+        </p>
+
+        <div class="space-y-4">
+            <div class="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-blue-600 rounded-full transition-all duration-[1500ms] w-0" id="progress-bar"></div>
+            </div>
+            
+            <a href="${orderLink}" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors">
+                Click here if not redirected automatically
+            </a>
+        </div>
+    </div>
+
+    <script>
+        setTimeout(() => {
+            document.getElementById('progress-bar').style.width = '100%';
+        }, 50);
+        
+        // Fallback redirect if meta fails
+        setTimeout(() => {
+            window.location.href = "${orderLink}";
+        }, 3000);
+    </script>
+</body>
+</html>`;
+    zip.file("order.html", orderHtml);
+
     const primaryColor = data.theme?.primary || '#2C0D67';
     const secondaryColor = data.theme?.secondary || '#fbbf24';
     const layoutStyle = data.layoutStyle || 'default';
+    const customCss = '';
 
     let htmlContent = '';
     let cssContent = '';
@@ -37,6 +97,112 @@ export async function generateProjectZip(data: any) {
 
     const favicon = seo.favicon || '';
     const themeColor = seo.themeColor || primaryColor;
+
+    const socialProofBlock = data.socialProof?.enabled ? `
+    <!-- Social Proof -->
+    <div id="purchase-proof" class="purchase-proof">
+      <div class="proof-image">
+        <img id="proof-img" src="${data.socialProof?.items[0]?.image || data.hero.image}" alt="Product">
+      </div>
+      <div class="proof-content">
+        <div class="proof-stars">
+          <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+        </div>
+        <div id="proof-text" class="proof-text">
+          <strong style="color: #16a34a;">${data.socialProof?.items[0]?.name}</strong> from <strong style="color: #16a34a;">${data.socialProof?.items[0]?.location}</strong> <br>
+          ${data.socialProof?.items[0]?.content}
+        </div>
+        <div id="proof-time" class="proof-time">${data.socialProof?.items[0]?.timeAgo} • Verified Buyer</div>
+      </div>
+    </div>
+    <style>
+      .purchase-proof { position: fixed; bottom: 30px; left: 30px; background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #eee; font-size: 13px; max-width: 320px; z-index: 9999; transform: translateX(-150%); transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); color: #333; line-height: 1.4; font-family: sans-serif; }
+      .purchase-proof.active { transform: translateX(0); }
+      .proof-image { width: 60px; height: 60px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #f8f9fa; border: 1px solid #f0f0f0; }
+      .proof-image img { width: 100%; height: 100%; object-fit: contain; }
+      .proof-stars { color: #fbbf24; font-size: 10px; margin-bottom: 4px; }
+      .proof-time { font-size: 10px; color: #999; margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+      @media (max-width: 576px) { .purchase-proof { display: none !important; } }
+    </style>
+    <script>
+      (function() {
+        const items = ${JSON.stringify(data.socialProof?.items || [])};
+        if (!items.length) return;
+        let index = 0;
+        const proof = document.getElementById('purchase-proof');
+        const img = document.getElementById('proof-img');
+        const text = document.getElementById('proof-text');
+        const time = document.getElementById('proof-time');
+
+        function showNext() {
+          const item = items[index];
+          img.src = item.image || '${data.hero.image}';
+          text.innerHTML = '<strong style="color: #16a34a;">' + item.name + '</strong> from <strong style="color: #16a34a;">' + item.location + '</strong> <br>' + item.content;
+          time.innerText = item.timeAgo + ' • Verified Buyer';
+          
+          proof.classList.add('active');
+          setTimeout(() => {
+            proof.classList.remove('active');
+          }, ${data.socialProof?.displayTime || 5000});
+          
+          index = (index + 1) % items.length;
+        }
+
+        setTimeout(() => {
+          showNext();
+          setInterval(showNext, ${data.socialProof?.interval || 8000});
+        }, 3000);
+      })();
+    </script>
+    ` : '';
+
+    const scrollToTopBlock = `
+    <!-- Scroll To Top -->
+    <button id="scroll-to-top" class="scroll-to-top" onclick="window.scrollTo({top: 0, behavior: 'smooth'})">
+      <i class="fas fa-arrow-up"></i>
+    </button>
+    <style>
+      .scroll-to-top { 
+        position: fixed; 
+        bottom: 30px; 
+        right: 30px; 
+        width: 50px; 
+        height: 50px; 
+        background: ${secondaryColor}; 
+        color: #000; 
+        border-radius: 50%; 
+        display: flex; 
+        align-items: center; 
+        justify-content: center; 
+        font-size: 18px; 
+        cursor: pointer; 
+        border: 2px solid #000; 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1); 
+        z-index: 9998; 
+        transition: all 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+      }
+      .scroll-to-top.visible {
+        opacity: 1;
+        visibility: visible;
+      }
+      .scroll-to-top:hover {
+        transform: translateY(-5px);
+        background: #fff;
+      }
+    </style>
+    <script>
+      window.addEventListener('scroll', function() {
+        const btn = document.getElementById('scroll-to-top');
+        if (window.pageYOffset > 300) {
+          btn.classList.add('visible');
+        } else {
+          btn.classList.remove('visible');
+        }
+      });
+    </script>
+    `;
     const viewport = seo.viewport || 'width=device-width, initial-scale=1.0';
 
     const ogTitle = seo.ogTitle || metaTitle;
@@ -174,14 +340,12 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
 .ing { border-radius: 12px; }
 .btn-custom-pill { background-color: ${secondaryColor}; color: black; font-weight: 700; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.05); padding: 0.75rem 2rem; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; }
 .btn-custom-pill:hover { opacity: 0.9; transform: translateY(-2px); color: black; }
-.purchase-proof { position: fixed; bottom: 20px; left: 20px; background: #ffffff; border-radius: 12px; padding: 15px 18px; border: 1px solid #eee; font-size: 14px; max-width: 320px; z-index: 9999; transform: translateX(-120%); transition: transform 0.5s ease; display: flex; align-items: center; gap: 12px; }
 .about-description { text-align: justify; }
 @media (max-width: 992px) { 
     .title-scale { font-size: 1.6rem !important; } 
     .about-description { text-align: center !important; }
 }
 @media (max-width: 768px) { .bgbadge { max-width: 100%; } .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; } }
-@media (max-width: 576px) { .purchase-proof { display: none !important; } .container { padding-left: 20px !important; padding-right: 20px !important; } }
 `;
         htmlContent = `<!DOCTYPE html>
 <html lang="en-US">
@@ -473,6 +637,7 @@ ${seoBlock}
     </script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    ${socialProofBlock}
 </body>
 </html>`;
     }
@@ -775,6 +940,7 @@ ${seoBlock}
     </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    ${socialProofBlock}
 </body>
 </html>`;
     }
@@ -821,21 +987,20 @@ ${seoBlock}
             </a>
             <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
                 <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-3 text-decoration-none" style="background: ${secondaryColor} !important; border: none; font-size: 0.8rem;">Order Now</a>
-                <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavClinical">
-                    <i class="fa-solid fa-bars fs-3" style="color: ${primaryColor}"></i>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="navbarNavClinical">
-                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-light bg-lg-transparent rounded p-3 p-lg-0">
-                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-semibold p-0 text-decoration-none w-100" style="font-size: 0.85rem; color: #64748b;">${link.label.toUpperCase()}</a>`).join('')}
-                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${secondaryColor} !important; border: none; white-space: nowrap;">Order Now</a>
-                </div>
+        <div class="container px-4 d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="index.html">
+                <img src="${data.hero?.logoImage}" style="width: 40px; height: 40px; object-fit: contain;" />
+                <span class="fs-5 fw-bold logo" style="color: ${primaryColor}">${data.productName}</span>
+            </a>
+            <div class="d-none d-lg-flex align-items-center gap-5">
+                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium text-secondary hover-dark text-sm p-0">${link.label}</a>`).join('')}
+                <div class="h-6 w-px bg-light mx-2"></div>
+                <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm">${data.hero?.buttonText}</a>
             </div>
         </div>
     </nav>
-    </header>
 
-    <section id="features" class="bg-white border-bottom py-5">
+    <section class="bg-white border-bottom py-5">
         <div class="container py-lg-4">
             <div class="row align-items-center g-5">
                 <div class="col-12 col-lg-6 text-center text-lg-start pe-lg-5">
@@ -849,7 +1014,7 @@ ${seoBlock}
             <div class="row mt-5 border-top pt-4">
                 <div class="col-12">
                     <span class="data-label text-center mb-4">REGULATORY / SAFETY COMPLIANCE</span>
-                    <div class="d-flex justify-content-center flex-wrap gap-5 py-4 border-top border-bottom">
+                    <div class="d-flex justify-content-center flex-wrap gap-5 py-4">
                         ${(data.logos || []).map((logo: string) => `<div style="width: 80px; opacity: 0.5;"><img src="${logo}" class="img-fluid grayscale" /></div>`).join('')}
                     </div>
                 </div>
@@ -857,25 +1022,24 @@ ${seoBlock}
         </div>
     </section>
 
-
-
-    <section id="ingredients" class="py-5 bg-light border-bottom">
+    ${data.sections?.features ? `
+    <section id="features" class="py-5 bg-light border-bottom">
         <div class="container py-lg-4">
-            <span class="data-label text-center mb-2">EFFICACY METRICS</span>
-            <h2 class="text-center fw-bold mb-5" style="color: ${primaryColor};">${data.featuresTitle || "Core Tolerances"}</h2>
+            <span class="data-label text-center mb-2 d-block">EFFICACY METRICS</span>
+            <h2 class="text-center fw-bold mb-5" style="color: ${primaryColor}">${data.featuresTitle || "Core Tolerances"}</h2>
             <div class="row g-4">
                 ${(data.features || []).map((f: any) => `
                 <div class="col-12 col-md-6 col-lg-3"><div class="clinical-card p-4 h-100"><div class="mb-4 pb-3 border-bottom d-flex align-items-center justify-content-between"><h4 class="fw-semibold mb-0 text-dark" style="font-size: 1rem;">${f.title}</h4><img src="${f.image}" class="opacity-25 grayscale" style="height: 32px;" /></div><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
+    ${data.sections?.about ? `
     <section id="about" class="bg-white py-4 border-bottom">
         <div class="container  mx-auto" style="max-width: 1100px;">
             <div class="clinical-header mb-4"><span class="data-label">PROTOCOL SUMMARY</span><h2 class="fw-bold mb-0" style="color: ${primaryColor}; font-size: 2.3rem;">${data.about?.title || "The Formula"}</h2></div>
             <div class="clearfix">
-                <!-- Image Section - Floated Left for Newspaper/Journal Style -->
                 <div class="float-lg-start me-lg-5 mb-4 col-12 col-lg-5 px-0">
                     <div class="p-2 bg-light border rounded shadow-sm text-center">
                         <img src="${data.about?.image}" class="img-fluid rounded border border-light mx-auto" style="max-height: 380px; object-fit: contain;" />
@@ -888,11 +1052,10 @@ ${seoBlock}
                 </div>
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
-    <!-- Research -->
-    ${data.research ? `
-    <section class="py-5 bg-light border-bottom">
+    ${data.sections?.research && data.research ? `
+    <section id="research" class="py-5 bg-light border-bottom">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
@@ -908,15 +1071,15 @@ ${seoBlock}
                         `).join('')}
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="clinical-card p-2 shadow-sm"><img src="${data.research.image}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;" /></div>
+                <div class="col-lg-6 text-center">
+                    <div class="clinical-card p-2 shadow-sm d-inline-block"><img src="${data.research.image}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;" /></div>
                 </div>
             </div>
         </div>
     </section>` : ''}
 
-    ${data.gallery ? `
-    <section class="py-5 bg-white border-bottom">
+    ${data.sections?.gallery && data.gallery ? `
+    <section id="gallery" class="py-5 bg-white border-bottom">
         <div class="container">
             <div class="text-center mb-5"><span class="data-label">VERIFIED PROOF</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.gallery.title}</h2><p class="text-muted mx-auto" style="max-width: 600px;">${data.gallery.subtitle}</p></div>
             <div class="row g-3">
@@ -931,19 +1094,20 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.benefits?.items?.length ? `
+    ${data.sections?.benefits ? `
     <section id="benefits" class="py-5 bg-light border-bottom">
         <div class="container">
             <div class="text-center mb-5"><span class="data-label">THERAPEUTIC EFFECTS</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.benefits.title || "Clinical Benefits"}</h2></div>
             <div class="row g-4 justify-content-center">
-                ${data.benefits.items.map((b: any) => `
+                ${(data.benefits?.items || []).map((b: any) => `
                 <div class="col-12 col-lg-10"><div class="clinical-card p-4 d-flex align-items-start gap-3"><i class="fa-solid fa-check-circle text-success mt-1"></i><div><h4 class="fw-bold mb-1 text-dark" style="font-size: 1rem;">${b.title}</h4><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${b.description}</p></div></div></div>
                 `).join('')}
             </div>
         </div>
     </section>` : ''}
 
-    <section id="analysis" class="py-5 bg-white border-bottom">
+    ${data.sections?.ingredients ? `
+    <section id="ingredients" class="py-5 bg-white border-bottom">
         <div class="container text-center">
             <span class="data-label">COMPOUND ANALYSIS</span>
             <h2 class="fw-bold mb-5" style="color: ${primaryColor}">${data.ingredients?.title || "Active Constituents"}</h2>
@@ -953,9 +1117,9 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
-    ${data.testimonials ? `
+    ${data.sections?.testimonials && data.testimonials ? `
     <section id="testimonials" class="py-5 bg-light border-bottom">
         <div class="container">
             <div class="text-center mb-5"><span class="data-label">PATIENT FEEDBACK</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.testimonials.title}</h2></div>
@@ -983,29 +1147,6 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-
-    ${data.ingredients?.items?.length ? `
-    <section id="ingredients" class="py-5 bg-light">
-        <div class="container py-lg-5">
-            <div class="text-center mb-5"><span class="data-label">FORMULATION</span><h2 class="fw-bold clinical-header border-0 px-0 d-inline-block" style="color: ${primaryColor};">${data.ingredients.title || "Active Constituents"}</h2></div>
-            <div class="row g-4">
-                ${data.ingredients.items.map((item: any) => `
-                <div class="col-lg-4 col-md-6">
-                    <div class="clinical-card p-4 h-100 d-flex gap-4 align-items-start">
-                        <div class="flex-shrink-0 rounded overflow-hidden border" style="width: 80px; height: 80px;">
-                            <img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" />
-                        </div>
-                        <div>
-                            <h4 class="fw-bold mb-2 fs-5" style="color: ${primaryColor};">${item.title}</h4>
-                            <p class="mb-0 text-secondary text-sm" style="line-height: 1.6;">${item.description}</p>
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
     <section class="py-5 bg-white" id="pricing">
         <div class="container py-lg-5">
             <div class="text-center mb-5"><span class="data-label">DISTRIBUTION TIERS</span><h2 class="fw-bold" style="color: ${primaryColor};">${data.pricingTitle || "Select Supply"}</h2></div>
@@ -1025,19 +1166,7 @@ ${seoBlock}
         </div>
     </section>
 
-    <section class="py-5 bg-light border-bottom">
-        <div class="container py-lg-4">
-            <div class="p-5 bg-white border rounded shadow-sm">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 250px;" /><p class="data-label mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Security Protocol"}</p></div>
-                    <div class="col-lg-8"><h3 class="fw-bold mb-3" style="color: ${primaryColor}">${data.guaranteeHeadline || "60-Day Satisfaction Protocol"}</h3><p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="clinical-btn-primary mt-3">Order Now <i class="fa-solid fa-arrow-right"></i></a></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    ${data.faq?.length ? `
+    ${data.sections?.faq && data.faq?.length ? `
     <section id="faq" class="py-5 bg-white">
         <div class="container py-lg-5  mx-auto" style="max-width: 800px;">
             <h2 class="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style="color: ${primaryColor};">${data.faqTitle || "Protocol FAQ"}</h2>
@@ -1070,69 +1199,48 @@ ${seoBlock}
     </div></footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    ${socialProofBlock}
 </body>
 </html>`;
     }
     else if (layoutStyle === 'organic') {
-        cssContent = `
-@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600;700&display=swap');
-body { font-family: 'Nunito', sans-serif; background-color: #FAF6ED; color: ${primaryColor}; margin: 0; padding: 0; }
-h1, h2, h3, h4, .logo { font-family: 'Lora', serif !important; }
-.organic-card { background: #ffffff; border-radius: 30px 30px 30px 0; box-shadow: 10px 10px 30px rgba(74, 51, 32, 0.05); transition: all 0.3s ease; border: 1px solid rgba(138, 121, 105, 0.1); }
-.organic-card:hover { transform: translateY(-5px); border-radius: 30px; }
-.organic-btn-primary { background: ${primaryColor}; color: #FAF6ED; border-radius: 30px; padding: 0.8rem 2.2rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: none; }
-.organic-btn-primary:hover { background: ${secondaryColor}; color: #FAF6ED; }
-.organic-btn-outline { background: transparent; border: 2px solid ${primaryColor}; color: ${primaryColor}; border-radius: 30px; padding: 0.8rem 2.2rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
-.organic-btn-outline:hover { background: #F0EBE1; }
-.organic-blob { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-.leaf-shape { border-radius: 50% 0 50% 50%; }
-@media (max-width: 992px) {
-    h1 { font-size: 2.8rem !important; }
-}
-@media (max-width: 768px) {
-    .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-    h1 { font-size: 2.2rem !important; }
-    h2 { font-size: 1.8rem !important; }
-    .organic-blob { width: 150% !important; height: 150% !important; }
-    .organic-btn-primary, .organic-btn-outline { width: 100%; justify-content: center; }
-    .navbar { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-    .font-serif.italic { font-size: 1rem !important; }
-    img[style*="max-height: 500px"] { max-height: 300px !important; }
-    h1 { font-size: 1.8rem !important; }
-}
-`;
         htmlContent = `<!DOCTYPE html>
 <html lang="en-US">
 <head>
-    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-${seoBlock}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${data.productName}</title>
+    ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600;700&display=swap');
+        body { font-family: 'Nunito', sans-serif; background-color: #FAF6ED; color: ${primaryColor}; margin: 0; padding: 0; }
+        h1, h2, h3, h4, .logo { font-family: 'Lora', serif !important; }
+        .organic-card { background: #ffffff; border-radius: 30px 30px 30px 0; box-shadow: 10px 10px 30px rgba(74, 51, 32, 0.05); transition: all 0.3s ease; border: 1px solid rgba(138, 121, 105, 0.1); }
+        .organic-card:hover { transform: translateY(-5px); border-radius: 30px; }
+        .organic-btn-primary { background: ${primaryColor}; color: #FAF6ED; border-radius: 30px; padding: 0.8rem 2.2rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: none; }
+        .organic-btn-primary:hover { background: ${secondaryColor}; color: #FAF6ED; }
+        .organic-blob { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+        .leaf-shape { border-radius: 50% 0 50% 50%; }
+        ${customCss}
+    </style>
 </head>
 <body>
-    <header>
-    <nav class="navbar navbar-expand-lg sticky-top py-4" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px);">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                <i class="fa-solid fa-leaf fs-4" style="color: ${secondaryColor}"></i>
-                <span class="fw-bold fs-4 logo" style="color: ${primaryColor}">${data.productName}</span>
-            </a>
-            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-3 text-decoration-none" style="background: ${primaryColor} !important; color: #FAF6ED !important; font-size: 0.8rem; width: auto; min-width: auto;">Order Now</a>
-                <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavOrganic">
-                    <i class="fa-solid fa-bars fs-3" style="color: ${primaryColor}"></i>
-                </button>
-            </div>
-            <div class="collapse navbar-collapse" id="navbarNavOrganic">
-                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center rounded p-3 p-lg-0" style="background: rgba(250, 246, 237, 0.95);">
-                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-bold p-0 text-decoration-none font-serif italic w-100" style="color: ${secondaryColor}; font-size: 1rem;">${link.label}</a>`).join('')}
-                    <a href="${data.hero?.buttonHref}" class="organic-btn-primary py-2 px-4 text-decoration-none d-none d-lg-inline-flex text-nowrap" style="background: ${primaryColor} !important; color: #FAF6ED !important; width: auto; white-space: nowrap;">Order Now</a>
+    <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 121, 105, 0.1);">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="index.html">
+                <div class="leaf-shape d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; background: ${primaryColor}; color: white;">
+                    <img src="${data.hero?.logoImage}" style="width: 30px; height: 30px; object-fit: contain; filter: brightness(0) invert(1);" />
                 </div>
+                <span class="fs-4 fw-bold logo" style="color: ${primaryColor}">${data.productName}</span>
+            </a>
+            <div class="d-none d-lg-flex align-items-center gap-5">
+                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">${link.label}</a>`).join('')}
+                <a href="${data.hero?.buttonHref}" class="organic-btn-primary shadow-sm">${data.hero?.buttonText}</a>
             </div>
         </div>
     </nav>
-    </header>
 
     <section class="py-5 overflow-hidden" style="background: #FAF6ED;">
         <div class="container pt-lg-5 pb-lg-3">
@@ -1144,21 +1252,11 @@ ${seoBlock}
                     <h1 class="fw-bold mb-4" style="color: ${primaryColor}; font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1;">${data.hero?.title}</h1>
                     <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; max-width: 500px; font-size: 1.05rem; white-space: pre-line;">${data.hero?.subtitle}</p>
                     <a href="${data.hero?.buttonHref}" class="organic-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i></a>
-                    <div class="mt-5 d-flex gap-3 justify-content-center justify-content-lg-start align-items-center">
-                        <div class="d-flex" style="margin-left: 0.5rem;">
-                            ${[1, 2, 3].map(i => `<div style="width: 32px; height: 32px; border-radius: 50%; background: #E6D5C3; border: 2px solid #FAF6ED; margin-left: -0.5rem;"></div>`).join('')}
-                        </div>
-                        <span class="small fw-bold" style="color: #8A7969">Loved by 10,000+ naturally</span>
-                    </div>
                 </div>
                 <div class="col-12 col-lg-6 text-center position-relative">
                     <div class="position-absolute top-50 start-50 translate-middle organic-blob" style="width: 120%; height: 120%; background: #F0EBE1; z-index: 0;"></div>
                     <div class="position-relative z-1 d-inline-block p-4">
                         <img src="${data.hero?.image}" class="img-fluid" style="max-height: 500px; object-fit: contain;" />
-                        ${data.hero?.badgeImage ? `
-                        <div class="position-absolute bottom-0 end-0 bg-white p-3 leaf-shape shadow-sm d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; transform: translate(10%, 10%);">
-                            <img src="${data.hero.badgeImage}" class="img-fluid" style="max-width: 70px;" />
-                        </div>` : ''}
                     </div>
                 </div>
             </div>
@@ -1173,11 +1271,8 @@ ${seoBlock}
         </div>
     </section>
 
-
-
-    <!-- Research -->
-    ${data.research ? `
-    <section class="py-5 bg-white border-top border-bottom" style="border-color: #FAF6ED !important;">
+    ${data.sections?.research && data.research ? `
+    <section id="research" class="py-5 bg-white border-top border-bottom" style="border-color: #FAF6ED !important;">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
@@ -1193,17 +1288,17 @@ ${seoBlock}
                         `).join('')}
                     </div>
                 </div>
-                <div class="col-lg-6">
-                    <div class="p-3" style="background: #FAF6ED; border-radius: 3rem;">
-                        <img src="${data.research.image}" class="img-fluid w-100" style="border-radius: 2.5rem; max-height: 420px; object-fit: contain;" />
+                <div class="col-lg-6 text-center">
+                    <div class="p-3 d-inline-block" style="background: #FAF6ED; border-radius: 3rem;">
+                        <img src="${data.research.image}" class="img-fluid" style="border-radius: 2.5rem; max-height: 420px; object-fit: contain;" />
                     </div>
                 </div>
             </div>
         </div>
     </section>` : ''}
 
-    ${data.gallery ? `
-    <section class="py-5" style="background-color: #FAF6ED;">
+    ${data.sections?.gallery && data.gallery ? `
+    <section id="gallery" class="py-5" style="background-color: #FAF6ED;">
         <div class="container">
             <div class="text-center mb-5">
                 <div class="d-inline-block p-1 px-3 rounded-pill bg-success text-white small fw-bold mb-3">Community Trust</div>
@@ -1222,6 +1317,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${data.sections?.ingredients ? `
     <section id="ingredients" class="py-5" style="background: #F0EBE1;">
         <div class="container py-lg-5 text-center">
             <i class="fa-solid fa-leaf mb-3 fs-2" style="color: ${secondaryColor}"></i>
@@ -1233,8 +1329,9 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
+    ${data.sections?.about ? `
     <section id="about" class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
             <div class="row align-items-center g-5">
@@ -1242,14 +1339,14 @@ ${seoBlock}
                 <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about?.description}</div></div>
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
-    ${data.benefits?.items?.length ? `
+    ${data.sections?.benefits ? `
     <section id="features" class="py-5" style="background: #F0EBE1;">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.featuresTitle || "Nature's Bounty"}</h2>
             <div class="row g-4">
-                ${data.benefits.items.map((b: any) => `
+                ${(data.benefits?.items || []).map((b: any) => `
                 <div class="col-12 col-md-6"><div class="organic-card p-4 h-100 d-flex align-items-start gap-3 bg-white"><i class="fa-solid fa-circle-check fs-4 mt-1" style="color: ${secondaryColor}"></i><div class="text-start"><h4 class="fw-bold mb-1 font-serif" style="color: ${primaryColor}">${b.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${b.description}</p></div></div></div>
                 `).join('')}
             </div>
@@ -1283,7 +1380,7 @@ ${seoBlock}
         </div>
     </section>
 
-    ${data.testimonials ? `
+    ${data.sections?.testimonials && data.testimonials ? `
     <section id="testimonials" class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5 text-center">
             <i class="fa-solid fa-heart mb-3 fs-3" style="color: ${secondaryColor}"></i>
@@ -1314,7 +1411,7 @@ ${seoBlock}
     </section>` : ''}
 
 
-    ${data.faq?.length ? `
+    ${data.sections?.faq && data.faq?.length ? `
     <section id="faq" class="py-5" style="background: #F0EBE1;">
         <div class="container py-lg-5" style="max-width: 800px;">
             <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.faqTitle || "Wisdom & Questions"}</h2>
@@ -1350,6 +1447,7 @@ ${seoBlock}
     </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    ${socialProofBlock}
 </body>
 </html>`;
     }
@@ -1444,148 +1542,69 @@ ${seoBlock}
     }
 
     cssFolder?.file("style.css", rawCss);
+    rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
     zip.file("index.html", rawHtml);
 
     // Legal Pages - Using user-provided high-quality content
+    // Legal Pages - Using user-provided content with professional defaults
+    const productName = data.productName || 'this product';
     const legalPages = [
-        { id: 'privacy-policy', title: 'Privacy Policy' },
-        { id: 'disclaimer', title: 'Disclaimer' },
-        { id: 'terms-and-conditions', title: 'Terms & Conditions' }
+        {
+            id: 'privacy-policy',
+            title: 'Privacy Policy',
+            content: data.legalPages?.privacyPolicy || `This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from ${productName}. We are committed to protecting your privacy and ensuring a secure experience. We collect information about your device, including your web browser, IP address, and time zone. Additionally, as you browse the site, we collect information about the individual web pages or products that you view.`
+        },
+        {
+            id: 'disclaimer',
+            title: 'Disclaimer',
+            content: data.legalPages?.disclaimer || `The information provided on this website is for educational purposes only and is not intended as a substitute for professional medical advice, diagnosis, or treatment. Always seek the advice of your physician or other qualified health provider with any questions you may have regarding a medical condition. Never disregard professional medical advice or delay in seeking it because of something you have read on this website. Results may vary from person to person.`
+        },
+        {
+            id: 'terms-and-conditions',
+            title: 'Terms & Conditions',
+            content: data.legalPages?.termsAndConditions || `By accessing this website, we assume you accept these terms and conditions. Do not continue to use ${productName} if you do not agree to take all of the terms and conditions stated on this page. These terms govern your use of the site and the purchase of any products. We reserve the right to update these terms at any time without prior notice.`
+        }
     ];
 
-    const headerEndIndex = rawHtml.indexOf('</header>') + 9;
+    // Try to extract header/footer for consistent look, or use a basic layout
+    let pageHeader = '';
+    let pageFooter = '';
+
+    const headerEndIndex = rawHtml.indexOf('</header>') > -1
+        ? rawHtml.indexOf('</header>') + 9
+        : (rawHtml.indexOf('</nav>') > -1 ? rawHtml.indexOf('</nav>') + 6 : -1);
+
     const footerStartIndex = rawHtml.lastIndexOf('<footer');
 
-    if (headerEndIndex > 8 && footerStartIndex > -1) {
-        const pageHeader = rawHtml.substring(0, headerEndIndex);
-        const pageFooter = rawHtml.substring(footerStartIndex);
-
-        for (const page of legalPages) {
-            let bodyContent = '';
-
-            if (page.id === 'privacy-policy') {
-                bodyContent = `
-                    <main class="container py-5" style="min-height: 70vh;">
-                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
-                            <h1 class="fw-bold mb-5">${page.title}</h1>
-                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
-At ${data.productName}, safeguarding your personal data is fundamental to how we operate. This Privacy Policy outlines the types of information we gather, the purposes for which we utilize it, and the protective measures we employ when you browse our website, complete a purchase, or engage with any of our digital services. Your continued use of this website indicates your agreement with the data practices described herein.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">1. Data We Gather</h4>
-In order to deliver and enhance our offerings, we may collect specific personal details and technical data points whenever you interact with our digital platform.
-
-<strong class="text-dark">Personally Identifiable Data:</strong> When you submit an order, sign up for newsletters, or reach out to our team, we may gather your full name, email address, telephone number, delivery and payment addresses, and purchase records.
-<strong class="text-dark">Automatically Collected Data:</strong> Our systems may passively record details such as your IP address, hardware type, browser version, pages browsed, and navigation behavior to optimize site speed and improve your overall browsing experience.
-
-All financial transactions are handled securely via reputable third-party payment processors. We do not retain complete credit card numbers or confidential financial details on any of our internal systems.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">2. Purpose of Data Usage</h4>
-• To fulfill and dispatch your purchases
-• To deliver prompt and helpful customer assistance
-• To transmit order acknowledgments, status alerts, and delivery tracking notices
-• To refine website performance and overall user satisfaction
-• To distribute marketing materials (with straightforward opt-out mechanisms)
-• To adhere to applicable legal and regulatory requirements
-
-Under no circumstances do we trade or lease your personal details to outside organizations for their promotional activities.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">3. Cookie Usage and Tracking Technologies</h4>
-This website may deploy cookies and comparable tracking mechanisms to enrich your browsing experience, recall your preferences, and evaluate overall site engagement. You retain the ability to configure or deactivate cookies via your browser preferences, though certain site features may function differently as a result.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">4. Information Protection</h4>
-We maintain robust technical infrastructure and organizational protocols to shield your personal data against unauthorized access or unintended exposure. Nevertheless, no digital communication method can offer an absolute guarantee of security.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">5. External Service Partners</h4>
-We may collaborate with vetted service providers who assist with payment handling, order fulfillment, data analytics, and customer care. These partners are granted access solely to the information essential for performing their designated functions and are contractually bound to maintain strict confidentiality.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">6. Your Data Rights</h4>
-Subject to the privacy regulations in your jurisdiction, you may be entitled to review your stored personal data, rectify any inaccuracies, or request its removal. You may also withdraw from promotional communications at any point by utilizing the unsubscribe links embedded in our emails or by reaching out directly to our support staff.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">7. Policy Revisions</h4>
-This Privacy Policy may be revised from time to time to accommodate legal developments, technological advancements, or evolving business practices. Any modifications will be published on this page along with the updated effective date. Your ongoing use of this website following any changes signifies your acceptance of the revised terms.
-
-Should you have any inquiries regarding this Privacy Policy or the way your information is managed, please do not hesitate to contact our support team. ${data.productName} remains steadfast in its dedication to preserving your privacy and ensuring complete openness about your data.
-                            </div>
-                        </div>
-                    </main>`;
-            } else if (page.id === 'disclaimer') {
-                bodyContent = `
-                    <main class="container py-5" style="min-height: 70vh;">
-                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
-                            <h1 class="fw-bold mb-5">${page.title}</h1>
-                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
-All material published on this website is offered exclusively for general knowledge and educational reference. Nothing presented here should be construed as professional medical counsel, nor should it serve as a substitute for personalized advice from a certified healthcare practitioner. ${data.productName} is a naturally-formulated dietary supplement engineered to encourage stable blood sugar readings, well-tuned metabolic processes, and enhanced daily vitality when used in conjunction with sensible eating habits and consistent physical movement. Individual experiences and outcomes will naturally differ from person to person. User reviews, success stories, and shared testimonials represent the subjective views of those individuals and should not be taken as guarantees of typical results. How well any dietary supplement performs can be influenced by numerous variables including age, nutritional intake, activity frequency, personal habits, and baseline health condition.
-
-<div class="bg-light p-4 border-start border-4 border-warning my-5">
-    <h5 class="fw-bold text-dark mb-2">FDA Disclosure</h5>
-    <p class="mb-0 text-dark small">Claims associated with ${data.productName} have not undergone formal review or approval by the U.S. Food and Drug Administration (FDA). This product is not formulated with the intent to diagnose, treat, cure, or prevent any disease, medical condition, or health disorder.</p>
-</div>
-
-Those who are currently pregnant, nursing, on prescription medication regimens, or dealing with ongoing health issues should seek professional medical guidance prior to incorporating this product into their routine. Should you experience any unexpected reactions, stop usage right away and consult a qualified medical professional without delay.
-
-${data.productName} is composed of premium, plant-origin ingredients chosen specifically to promote metabolic well-being in a safe manner. However, every product and piece of information available on this site is furnished on an "as is" basis with no guarantees, whether explicit or implied. We encourage all users to thoroughly review product labels, composition details, and dosage guidelines before consumption to ensure proper and beneficial integration into their personal wellness practice.
-
-By navigating this website or purchasing ${data.productName}, you recognize and agree that dietary supplements are meant to augment a health-conscious lifestyle rather than take the place of qualified medical treatment or professional healthcare services.
-                            </div>
-                        </div>
-                    </main>`;
-            } else {
-                bodyContent = `
-                    <main class="container py-5" style="min-height: 70vh;">
-                        <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
-                            <h1 class="fw-bold mb-5">${page.title}</h1>
-                            <div class="text-secondary " style="line-height: 1.6;" style="white-space: pre-line; font-size: 0.95rem;">
-Welcome to ${data.productName}. These Terms & Conditions establish the guidelines governing your use of our website, product purchases, and access to services available at our official website. By navigating this website or submitting an order, you acknowledge and accept these terms in their entirety. If you find yourself unable to agree, please exit the site immediately.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">1. Agreement to These Terms</h4>
-By entering this website, you affirm that you have thoroughly reviewed, comprehended, and consented to abide by these Terms & Conditions, our Privacy Policy, and any supplementary guidelines published on this platform. These provisions extend to every visitor, browser, and purchaser.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">2. Responsible Website Usage</h4>
-This website may only be accessed and utilized for legitimate, lawful purposes. Any effort to undermine site operations, infiltrate secured sections, propagate malicious material, or participate in deceptive conduct is expressly forbidden.
-
-Every element of this website, including written material, photographs, product specifications, visual assets, and brand marks, constitutes the intellectual property of ${data.productName} or its authorized licensors, safeguarded under applicable copyright and trademark statutes. No unauthorized reproduction, duplication, or redistribution is permitted without explicit written authorization.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">3. Product Details and Accuracy</h4>
-Although we make every reasonable effort to present precise product descriptions, pricing structures, ingredient profiles, and stock availability, ${data.productName} cannot warrant that all published information is entirely free of error. We maintain the right to revise content, address inaccuracies, modify pricing, or withdraw products at any time without advance notification.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">4. Eligibility Requirements</h4>
-By utilizing this website or completing a purchase, you certify that you are no younger than 18 years of age, or that you are accessing the platform with appropriate parental or guardian oversight. You pledge to furnish truthful and complete details when creating accounts, placing orders, or engaging with our support channels.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">5. Purchasing and Payment Processing</h4>
-All orders placed through our website are contingent upon verification and formal acceptance. ${data.productName} retains the authority to decline or void any order where fraud is suspected, errors have occurred, or requested items are temporarily unavailable.
-
-Payment transactions are executed securely through established third-party processing platforms. We do not collect or store complete credit card credentials, and all payment exchanges benefit from industry-standard encryption safeguards.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">6. Delivery and Shipping</h4>
-Estimated shipping windows are approximate and may fluctuate based on carrier logistics, customs procedures, or other circumstances beyond our direct control. It is the buyer's responsibility to supply an accurate and complete shipping address during the checkout process.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">7. Return and Refund Procedures</h4>
-${data.productName} is dedicated to ensuring buyer satisfaction. Qualifying purchases may be eligible for a return or monetary refund in accordance with our published return policy. Buyers are required to adhere to the designated return process and initiate any claims within the applicable guarantee timeframe.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">8. Wellness Disclaimer</h4>
-All information appearing on this website serves general educational purposes exclusively. ${data.productName} is a dietary supplement formulated to complement overall wellness and support healthy blood sugar levels as part of a balanced nutritional plan and active lifestyle. Individual results are inherently variable.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">9. Liability Boundaries</h4>
-To the maximum extent allowable under applicable law, ${data.productName} shall bear no responsibility for any direct, indirect, incidental, or consequential damages resulting from the use of this website, its published content, its products, or its associated services.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">10. External Website Links</h4>
-This website may occasionally feature hyperlinks directing you to third-party websites. ${data.productName} exercises no authority over these external platforms and assumes no liability for their content, privacy practices, or operational policies.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">11. Modifications to These Terms</h4>
-We reserve the right to amend these Terms & Conditions at any point to reflect operational shifts, legal developments, or policy refinements. Revised terms will be posted directly on this page, and your continued engagement with the website constitutes acceptance of the amended provisions.
-
-<h4 class="fw-bold text-dark mt-5 mb-3">12. Applicable Legal Framework</h4>
-These Terms & Conditions fall under the jurisdiction of the laws governing the company's registered location. Any disputes originating from website usage or product purchases will be resolved in accordance with those governing statutes.
-
-For any questions or concerns regarding these Terms & Conditions, please contact our dedicated support team. ${data.productName} is firmly committed to upholding transparency, robust security measures, and unwavering trust for every user and customer.
-                            </div>
-                        </div>
-                    </main>`;
-            }
-
-            const fullHtml = pageHeader + bodyContent + pageFooter;
-            zip.file(`${page.id}.html`, fullHtml.replace(/href="#"/g, 'href="index.html"'));
+    if (headerEndIndex > -1 && footerStartIndex > -1) {
+        pageHeader = rawHtml.substring(0, headerEndIndex);
+        pageFooter = rawHtml.substring(footerStartIndex);
+        // Ensure the legal pages also have the blocks if they didn't get them from rawHtml
+        if (!pageFooter.includes('purchase-proof')) {
+            pageFooter = pageFooter.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
         }
+    } else {
+        // Fallback to basic SEO header
+        pageHeader = `<!DOCTYPE html><html lang="en"><head>${seoBlock}<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"></head><body>`;
+        pageFooter = `\n        ${socialProofBlock}\n${scrollToTopBlock}\n        </body></html>`;
+    }
+
+    for (const page of legalPages) {
+        const bodyContent = `
+            <main class="container py-5" style="min-height: 70vh;">
+                <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
+                    <h1 class="fw-bold mb-5">${page.title}</h1>
+                    <div class="text-secondary" style="line-height: 1.8; white-space: pre-line; font-size: 1.1rem; text-align: justify;">
+${page.content}
+                    </div>
+                    <div class="mt-5 pt-4 border-top">
+                        <a href="index.html" class="btn btn-outline-dark px-4 py-2 fw-bold uppercase" style="border-radius: 0; font-size: 12px; letter-spacing: 1px;">← Back to Home</a>
+                    </div>
+                </div>
+            </main>`;
+
+        const fullHtml = pageHeader + bodyContent + pageFooter;
+        zip.file(`${page.id}.html`, fullHtml.replace(/href="#"/g, 'href="index.html"'));
     }
 
     return await zip.generateAsync({ type: "blob" });

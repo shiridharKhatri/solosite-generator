@@ -24,7 +24,17 @@ function DashboardContent() {
 
     if (status === 'authenticated') {
       fetch(url)
-        .then(res => res.json())
+        .then(async res => {
+          if (!res.ok) {
+            const text = await res.text();
+            throw new Error(`Request failed with status ${res.status}: ${text}`);
+          }
+          const contentType = res.headers.get("content-type");
+          if (contentType && contentType.includes("application/json")) {
+            return res.json();
+          }
+          throw new Error("Response is not JSON");
+        })
         .then(data => {
           if (Array.isArray(data)) {
             setProjects(data);

@@ -3,12 +3,12 @@
 import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
-import { useStore } from '@/lib/store';
+import { useStore, type ProjectData } from '@/lib/store';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute top-2 right-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white w-6 h-6 rounded-none flex items-center justify-center transition-all z-20 hover:scale-110 border-none">
-    <i className="fa-solid fa-trash-can text-[10px]"></i>
+  <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="absolute -top-3 -right-3 bg-red-500 text-white w-5 h-5 rounded-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-20 hover:scale-110 border-none shadow-lg">
+    <i className="fa-solid fa-xmark text-[10px]"></i>
   </button>
 );
 
@@ -95,10 +95,11 @@ export const ModernTemplate: React.FC = () => {
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateGallery, updateNavbar,
-    updateSocialProof, updateSectionVisibility
+    updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
+    showLegalModal, setShowLegalModal
   } = useStore();
 
-  const SectionSettings = ({ sectionKey }: { sectionKey: keyof ProjectData['sections'] }) => (
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
     <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
       <button
         onClick={() => updateSectionVisibility(sectionKey, false)}
@@ -118,26 +119,17 @@ export const ModernTemplate: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [schemaEditor, setSchemaEditor] = useState<{ i: number, x: number, y: number } | null>(null);
-  const [proof, setProof] = useState<{ name: string; state: string; bottleCount: string; timeAgo: number } | null>(null);
+  const [proofIndex, setProofIndex] = useState(0);
   const [showProof, setShowProof] = useState(false);
   const [showProofSettings, setShowProofSettings] = useState(false);
 
   useEffect(() => {
     const sp = projectData?.socialProof;
-    if (!sp || !sp.enabled) return;
-
-    const names = sp.names.length > 0 ? sp.names : ["James", "Michael", "Chris"];
-    const locations = sp.locations.length > 0 ? sp.locations : ["California", "Texas", "Austin"];
-    const bottles = sp.products.length > 0 ? sp.products : ["2 bottles", "3 bottles"];
+    if (!sp || !sp.enabled || !sp.items?.length) return;
 
     const interval = setInterval(() => {
       if (typeof window !== 'undefined' && window.innerWidth >= 500) {
-        setProof({
-          name: names[Math.floor(Math.random() * names.length)],
-          state: locations[Math.floor(Math.random() * locations.length)],
-          bottleCount: bottles[Math.floor(Math.random() * bottles.length)],
-          timeAgo: Math.floor(Math.random() * 10) + 1
-        });
+        setProofIndex((prev) => (prev + 1) % sp.items.length);
         setShowProof(true);
         setTimeout(() => setShowProof(false), sp.displayTime || 5000);
       }
@@ -706,12 +698,18 @@ export const ModernTemplate: React.FC = () => {
               {visible ? 'Hide' : 'Add'} {key}
             </button>
           ))}
+          <button
+            onClick={() => setShowLegalModal(true)}
+            className="px-4 py-2 text-[10px] font-bold rounded-none uppercase transition-all flex items-center gap-2 bg-blue-600 text-white hover:scale-105 border-none shadow-sm"
+          >
+            <i className="fa-solid fa-file-contract"></i> Edit Legal Pages
+          </button>
         </div>
       </div>
 
       {/* Purchase Proof Popup */}
       {projectData.socialProof?.enabled && (
-        <div 
+        <div
           className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-500/50 transition-colors glass-card p-3 d-flex align-items-center gap-3`}
           style={{ width: '320px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}
           onClick={() => setShowProofSettings(true)}
@@ -721,7 +719,7 @@ export const ModernTemplate: React.FC = () => {
           </div>
           <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/5">
             <img
-              src={projectData.hero.image || '/image/banner-img.webp'}
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
               className="w-100 h-100 object-contain"
               alt="Product"
             />
@@ -731,10 +729,10 @@ export const ModernTemplate: React.FC = () => {
               {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
             </div>
             <div className="text-white/90 text-xs leading-tight">
-              <strong>{proof?.name}</strong> in <strong>{proof?.state}</strong> <br/>
-              just bought <strong>{proof?.bottleCount}</strong>
+              <strong className="text-green-400">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-400">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
+              {projectData.socialProof?.items[proofIndex]?.content}
             </div>
-            <small className="text-white/30 text-[9px] mt-1">{proof?.timeAgo}m ago • Verified Buyer</small>
+            <small className="text-white/30 text-[9px] mt-1 font-bold uppercase tracking-wider">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Buyer</small>
           </div>
         </div>
       )}
@@ -753,7 +751,7 @@ export const ModernTemplate: React.FC = () => {
             <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
               <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10">
                 <span className="text-xs font-bold text-white/60 uppercase">Display Widget</span>
-                <button 
+                <button
                   onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
                   className={`px-4 py-1.5 rounded-none text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-blue-600 text-white' : 'bg-white/10 text-white/40'}`}
                 >
@@ -772,19 +770,72 @@ export const ModernTemplate: React.FC = () => {
                 </div>
               </div>
 
-              <div>
-                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Names</label>
-                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.names.join('\n')} onChange={(e) => updateSocialProof({ names: e.target.value.split('\n').filter(s => s.trim()) })} />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Locations</label>
-                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.locations.join('\n')} onChange={(e) => updateSocialProof({ locations: e.target.value.split('\n').filter(s => s.trim()) })} />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Products</label>
-                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.products.join('\n')} onChange={(e) => updateSocialProof({ products: e.target.value.split('\n').filter(s => s.trim()) })} />
+              <div className="space-y-4">
+                {(projectData.socialProof?.items || []).map((item, idx) => (
+                  <div key={idx} className="p-3 bg-white/5 border border-white/10 relative group/item">
+                    <button 
+                      onClick={() => {
+                        const ni = [...(projectData.socialProof?.items || [])];
+                        ni.splice(idx, 1);
+                        updateSocialProof({ items: ni });
+                      }}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none"
+                    >
+                      <i className="fa-solid fa-times text-[10px]"></i>
+                    </button>
+                    <div className="row g-2">
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Name</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.name} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], name: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Location</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.location} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], location: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-12">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Purchase Info</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.content} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], content: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Time</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.timeAgo} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], timeAgo: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                         <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Image URL</label>
+                         <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.image} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <button 
+                  onClick={() => {
+                    const ni = [...(projectData.socialProof?.items || []), { name: "New Customer", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
+                    updateSocialProof({ items: ni });
+                  }}
+                  className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-[10px] font-bold uppercase border border-blue-500/30 transition-all mt-2"
+                >
+                  <i className="fa-solid fa-plus mr-1"></i> Add Entry
+                </button>
               </div>
             </div>
             <div className="p-4 border-t border-white/10 text-right">
@@ -795,9 +846,10 @@ export const ModernTemplate: React.FC = () => {
       )}
 
       {/* Back to top */}
-      <button className="position-fixed bottom-4 right-4 w-12 h-12 rounded-none flex items-center justify-center z-50 border-none transition-all hover:-translate-y-1" style={{ background: secondary, color: primary }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-        <i className="fa-solid fa-arrow-up"></i>
+      <button className="position-fixed bottom-8 right-8 w-14 h-14 rounded-full flex items-center justify-center z-50 border-none transition-all hover:-translate-y-2 shadow-xl border-2 border-black" style={{ background: '#fbbf24', color: '#000', boxShadow: '0 10px 20px rgba(0,0,0,0.2)' }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+        <i className="fa-solid fa-arrow-up fs-4"></i>
       </button>
+
     </div>
   );
 };
