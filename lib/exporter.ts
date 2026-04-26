@@ -1413,7 +1413,9 @@ ${seoBlock}
             if (imgSrc.startsWith('//')) {
                 fetchUrl = 'https:' + imgSrc;
             } else if (!imgSrc.startsWith('http')) {
-                const baseUrlOrigin = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+                const baseUrlOrigin = typeof window !== 'undefined' 
+                    ? window.location.origin 
+                    : (process.env.NEXTAUTH_URL || 'http://localhost:3000');
                 const path = imgSrc.startsWith('/') ? imgSrc : '/' + imgSrc;
                 fetchUrl = baseUrlOrigin + path;
             }
