@@ -94,8 +94,20 @@ export const ModernTemplate: React.FC = () => {
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar
+    updateResearch, updateGallery, updateNavbar,
+    updateSocialProof, updateSectionVisibility
   } = useStore();
+
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof ProjectData['sections'] }) => (
+    <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+      <button
+        onClick={() => updateSectionVisibility(sectionKey, false)}
+        className="bg-red-500/80 hover:bg-red-500 text-white px-2 py-1 text-[10px] font-bold rounded-none uppercase flex items-center gap-1 shadow-lg border-none backdrop-blur-sm transition-all"
+      >
+        <i className="fa-solid fa-eye-slash"></i> Hide Section
+      </button>
+    </div>
+  );
 
   const AddButton = ({ onClick, label }: { onClick: () => void, label: string }) => (
     <button onClick={(e) => { e.stopPropagation(); onClick(); }} className="text-white text-[12px] font-bold py-2 px-5 rounded-none transition-all flex items-center gap-2 mx-auto my-8 uppercase tracking-widest border-none" style={{ backgroundColor: projectData?.theme?.primary || '#1e3932' }}>
@@ -106,6 +118,33 @@ export const ModernTemplate: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [schemaEditor, setSchemaEditor] = useState<{ i: number, x: number, y: number } | null>(null);
+  const [proof, setProof] = useState<{ name: string; state: string; bottleCount: string; timeAgo: number } | null>(null);
+  const [showProof, setShowProof] = useState(false);
+  const [showProofSettings, setShowProofSettings] = useState(false);
+
+  useEffect(() => {
+    const sp = projectData?.socialProof;
+    if (!sp || !sp.enabled) return;
+
+    const names = sp.names.length > 0 ? sp.names : ["James", "Michael", "Chris"];
+    const locations = sp.locations.length > 0 ? sp.locations : ["California", "Texas", "Austin"];
+    const bottles = sp.products.length > 0 ? sp.products : ["2 bottles", "3 bottles"];
+
+    const interval = setInterval(() => {
+      if (typeof window !== 'undefined' && window.innerWidth >= 500) {
+        setProof({
+          name: names[Math.floor(Math.random() * names.length)],
+          state: locations[Math.floor(Math.random() * locations.length)],
+          bottleCount: bottles[Math.floor(Math.random() * bottles.length)],
+          timeAgo: Math.floor(Math.random() * 10) + 1
+        });
+        setShowProof(true);
+        setTimeout(() => setShowProof(false), sp.displayTime || 5000);
+      }
+    }, sp.interval || 8000);
+
+    return () => clearInterval(interval);
+  }, [projectData?.socialProof]);
 
   if (!projectData) return null;
 
@@ -317,45 +356,52 @@ export const ModernTemplate: React.FC = () => {
       </section>
 
       {/* Features */}
-      <section className="section-darker py-5">
-        <div className="container">
-          <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.featuresTitle || "What Sets Us Apart"} onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })} />
-          <p className="text-center mb-5" style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.9rem' }}>Science-backed ingredients. Zero compromises.</p>
-          <div className="row g-4 justify-content-center">
-            {projectData.features?.map((feature, i) => (
-              <div key={i} className="col-12 col-sm-6 col-lg-3">
-                <div className="glass-card p-4 h-100 text-center relative">
-                  <RemoveButton onClick={() => removeFeature(i)} />
-                  <EditableImage src={feature.image || '/image/gmo.webp'} onChange={(val) => updateFeature(i, { image: val })} className="img-fluid mx-auto mb-3" style={{ height: '80px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.7 }} />
-                  <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
-                  <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
+      {projectData.sections?.features !== false && (
+        <section className="section-darker py-5 relative group/section">
+          <SectionSettings sectionKey="features" />
+          <div className="container">
+            <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.featuresTitle || "What Sets Us Apart"} onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })} />
+            <p className="text-center mb-5" style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.9rem' }}>Science-backed ingredients. Zero compromises.</p>
+            <div className="row g-4 justify-content-center">
+              {projectData.features?.map((feature, i) => (
+                <div key={i} className="col-12 col-sm-6 col-lg-3">
+                  <div className="glass-card p-4 h-100 text-center relative">
+                    <RemoveButton onClick={() => removeFeature(i)} />
+                    <EditableImage src={feature.image || '/image/gmo.webp'} onChange={(val) => updateFeature(i, { image: val })} className="img-fluid mx-auto mb-3" style={{ height: '80px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.7 }} />
+                    <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <AddButton onClick={addFeature} label="Feature" />
           </div>
-          <AddButton onClick={addFeature} label="Feature" />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* About */}
-      <section className="section-dark py-5">
-        <div className="container">
-          <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.about.title || "The Formula"} onChange={(val) => updateAbout({ title: val })} />
-          <div className="row align-items-center g-5">
-            <div className="col-12 col-lg-5 text-center">
-              <div className="glass-card p-4">
-                <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid rounded-3" style={{ maxHeight: '400px', objectFit: 'contain' }} />
+      {projectData.sections?.about !== false && (
+        <section className="section-dark py-5 relative group/section">
+          <SectionSettings sectionKey="about" />
+          <div className="container">
+            <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.about.title || "The Formula"} onChange={(val) => updateAbout({ title: val })} />
+            <div className="row align-items-center g-5">
+              <div className="col-12 col-lg-5 text-center">
+                <div className="glass-card p-4">
+                  <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid rounded-3" style={{ maxHeight: '400px', objectFit: 'contain' }} />
+                </div>
+              </div>
+              <div className="col-12 col-lg-7">
+                <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.9, fontSize: '0.95rem', whiteSpace: 'pre-line' }} />
               </div>
             </div>
-            <div className="col-12 col-lg-7">
-              <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.9, fontSize: '0.95rem', whiteSpace: 'pre-line' }} />
-            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
       {/* Research */}
-      {projectData.research && (
-        <section className="section-darker py-5 border-t border-white/5">
+      {projectData.research && projectData.sections?.research !== false && (
+        <section className="section-darker py-5 border-t border-white/5 relative group/section">
+          <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
@@ -390,41 +436,45 @@ export const ModernTemplate: React.FC = () => {
       )}
 
       {/* Testimonials */}
-      <section className="section-dark py-5">
-        <div className="container">
-          <div className="text-center mb-5">
-            <span className="px-4 py-1.5 rounded-none text-[10px] fw-bold uppercase tracking-[0.3em] mb-3 d-inline-block" style={{ background: `${secondary}10`, color: secondary, border: `1px solid ${secondary}30` }}>Proof of Concept</span>
-            <EditableText tagName="h2" className="fw-bold gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Community Feedback"} onChange={(val) => updateTestimonials(-1, { title: val })} />
-          </div>
-          <div className="row g-4">
-            {projectData.testimonials?.items.map((item, i) => (
-              <div key={i} className="col-12 col-md-4">
-                <div className="glass-card p-5 h-100 relative group/card">
-                  <RemoveButton onClick={() => removeTestimonial(i)} />
-                  <div className="mb-4 d-flex align-items-center gap-3">
-                    <div className="w-12 h-12 rounded-none overflow-hidden border border-white/10 p-0.5">
-                      <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-100 h-100 object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500" />
+      {projectData.sections?.testimonials !== false && (
+        <section className="section-dark py-5 relative group/section">
+          <SectionSettings sectionKey="testimonials" />
+          <div className="container">
+            <div className="text-center mb-5">
+              <span className="px-4 py-1.5 rounded-none text-[10px] fw-bold uppercase tracking-[0.3em] mb-3 d-inline-block" style={{ background: `${secondary}10`, color: secondary, border: `1px solid ${secondary}30` }}>Proof of Concept</span>
+              <EditableText tagName="h2" className="fw-bold gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.testimonials?.title || "Community Feedback"} onChange={(val) => updateTestimonials(-1, { title: val })} />
+            </div>
+            <div className="row g-4">
+              {projectData.testimonials?.items.map((item, i) => (
+                <div key={i} className="col-12 col-md-4">
+                  <div className="glass-card p-5 h-100 relative group/card">
+                    <RemoveButton onClick={() => removeTestimonial(i)} />
+                    <div className="mb-4 d-flex align-items-center gap-3">
+                      <div className="w-12 h-12 rounded-none overflow-hidden border border-white/10 p-0.5">
+                        <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-100 h-100 object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500" />
+                      </div>
+                      <div>
+                        <EditableText tagName="h5" className="fw-bold mb-0 text-white text-sm" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
+                        <EditableText tagName="p" className="mb-0 text-[10px] text-white/40 uppercase tracking-widest font-mono" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
+                      </div>
                     </div>
-                    <div>
-                      <EditableText tagName="h5" className="fw-bold mb-0 text-white text-sm" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
-                      <EditableText tagName="p" className="mb-0 text-[10px] text-white/40 uppercase tracking-widest font-mono" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
+                    <div className="mb-4 d-flex gap-1 text-yellow-500 text-[10px]">
+                      {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
                     </div>
+                    <EditableText tagName="p" className="mb-0 text-white/60 italic text-sm" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
                   </div>
-                  <div className="mb-4 d-flex gap-1 text-yellow-500 text-[10px]">
-                    {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
-                  </div>
-                  <EditableText tagName="p" className="mb-0 text-white/60 italic text-sm" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <AddButton onClick={addTestimonial} label="Testimonial" />
           </div>
-          <AddButton onClick={addTestimonial} label="Testimonial" />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Gallery */}
-      {projectData.gallery && (
-        <section className="section-darker py-5 border-t border-white/5">
+      {projectData.gallery && projectData.sections?.gallery !== false && (
+        <section className="section-darker py-5 border-t border-white/5 relative group/section">
+          <SectionSettings sectionKey="gallery" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
             <EditableText tagName="p" className="text-center mb-5 text-white/50" style={{ fontSize: '1rem' }} value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
@@ -444,76 +494,87 @@ export const ModernTemplate: React.FC = () => {
           </div>
         </section>
       )}
-      <section className="section-darker py-5">
-        <div className="container">
-          <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
-          <EditableText tagName="p" className="text-center mb-5 mx-auto" style={{ color: 'rgba(255,255,255,0.4)', maxWidth: '700px', fontSize: '0.9rem' }} value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
-          <div className="row g-4">
-            {projectData.benefits?.items?.map((benefit, i) => (
-              <div key={i} className="col-12 col-md-6 relative">
-                <div className="glass-card p-4 h-100">
-                  <RemoveButton onClick={() => removeBenefit(i)} />
-                  <div className="d-flex align-items-start gap-3">
-                    <div className="flex-shrink-0 w-10 h-10 rounded-none d-flex align-items-center justify-content-center" style={{ background: `${secondary}15` }}>
-                      <i className="fa-solid fa-check" style={{ color: secondary, fontSize: '0.8rem' }}></i>
-                    </div>
-                    <div>
-                      <EditableText tagName="h4" className="fw-bold mb-1" style={{ color: '#fff', fontSize: '1rem' }} value={benefit.title} onChange={(val) => updateBenefit(i, { title: val })} />
-                      <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
+
+      {/* Benefits */}
+      {projectData.sections?.benefits !== false && (
+        <section className="section-darker py-5 relative group/section">
+          <SectionSettings sectionKey="benefits" />
+          <div className="container">
+            <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
+            <EditableText tagName="p" className="text-center mb-5 mx-auto" style={{ color: 'rgba(255,255,255,0.4)', maxWidth: '700px', fontSize: '0.9rem' }} value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+            <div className="row g-4">
+              {projectData.benefits?.items?.map((benefit, i) => (
+                <div key={i} className="col-12 col-md-6 relative">
+                  <div className="glass-card p-4 h-100">
+                    <RemoveButton onClick={() => removeBenefit(i)} />
+                    <div className="d-flex align-items-start gap-3">
+                      <div className="flex-shrink-0 w-10 h-10 rounded-none d-flex align-items-center justify-content-center" style={{ background: `${secondary}15` }}>
+                        <i className="fa-solid fa-check" style={{ color: secondary, fontSize: '0.8rem' }}></i>
+                      </div>
+                      <div>
+                        <EditableText tagName="h4" className="fw-bold mb-1" style={{ color: '#fff', fontSize: '1rem' }} value={benefit.title} onChange={(val) => updateBenefit(i, { title: val })} />
+                        <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <AddButton onClick={addBenefit} label="Benefit" />
           </div>
-          <AddButton onClick={addBenefit} label="Benefit" />
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Guarantee */}
-      <section className="py-5" style={{ background: `linear-gradient(135deg, ${primary}30, #0a0a0a)` }}>
-        <div className="container">
-          <div className="glass-card p-5">
-            <div className="row align-items-center g-5">
-              <div className="col-lg-4 text-center">
-                <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-3" style={{ maxWidth: '200px' }} />
-                <EditableText tagName="p" className="fw-semibold mb-0" style={{ color: secondary, fontSize: '0.9rem' }} value={projectData.guaranteeSubtitle || "Zero Risk"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
-              </div>
-              <div className="col-lg-8">
-                <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: '#fff', fontSize: '1.6rem' }} value={projectData.guaranteeHeadline || "60-Day Money Back"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
-                <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
-                <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
-                  <button className="modern-btn modern-btn-primary mt-3">Claim Your Package <i className="fa-solid fa-arrow-right"></i></button>
-                </Linkable>
+      {projectData.sections?.guarantee !== false && (
+        <section className="py-5 relative group/section" style={{ background: `linear-gradient(135deg, ${primary}30, #0a0a0a)` }}>
+          <SectionSettings sectionKey="guarantee" />
+          <div className="container">
+            <div className="glass-card p-5">
+              <div className="row align-items-center g-5">
+                <div className="col-lg-4 text-center">
+                  <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-3" style={{ maxWidth: '200px' }} />
+                  <EditableText tagName="p" className="fw-semibold mb-0" style={{ color: secondary, fontSize: '0.9rem' }} value={projectData.guaranteeSubtitle || "Zero Risk"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
+                </div>
+                <div className="col-lg-8">
+                  <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: '#fff', fontSize: '1.6rem' }} value={projectData.guaranteeHeadline || "60-Day Money Back"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
+                  <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                  <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
+                    <button className="modern-btn modern-btn-primary mt-3">Claim Your Package <i className="fa-solid fa-arrow-right"></i></button>
+                  </Linkable>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Ingredients */}
-      <section className="section-dark py-5">
-        <div className="container">
-          <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.ingredients.title || "Natural Ingredients"} onChange={(val) => updateIngredient(-1, { title: val })} />
-          <div className="row g-4 justify-content-center">
-            {projectData.ingredients?.items?.map((item, i) => (
-              <div key={i} className="col-12 col-md-6 col-lg-4">
-                <div className="glass-card p-4 h-100 text-center relative">
-                  <RemoveButton onClick={() => removeIngredient(i)} />
-                  <div className="mx-auto mb-3 rounded-none overflow-hidden" style={{ width: '120px', height: '120px', border: `3px solid ${secondary}30` }}>
-                    <EditableImage src={item.image || '/image/ingredient-schisandra.png'} onChange={(val) => updateIngredient(i, { image: val })} className="w-100 h-100" style={{ objectFit: 'cover' }} />
+      {projectData.sections?.ingredients !== false && (
+        <section className="section-dark py-5 relative group/section">
+          <SectionSettings sectionKey="ingredients" />
+          <div className="container">
+            <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.ingredients.title || "Natural Ingredients"} onChange={(val) => updateIngredient(-1, { title: val })} />
+            <div className="row g-4 justify-content-center">
+              {projectData.ingredients?.items?.map((item, i) => (
+                <div key={i} className="col-12 col-md-6 col-lg-4">
+                  <div className="glass-card p-4 h-100 text-center relative">
+                    <RemoveButton onClick={() => removeIngredient(i)} />
+                    <div className="mx-auto mb-3 rounded-none overflow-hidden" style={{ width: '120px', height: '120px', border: `3px solid ${secondary}30` }}>
+                      <EditableImage src={item.image || '/image/ingredient-schisandra.png'} onChange={(val) => updateIngredient(i, { image: val })} className="w-100 h-100" style={{ objectFit: 'cover' }} />
+                    </div>
+                    <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={item.description} onChange={(val) => updateIngredient(i, { description: val })} />
                   </div>
-                  <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
-                  <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={item.description} onChange={(val) => updateIngredient(i, { description: val })} />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <AddButton onClick={addIngredient} label="Ingredient" />
           </div>
-          <AddButton onClick={addIngredient} label="Ingredient" />
-        </div>
-      </section>
+        </section>
+      )}
 
-      {/* Pricing */}
+      {/* Pricing - Always Visible for Conversion */}
       <section className="section-darker py-5" id="pricing">
         <div className="container">
           <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.pricingTitle || "Choose Your Plan"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
@@ -557,7 +618,9 @@ export const ModernTemplate: React.FC = () => {
                     </div>
                     <EditableImage src={plan.image || '/image/bottle-snap.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto transition-all duration-700 group-hover/img:scale-110 group-hover/img:rotate-2" style={{ height: '140px', objectFit: 'contain' }} />
                   </div>
-                  <EditableText tagName="p" className="fw-bold mb-3" style={{ color: secondary, fontSize: '2rem' }} value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
+                  <div className="flex justify-center items-baseline gap-1 mb-3">
+                    <EditableText tagName="span" className="fw-bold" style={{ color: secondary, fontSize: '2rem' }} value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
+                  </div>
                   <div className="mb-4">
                     {plan.features.map((f, fi) => (
                       <div key={fi} className="mb-2 d-flex align-items-center gap-2 justify-content-center" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>
@@ -580,26 +643,29 @@ export const ModernTemplate: React.FC = () => {
       </section>
 
       {/* FAQ */}
-      <section className="section-dark py-5">
-        <div className="container" style={{ maxWidth: '800px' }}>
-          <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.faqTitle || "FAQ"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />
-          {projectData.faq?.map((item, i) => (
-            <div key={i} className="glass-card mb-3 relative">
-              <RemoveButton onClick={() => removeFAQ(i)} />
-              <div className="p-4 cursor-pointer d-flex justify-content-between align-items-center" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
-                <EditableText tagName="span" className="fw-bold" style={{ color: '#fff', fontSize: '0.95rem' }} value={item.question} onChange={(val) => updateFAQ(i, { question: val })} />
-                <i className={`fa-solid fa-chevron-down transition-transform ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}></i>
-              </div>
-              {openFaq === i && (
-                <div className="px-4 pb-4">
-                  <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem', lineHeight: 1.7 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
+      {projectData.sections?.faq !== false && (
+        <section className="section-dark py-5 relative group/section">
+          <SectionSettings sectionKey="faq" />
+          <div className="container" style={{ maxWidth: '800px' }}>
+            <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.faqTitle || "FAQ"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />
+            {projectData.faq?.map((item, i) => (
+              <div key={i} className="glass-card mb-3 relative">
+                <RemoveButton onClick={() => removeFAQ(i)} />
+                <div className="p-4 cursor-pointer d-flex justify-content-between align-items-center" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
+                  <EditableText tagName="span" className="fw-bold" style={{ color: '#fff', fontSize: '0.95rem' }} value={item.question} onChange={(val) => updateFAQ(i, { question: val })} />
+                  <i className={`fa-solid fa-chevron-down transition-transform ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}></i>
                 </div>
-              )}
-            </div>
-          ))}
-          <AddButton onClick={addFAQ} label="FAQ" />
-        </div>
-      </section>
+                {openFaq === i && (
+                  <div className="px-4 pb-4">
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem', lineHeight: 1.7 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
+                  </div>
+                )}
+              </div>
+            ))}
+            <AddButton onClick={addFAQ} label="FAQ" />
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="py-5 text-center" style={{ background: '#050505', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
@@ -625,6 +691,108 @@ export const ModernTemplate: React.FC = () => {
           <p style={{ color: 'rgba(255,255,255,0.2)', fontSize: '0.75rem' }}>© {new Date().getFullYear()} {projectData.productName}. All Rights Reserved.</p>
         </div>
       </footer>
+
+      {/* Section Manager */}
+      <div className="p-8 border-t border-dashed border-white/10 text-center" style={{ background: '#080808' }}>
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-white/30 mb-6">Manage Page Sections</h3>
+        <div className="flex flex-wrap justify-center gap-4">
+          {Object.entries(projectData.sections || {}).map(([key, visible]) => (
+            <button
+              key={key}
+              onClick={() => updateSectionVisibility(key as any, !visible)}
+              className={`px-4 py-2 text-[10px] font-bold rounded-none uppercase transition-all flex items-center gap-2 border-none shadow-sm ${visible ? 'bg-white/5 text-white/40' : 'bg-blue-600 text-white hover:scale-105'}`}
+            >
+              <i className={`fa-solid ${visible ? 'fa-eye-slash' : 'fa-plus'}`}></i>
+              {visible ? 'Hide' : 'Add'} {key}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Purchase Proof Popup */}
+      {projectData.socialProof?.enabled && (
+        <div 
+          className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-500/50 transition-colors glass-card p-3 d-flex align-items-center gap-3`}
+          style={{ width: '320px', borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)' }}
+          onClick={() => setShowProofSettings(true)}
+        >
+          <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
+            <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
+          </div>
+          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/5">
+            <img
+              src={projectData.hero.image || '/image/banner-img.webp'}
+              className="w-100 h-100 object-contain"
+              alt="Product"
+            />
+          </div>
+          <div className="flex flex-col">
+            <div className="text-yellow-500 text-[8px] mb-1">
+              {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+            </div>
+            <div className="text-white/90 text-xs leading-tight">
+              <strong>{proof?.name}</strong> in <strong>{proof?.state}</strong> <br/>
+              just bought <strong>{proof?.bottleCount}</strong>
+            </div>
+            <small className="text-white/30 text-[9px] mt-1">{proof?.timeAgo}m ago • Verified Buyer</small>
+          </div>
+        </div>
+      )}
+
+      {/* Social Proof Settings Modal */}
+      {showProofSettings && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={() => setShowProofSettings(false)}></div>
+          <div className="bg-[#111] w-full max-w-xl rounded-none shadow-2xl z-10 overflow-hidden border border-white/10 animate-in zoom-in-95 duration-200">
+            <div className="p-4 border-b border-white/10 d-flex justify-content-between align-items-center">
+              <h3 className="m-0 fs-6 fw-bold text-white uppercase tracking-widest">Popup Configuration</h3>
+              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-white/40 hover:text-white">
+                <i className="fa-solid fa-times fs-5"></i>
+              </button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+              <div className="flex items-center justify-between p-3 bg-white/5 border border-white/10">
+                <span className="text-xs font-bold text-white/60 uppercase">Display Widget</span>
+                <button 
+                  onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
+                  className={`px-4 py-1.5 rounded-none text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-blue-600 text-white' : 'bg-white/10 text-white/40'}`}
+                >
+                  {projectData.socialProof?.enabled ? 'ACTIVE' : 'INACTIVE'}
+                </button>
+              </div>
+
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Display Duration (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.displayTime} onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })} />
+                </div>
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Interval (ms)</label>
+                  <input type="number" className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.interval} onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })} />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Names</label>
+                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.names.join('\n')} onChange={(e) => updateSocialProof({ names: e.target.value.split('\n').filter(s => s.trim()) })} />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Locations</label>
+                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.locations.join('\n')} onChange={(e) => updateSocialProof({ locations: e.target.value.split('\n').filter(s => s.trim()) })} />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-white/30 uppercase mb-1 block">Products</label>
+                <textarea className="w-full p-2 bg-white/5 border border-white/10 text-white text-sm h-20 outline-none focus:border-blue-500 font-mono" value={projectData.socialProof?.products.join('\n')} onChange={(e) => updateSocialProof({ products: e.target.value.split('\n').filter(s => s.trim()) })} />
+              </div>
+            </div>
+            <div className="p-4 border-t border-white/10 text-right">
+              <button onClick={() => setShowProofSettings(false)} className="bg-white text-black px-6 py-2 text-[10px] font-bold uppercase tracking-widest border-none hover:bg-gray-200 transition-all">Apply Settings</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Back to top */}
       <button className="position-fixed bottom-4 right-4 w-12 h-12 rounded-none flex items-center justify-center z-50 border-none transition-all hover:-translate-y-1" style={{ background: secondary, color: primary }} onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>

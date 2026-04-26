@@ -156,6 +156,25 @@ interface ProjectData {
     subtitle: string;
     images: string[];
   };
+  socialProof?: {
+    enabled: boolean;
+    names: string[];
+    locations: string[];
+    products: string[];
+    interval: number;
+    displayTime: number;
+  };
+  sections?: {
+    features: boolean;
+    about: boolean;
+    research: boolean;
+    benefits: boolean;
+    guarantee: boolean;
+    ingredients: boolean;
+    testimonials: boolean;
+    faq: boolean;
+    gallery: boolean;
+  };
 }
 
 interface EditorState {
@@ -190,6 +209,8 @@ interface EditorState {
   updateResearch: (research: Partial<ProjectData['research']>) => void;
   updateGallery: (gallery: Partial<ProjectData['gallery']>) => void;
   updateNavbar: (navbar: Partial<ProjectData['navbar']>) => void;
+  updateSocialProof: (proof: Partial<ProjectData['socialProof']>) => void;
+  updateSectionVisibility: (section: keyof ProjectData['sections'], visible: boolean) => void;
   updateProjectData: (data: Partial<ProjectData>) => void;
   isDirty: boolean;
   setDirty: (dirty: boolean) => void;
@@ -510,6 +531,25 @@ export const initialProjectData: ProjectData = {
       { label: "Pricing", href: "#pricing" },
       { label: "FAQ", href: "#faq" }
     ]
+  },
+  socialProof: {
+    enabled: true,
+    names: ["James", "Michael", "Harper Lewis", "Sophia Mitchell", "Ella Carter", "Chris", "Mark", "Brian", "Anthony", "Isabella Reed"],
+    locations: ["California", "Texas", "Florida", "New York", "Illinois", "Ohio", "Austin", "Denver, Colorado", "Michigan", "Pennsylvania"],
+    products: ["1 bottle", "2 bottles", "3 bottles", "6 bottles"],
+    interval: 8000,
+    displayTime: 5000
+  },
+  sections: {
+    features: true,
+    about: true,
+    research: true,
+    benefits: true,
+    guarantee: true,
+    ingredients: true,
+    testimonials: true,
+    faq: true,
+    gallery: true
   }
 };
 
@@ -747,4 +787,22 @@ export const useStore = create<EditorState>((set) => ({
     projectData: state.projectData ? { ...state.projectData, navbar: { ...state.projectData.navbar, ...navbar } } : null,
     isDirty: true
   })),
+  updateSocialProof: (proof) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, socialProof: { ...state.projectData.socialProof, ...proof } as any } : null,
+    isDirty: true
+  })),
+  updateSectionVisibility: (section, visible) => set((state) => {
+    if (!state.projectData) return state;
+    const currentSections = state.projectData.sections || {
+      features: true, about: true, research: true, benefits: true, guarantee: true,
+      ingredients: true, testimonials: true, faq: true, gallery: true
+    };
+    return {
+      projectData: {
+        ...state.projectData,
+        sections: { ...currentSections, [section]: visible }
+      },
+      isDirty: true
+    };
+  }),
 }));

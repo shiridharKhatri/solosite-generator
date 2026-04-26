@@ -1391,14 +1391,14 @@ ${seoBlock}
                 const mimeType = parts[0].split(':')[1].split(';')[0];
                 let extension = mimeType.split('/')[1] || 'png';
                 if (extension === 'jpeg') extension = 'jpg';
-                
+
                 const filename = `uploaded_image_${imageIndex}.${extension}`;
-                
+
                 // Convert base64 to Buffer for JSZip
                 const bytes = Buffer.from(base64Data, 'base64');
-                
+
                 imagesFolder?.file(filename, bytes);
-                
+
                 const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                 const regex = new RegExp(escapedSrc, "g");
                 rawHtml = rawHtml.replace(regex, `images/${filename}`);
@@ -1413,8 +1413,8 @@ ${seoBlock}
             if (imgSrc.startsWith('//')) {
                 fetchUrl = 'https:' + imgSrc;
             } else if (!imgSrc.startsWith('http')) {
-                const baseUrlOrigin = typeof window !== 'undefined' 
-                    ? window.location.origin 
+                const baseUrlOrigin = typeof window !== 'undefined'
+                    ? window.location.origin
                     : (process.env.NEXTAUTH_URL || 'http://localhost:3000');
                 const path = imgSrc.startsWith('/') ? imgSrc : '/' + imgSrc;
                 fetchUrl = baseUrlOrigin + path;

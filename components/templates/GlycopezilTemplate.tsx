@@ -104,7 +104,8 @@ export const GlycopezilTemplate: React.FC = () => {
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar
+    updateResearch, updateGallery, updateNavbar,
+    updateSocialProof, updateSectionVisibility
   } = useStore();
 
   // Add Item Button inside to access projectData
@@ -118,30 +119,45 @@ export const GlycopezilTemplate: React.FC = () => {
     </button>
   );
 
+  const SectionSettings = ({ sectionKey }: { sectionKey: keyof ProjectData['sections'] }) => (
+    <div className="absolute top-4 left-4 z-50 flex gap-2 opacity-0 group-hover/section:opacity-100 transition-opacity">
+      <button
+        onClick={() => updateSectionVisibility(sectionKey, false)}
+        className="bg-red-500/80 hover:bg-red-500 text-white px-2 py-1 text-[10px] font-bold rounded uppercase flex items-center gap-1 shadow-lg border-none backdrop-blur-sm transition-all"
+      >
+        <i className="fa-solid fa-eye-slash"></i> Hide Section
+      </button>
+    </div>
+  );
+
   const [proof, setProof] = useState<{ name: string; state: string; bottleCount: string; timeAgo: number } | null>(null);
   const [showProof, setShowProof] = useState(false);
+  const [showProofSettings, setShowProofSettings] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
-    const names = ["James", "Michael", "Harper Lewis", "Sophia Mitchell", "Ella Carter", "Chris", "Mark", "Brian", "Anthony", "Isabella Reed"];
-    const states = ["California", "Texas", "Florida", "New York", "Illinois", "Ohio", "Austin", "Denver, Colorado", "Michigan", "Pennsylvania"];
-    const bottles = ["2 bottle", "3 bottles", "6 bottles"];
+    const sp = projectData?.socialProof;
+    if (!sp || !sp.enabled) return;
+
+    const names = sp.names.length > 0 ? sp.names : ["James", "Michael", "Chris"];
+    const locations = sp.locations.length > 0 ? sp.locations : ["California", "Texas", "Austin"];
+    const bottles = sp.products.length > 0 ? sp.products : ["2 bottles", "3 bottles"];
 
     const interval = setInterval(() => {
       if (typeof window !== 'undefined' && window.innerWidth >= 500) {
         setProof({
           name: names[Math.floor(Math.random() * names.length)],
-          state: states[Math.floor(Math.random() * states.length)],
+          state: locations[Math.floor(Math.random() * locations.length)],
           bottleCount: bottles[Math.floor(Math.random() * bottles.length)],
           timeAgo: Math.floor(Math.random() * 10) + 1
         });
         setShowProof(true);
-        setTimeout(() => setShowProof(false), 5000);
+        setTimeout(() => setShowProof(false), sp.displayTime || 5000);
       }
-    }, 8000);
+    }, sp.interval || 8000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [projectData?.socialProof]);
 
   if (!projectData) return null;
 
@@ -567,91 +583,102 @@ export const GlycopezilTemplate: React.FC = () => {
       </section>
 
       {/* Why Choose Section */}
-      <section className="container-fluid text-center mt-0 sectioncolor">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 py-4 fw-bold text-white mb-0"
-          value={projectData.featuresTitle || "What Sets " + projectData.productName + " Apart?"}
-          onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })}
-        />
-      </section>
+      {projectData.sections?.features !== false && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="features" />
+            <EditableText
+              tagName="h2"
+              className="text-center fs-1 py-4 fw-bold text-white mb-0"
+              value={projectData.featuresTitle || "What Sets " + projectData.productName + " Apart?"}
+              onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })}
+            />
+          </section>
 
-      <section className="container-fluid py-5 sectioncolor1">
-        <div className="container mx-auto">
-          <div className="row justify-content-center text-center gap-4">
-            {projectData.features?.map((feature, i) => (
-              <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 p-4 bgbadge relative group">
-                <RemoveButton onClick={() => removeFeature(i)} />
-                <EditableImage
-                  src={feature.image || '/image/gmo.webp'}
-                  onChange={(val) => updateFeature(i, { image: val })}
-                  className="img-fluid w-75 mb-3 mx-auto"
-                />
-                <EditableText
-                  tagName="h3"
-                  className="fw-bold fs-4 mb-2"
-                  value={feature.title}
-                  onChange={(val) => updateFeature(i, { title: val })}
-                />
-                <EditableText
-                  tagName="p"
-                  className="fs-5 text-gray-700"
-                  value={feature.description}
-                  onChange={(val) => updateFeature(i, { description: val })}
-                />
+          <section className="container-fluid py-5 sectioncolor1">
+            <div className="container mx-auto">
+              <div className="row justify-content-center text-center gap-4">
+                {projectData.features?.map((feature, i) => (
+                  <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 p-4 bgbadge relative group">
+                    <RemoveButton onClick={() => removeFeature(i)} />
+                    <EditableImage
+                      src={feature.image || '/image/gmo.webp'}
+                      onChange={(val) => updateFeature(i, { image: val })}
+                      className="img-fluid w-75 mb-3 mx-auto"
+                    />
+                    <EditableText
+                      tagName="h3"
+                      className="fw-bold fs-4 mb-2"
+                      value={feature.title}
+                      onChange={(val) => updateFeature(i, { title: val })}
+                    />
+                    <EditableText
+                      tagName="p"
+                      className="fs-5 text-gray-700"
+                      value={feature.description}
+                      onChange={(val) => updateFeature(i, { description: val })}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <AddButton onClick={addFeature} label="Feature Card" />
-        </div>
-      </section>
+              <AddButton onClick={addFeature} label="Feature Card" />
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Understanding the Formula Section */}
-      <section className="container-fluid text-center sectioncolor">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 py-4 fw-bold text-white mb-0"
-          value={projectData.about.title || "Understanding the " + projectData.productName + " Formula"}
-          onChange={(val) => updateAbout({ title: val })}
-        />
-      </section>
+      {projectData.sections?.about !== false && (
+        <>
+          <section className="container-fluid text-center sectioncolor relative group/section">
+            <SectionSettings sectionKey="about" />
+            <EditableText
+              tagName="h2"
+              className="text-center fs-1 py-4 fw-bold text-white mb-0"
+              value={projectData.about.title || "Understanding the " + projectData.productName + " Formula"}
+              onChange={(val) => updateAbout({ title: val })}
+            />
+          </section>
 
-      <section className="container-fluid sectioncolor1 py-4 border-bottom">
-        <div className="container">
-          <div className="clearfix">
-            {/* Image Section - Floated Right for Newspaper Style */}
-            <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
-              <div className="relative inline-block p-3 bg-white rounded-none shadow-md border border-gray-100 transition-transform hover:scale-[1.01] duration-300 w-full">
-                <EditableImage
-                  src={projectData.about.image || '/image/banner-img.webp'}
-                  onChange={(val) => updateAbout({ image: val })}
-                  className="rounded-none img-fluid w-full"
-                  style={{ maxHeight: '380px', objectFit: 'contain' }}
-                />
-                <div className="mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] border-top pt-2">
-                  Editorial: Clinical Formula Composition
+          <section className="container-fluid sectioncolor1 py-4 border-bottom">
+            <div className="container">
+              <div className="clearfix">
+                {/* Image Section - Floated Right for Newspaper Style */}
+                <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
+                  <div className="relative inline-block p-3 bg-white rounded-none shadow-md border border-gray-100 transition-transform hover:scale-[1.01] duration-300 w-full">
+                    <EditableImage
+                      src={projectData.about.image || '/image/banner-img.webp'}
+                      onChange={(val) => updateAbout({ image: val })}
+                      className="rounded-none img-fluid w-full"
+                      style={{ maxHeight: '380px', objectFit: 'contain' }}
+                    />
+                    <div className="mt-2 text-[9px] font-bold text-gray-400 uppercase tracking-[0.2em] border-top pt-2">
+                      Editorial: Clinical Formula Composition
+                    </div>
+                  </div>
+                </div>
+
+                {/* Text Section - Wrapped around image */}
+                <div className="about-description-wrapper">
+                  <EditableText
+                    tagName="div"
+                    value={projectData.about.description}
+                    onChange={(val) => updateAbout({ description: val })}
+                    className="fs-5 text-secondary about-description"
+                    style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.7', color: '#444' }}
+                  />
                 </div>
               </div>
             </div>
-
-            {/* Text Section - Wrapped around image */}
-            <div className="about-description-wrapper">
-              <EditableText
-                tagName="div"
-                value={projectData.about.description}
-                onChange={(val) => updateAbout({ description: val })}
-                className="fs-5 text-secondary about-description"
-                style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.7', color: '#444' }}
-              />
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </>
+      )}
 
       {/* Research */}
-      {projectData.research && (
+      {projectData.research && projectData.sections?.research !== false && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor">
+          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="research" />
             <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
           </section>
           <section className="container-fluid py-5 bg-light">
@@ -689,100 +716,110 @@ export const GlycopezilTemplate: React.FC = () => {
       )}
 
       {/* Benefits Section */}
-      <section className="container-fluid text-center mt-0 sectioncolor" id="Benefits">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 fw-bold py-4 text-white mb-0"
-          value={projectData.benefits.title || "Powerful Advantages of " + projectData.productName}
-          onChange={(val) => updateBenefit(-1, { title: val })} // Special index for section title if needed, or updateBenefitsTitle
-        />
-      </section>
+      {projectData.sections?.benefits !== false && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor relative group/section" id="Benefits">
+            <SectionSettings sectionKey="benefits" />
+            <EditableText
+              tagName="h2"
+              className="text-center fs-1 fw-bold py-4 text-white mb-0"
+              value={projectData.benefits.title || "Powerful Advantages of " + projectData.productName}
+              onChange={(val) => updateBenefit(-1, { title: val })}
+            />
+          </section>
 
-      <section className="container-fluid bg-light py-5">
-        <div className="container mx-auto">
-          <EditableText
-            tagName="p"
-            className="fs-5 text-center mb-5 max-w-4xl mx-auto text-gray-700"
-            value={projectData.benefits.description}
-            onChange={(val) => updateBenefit(-1, { description: val })}
-          />
+          <section className="container-fluid bg-light py-5">
+            <div className="container mx-auto">
+              <EditableText
+                tagName="p"
+                className="fs-5 text-center mb-5 max-w-4xl mx-auto text-gray-700"
+                value={projectData.benefits.description}
+                onChange={(val) => updateBenefit(-1, { description: val })}
+              />
 
-          <div className="row g-4 justify-content-center">
-            {projectData.benefits?.items?.map((benefit, i) => (
-              <div key={i} className="col-12 col-lg-10 relative">
-                <div className="card h-100 ing text-center text-lg-start p-4 bg-white hover:-translate-y-2 transition-all duration-300 border-0">
-                  <RemoveButton onClick={() => removeBenefit(i)} />
-                  <EditableText
-                    tagName="h3"
-                    className="fw-bold fs-4 mb-2"
-                    value={benefit.title}
-                    onChange={(val) => updateBenefit(i, { title: val })}
+              <div className="row g-4 justify-content-center">
+                {projectData.benefits?.items?.map((benefit, i) => (
+                  <div key={i} className="col-12 col-lg-10 relative">
+                    <div className="card h-100 ing text-center text-lg-start p-4 bg-white hover:-translate-y-2 transition-all duration-300 border-0">
+                      <RemoveButton onClick={() => removeBenefit(i)} />
+                      <EditableText
+                        tagName="h3"
+                        className="fw-bold fs-4 mb-2"
+                        value={benefit.title}
+                        onChange={(val) => updateBenefit(i, { title: val })}
+                      />
+                      <EditableText
+                        tagName="p"
+                        className="fs-5 text-gray-600 mb-0"
+                        value={benefit.description}
+                        onChange={(val) => updateBenefit(i, { description: val })}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <AddButton onClick={addBenefit} label="Benefit Box" />
+            </div>
+          </section>
+        </>
+      )}
+
+      {/* Money Back Section */}
+      {projectData.sections?.guarantee !== false && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="guarantee" />
+            <EditableText
+              tagName="h2"
+              className="text-center fs-1 fw-bold py-4 text-white mb-0"
+              value={projectData.guaranteeTitle || "Pure Ingredients & Thoroughly Verified"}
+              onChange={(val) => useStore.getState().updateProjectData({ guaranteeTitle: val })}
+            />
+          </section>
+
+          <section className="container-fluid py-5 bg-white">
+            <div className="container bg-white border ing p-4 p-lg-5 mx-auto">
+              <div className="row align-items-center g-5">
+                <div className="col-lg-4 text-center">
+                  <EditableImage
+                    src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
+                    onChange={(val) => updateFooter({ trustImage: val })}
+                    className="img-fluid mb-3 mx-auto"
+                    style={{ maxWidth: '300px' }}
                   />
                   <EditableText
                     tagName="p"
-                    className="fs-5 text-gray-600 mb-0"
-                    value={benefit.description}
-                    onChange={(val) => updateBenefit(i, { description: val })}
+                    className="fs-6 fw-semibold text-success mt-2"
+                    value={projectData.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}
+                    onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })}
                   />
                 </div>
+                <div className="col-lg-8">
+                  <EditableText
+                    tagName="h3"
+                    className="fs-2 fw-bold mb-3"
+                    value={projectData.guaranteeHeadline || "Full 60-Day Refund Assurance"}
+                    onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })}
+                  />
+                  <EditableText
+                    tagName="p"
+                    className="fs-5 text-gray-700 leading-relaxed"
+                    style={{ textAlign: 'left' }}
+                    value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}
+                    onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
+                  />
+                  <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
+                    <button className="btn-custom-pill mt-4 px-8 py-3 fs-5 w-full md:w-auto">
+                      Grab Your Risk-Free Package
+                      <IconEditor value="fa-solid fa-cart-arrow-down" onChange={() => { }} />
+                    </button>
+                  </Linkable>
+                </div>
               </div>
-            ))}
-          </div>
-          <AddButton onClick={addBenefit} label="Benefit Box" />
-        </div>
-      </section>
-
-      {/* Money Back Section */}
-      <section className="container-fluid text-center mt-0 sectioncolor">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 fw-bold py-4 text-white mb-0"
-          value={projectData.guaranteeTitle || "Pure Ingredients & Thoroughly Verified"}
-          onChange={(val) => useStore.getState().updateProjectData({ guaranteeTitle: val })}
-        />
-      </section>
-
-      <section className="container-fluid py-5 bg-white">
-        <div className="container bg-white border ing p-4 p-lg-5 mx-auto">
-          <div className="row align-items-center g-5">
-            <div className="col-lg-4 text-center">
-              <EditableImage
-                src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
-                onChange={(val) => updateFooter({ trustImage: val })}
-                className="img-fluid mb-3 mx-auto"
-                style={{ maxWidth: '300px' }}
-              />
-              <EditableText
-                tagName="p"
-                className="fs-6 fw-semibold text-success mt-2"
-                value={projectData.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}
-                onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })}
-              />
             </div>
-            <div className="col-lg-8">
-              <EditableText
-                tagName="h3"
-                className="fs-2 fw-bold mb-3"
-                value={projectData.guaranteeHeadline || "Full 60-Day Refund Assurance"}
-                onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })}
-              />
-              <EditableText
-                tagName="p"
-                className="fs-5 text-gray-700 leading-relaxed"
-                style={{ textAlign: 'left' }}
-                value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}
-                onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
-              />
-              <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
-                <button className="btn-custom-pill mt-4 px-8 py-3 fs-5 w-full md:w-auto">
-                  Grab Your Risk-Free Package
-                  <IconEditor value="fa-solid fa-cart-arrow-down" onChange={() => { }} />
-                </button>
-              </Linkable>
-            </div>
-          </div>
-        </div>
-      </section>
+          </section>
+        </>
+      )}
 
       {/* Ingredients Section */}
       <section className="container-fluid text-center mt-0 sectioncolor" id="ingredients">
@@ -1145,21 +1182,132 @@ export const GlycopezilTemplate: React.FC = () => {
         </div>
       </footer>
 
-      {/* Purchase Proof Popup */}
-      <div className={`purchase-proof ${showProof ? 'active' : ''}`}>
-        <img
-          src={projectData.hero.image || '/image/banner-img.webp'}
-          style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'contain' }}
-          alt="Product"
-        />
-        <div className="flex flex-col">
-          <div className="text-warning mb-1">{renderStars(4.8)}</div>
-          <div className="text-dark leading-tight">
-            <strong>{proof?.name}</strong> from <strong>{proof?.state}</strong> purchased <strong>{proof?.bottleCount}</strong>
-          </div>
-          <small className="text-gray-500 mt-1">{proof?.timeAgo} minutes ago</small>
+      {/* Section Manager */}
+      <div className="bg-gray-100 p-8 border-t border-dashed border-gray-300 text-center">
+        <h3 className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-6">Manage Page Sections</h3>
+        <div className="flex flex-wrap justify-center gap-4">
+          {Object.entries(projectData.sections || {}).map(([key, visible]) => (
+            <button
+              key={key}
+              onClick={() => updateSectionVisibility(key as any, !visible)}
+              className={`px-4 py-2 text-[10px] font-bold rounded-none uppercase transition-all flex items-center gap-2 border-none shadow-sm ${visible ? 'bg-gray-200 text-gray-500' : 'bg-green-500 text-white hover:scale-105'}`}
+            >
+              <i className={`fa-solid ${visible ? 'fa-eye-slash' : 'fa-plus'}`}></i>
+              {visible ? 'Hide' : 'Add'} {key}
+            </button>
+          ))}
         </div>
       </div>
+
+      {/* Purchase Proof Popup */}
+      {projectData.socialProof?.enabled && (
+        <div 
+          className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-400 transition-colors`}
+          onClick={() => setShowProofSettings(true)}
+          title="Click to customize social proof"
+        >
+          <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
+            <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
+          </div>
+          <img
+            src={projectData.hero.image || '/image/banner-img.webp'}
+            style={{ width: '80px', height: '80px', borderRadius: '8px', objectFit: 'contain' }}
+            alt="Product"
+          />
+          <div className="flex flex-col">
+            <div className="text-warning mb-1">{renderStars(4.8)}</div>
+            <div className="text-dark leading-tight">
+              <strong>{proof?.name}</strong> from <strong>{proof?.state}</strong> purchased <strong>{proof?.bottleCount}</strong>
+            </div>
+            <small className="text-gray-500 mt-1">{proof?.timeAgo} minutes ago</small>
+          </div>
+        </div>
+      )}
+
+      {/* Social Proof Settings Modal */}
+      {showProofSettings && (
+        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowProofSettings(false)}></div>
+          <div className="bg-white w-full max-w-xl rounded-none shadow-2xl z-10 overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="bg-gray-50 p-4 border-bottom d-flex justify-content-between align-items-center">
+              <h3 className="m-0 fs-5 fw-bold text-dark uppercase tracking-tight">Social Proof Popup Settings</h3>
+              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-gray-400 hover:text-dark">
+                <i className="fa-solid fa-xmark fs-4"></i>
+              </button>
+            </div>
+            <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+              <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 mb-4">
+                <span className="text-sm font-bold text-blue-900">Enable Social Proof Widget</span>
+                <button 
+                  onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
+                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}
+                >
+                  {projectData.socialProof?.enabled ? 'ENABLED' : 'DISABLED'}
+                </button>
+              </div>
+
+              <div className="row g-3">
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Display Duration (ms)</label>
+                  <input 
+                    type="number" 
+                    className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={projectData.socialProof?.displayTime}
+                    onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })}
+                  />
+                </div>
+                <div className="col-md-6">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Interval Between (ms)</label>
+                  <input 
+                    type="number" 
+                    className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                    value={projectData.socialProof?.interval}
+                    onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })}
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Names (one per line)</label>
+                <textarea 
+                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                  value={projectData.socialProof?.names.join('\n')}
+                  onChange={(e) => updateSocialProof({ names: e.target.value.split('\n').filter(s => s.trim()) })}
+                  placeholder="James&#10;Michael&#10;Chris..."
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Locations (one per line)</label>
+                <textarea 
+                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                  value={projectData.socialProof?.locations.join('\n')}
+                  onChange={(e) => updateSocialProof({ locations: e.target.value.split('\n').filter(s => s.trim()) })}
+                  placeholder="Texas&#10;California&#10;New York..."
+                />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Products/Purchase Info (one per line)</label>
+                <textarea 
+                  className="w-full p-2 border text-sm h-24 focus:ring-2 focus:ring-blue-500 outline-none font-mono"
+                  value={projectData.socialProof?.products.join('\n')}
+                  onChange={(e) => updateSocialProof({ products: e.target.value.split('\n').filter(s => s.trim()) })}
+                  placeholder="1 bottle&#10;3 bottles&#10;Buy 1 Get 1..."
+                />
+              </div>
+            </div>
+            <div className="bg-gray-50 p-4 border-top text-right">
+              <button 
+                onClick={() => setShowProofSettings(false)}
+                className="bg-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider border-none hover:bg-black transition-all"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Scroll Button */}
       <button
