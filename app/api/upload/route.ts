@@ -14,20 +14,11 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const filename = `${uuidv4()}-${file.name.replace(/\s+/g, "-")}`;
-    const uploadDir = path.join(process.cwd(), "public", "uploads");
+    const base64 = buffer.toString("base64");
+    const mimeType = file.type || "image/png";
+    const dataUrl = `data:${mimeType};base64,${base64}`;
 
-    // Ensure directory exists
-    try {
-      await mkdir(uploadDir, { recursive: true });
-    } catch (e) {
-      // Ignore if exists
-    }
-
-    const filePath = path.join(uploadDir, filename);
-    await writeFile(filePath, buffer);
-
-    return NextResponse.json({ url: `/uploads/${filename}` });
+    return NextResponse.json({ url: dataUrl });
   } catch (error) {
     console.error("Error uploading file:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });

@@ -1394,12 +1394,8 @@ ${seoBlock}
                 
                 const filename = `uploaded_image_${imageIndex}.${extension}`;
                 
-                // Convert base64 to Uint8Array for JSZip
-                const binaryString = window.atob(base64Data);
-                const bytes = new Uint8Array(binaryString.length);
-                for (let i = 0; i < binaryString.length; i++) {
-                    bytes[i] = binaryString.charCodeAt(i);
-                }
+                // Convert base64 to Buffer for JSZip
+                const bytes = Buffer.from(base64Data, 'base64');
                 
                 imagesFolder?.file(filename, bytes);
                 
@@ -1417,7 +1413,7 @@ ${seoBlock}
             if (imgSrc.startsWith('//')) {
                 fetchUrl = 'https:' + imgSrc;
             } else if (!imgSrc.startsWith('http')) {
-                const baseUrlOrigin = window.location.origin;
+                const baseUrlOrigin = process.env.NEXTAUTH_URL || 'http://localhost:3000';
                 const path = imgSrc.startsWith('/') ? imgSrc : '/' + imgSrc;
                 fetchUrl = baseUrlOrigin + path;
             }
