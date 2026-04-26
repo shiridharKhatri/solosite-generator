@@ -325,7 +325,7 @@ ${customTagsHtml}
     ${schemaJSON ? `<!-- JSON-LD Schema -->\n    <script type="application/ld+json">\n${schemaJSON}\n    </script>` : ''}
     `;
 
-    if (layoutStyle === 'default') {
+    if (layoutStyle === 'default' || layoutStyle === 'glycopezil') {
         cssContent = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 html, body { overflow-x: hidden; overflow-y: auto; scroll-behavior: smooth; margin: 0; padding: 0; }
@@ -436,6 +436,7 @@ ${seoBlock}
     </section>
 
     <!-- About -->
+    ${(data.sections?.about !== false) ? `
     <section id="about" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.about?.title || "Understanding the Formula"}</h2></section>
     <section class="container-fluid py-4 sectioncolor1 border-bottom">
         <div class="container">
@@ -450,9 +451,10 @@ ${seoBlock}
                 <div class="fs-5 text-muted about-description" style="line-height: 1.7; white-space: pre-line; text-align: justify; color: #444 !important;">${data.about?.description}</div>
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
     <!-- Benefits -->
+    ${(data.sections?.benefits !== false) ? `
     <section id="benefits" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.benefits?.title || "Powerful Advantages"}</h2></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
@@ -463,9 +465,9 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
  
-    ${data.research ? `
+    ${(data.sections?.research !== false && data.research) ? `
     <section id="research" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.research.title}</h2></section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
@@ -491,7 +493,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.gallery ? `
+    ${(data.sections?.gallery !== false && data.gallery) ? `
     <section id="gallery" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.gallery.title}</h2></section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
@@ -527,6 +529,7 @@ ${seoBlock}
     </section>
 
     <!-- Pricing -->
+    ${(data.sections?.pricing !== false) ? `
     <section id="pricing" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.pricingTitle || "Select Your Dynamic Package"}</h2></section>
     <section class="container-fluid py-5 bg-light">
         <div class="container"><div class="row g-4 justify-content-center">
@@ -553,9 +556,10 @@ ${seoBlock}
             </div></div>
             `).join('')}
         </div></div>
-    </section>
+    </section>` : ''}
 
     <!-- Ingredients -->
+    ${(data.sections?.ingredients !== false) ? `
     <section id="ingredients" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.ingredients?.title || "Key Ingredients"}</h2></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
@@ -573,11 +577,11 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
     <!-- Testimonials -->
-    ${data.testimonials ? `
-    <section class="container py-5 bg-white">
+    ${(data.sections?.testimonials !== false && data.testimonials) ? `
+    <section id="testimonials" class="container py-5 bg-white">
         <div class="container py-lg-5">
             <div class="text-center mb-5">
                 <h2 class="fs-1 fw-bold mb-3">${data.testimonials.title}</h2>
@@ -608,6 +612,7 @@ ${seoBlock}
     </section>` : ''}
 
     <!-- FAQ -->
+    ${(data.sections?.faq !== false && data.faq?.length) ? `
     <section class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.faqTitle || "Frequently Asked Questions"}</h2></section>
     <section class="container-fluid py-5 bg-white" style="margin-top: -1rem; position: relative; z-index: 10;">
         <div class="container mx-auto" style="max-width: 900px;"><div class="accordion accordion-flush" id="faqAccordion">
@@ -622,7 +627,7 @@ ${seoBlock}
             </div>
             `).join('')}
         </div></div>
-    </section>
+    </section>` : ''}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
@@ -766,6 +771,7 @@ ${seoBlock}
 
 
 
+    ${(data.sections?.features !== false) ? `
     <section id="features" class="section-darker py-5">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.featuresTitle || "Key Features"}</h2>
@@ -776,8 +782,9 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
+    ${(data.sections?.about !== false) ? `
     <section id="about" class="section-dark py-5">
         <div class="container">
             <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.about?.title || "The Formula"}</h2>
@@ -786,10 +793,10 @@ ${seoBlock}
                 <div class="col-12 col-lg-7"><div class="text-white-50" style="line-height: 1.9; font-size: 0.95rem; white-space: pre-line;">${data.about?.description}</div></div>
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
     <!-- Research -->
-    ${data.research ? `
+    ${(data.sections?.research !== false && data.research) ? `
     <section class="section-darker py-5 border-top border-white/5">
         <div class="container">
             <div class="row align-items-center g-5">
@@ -815,7 +822,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.benefits?.items?.length ? `
+    ${(data.sections?.benefits !== false && data.benefits?.items?.length) ? `
     <section id="benefits" class="section-darker py-5">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.benefits.title || "Benefits"}</h2>
@@ -828,7 +835,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.testimonials ? `
+    ${(data.sections?.testimonials !== false && data.testimonials) ? `
     <section id="testimonials" class="section-dark py-5">
         <div class="container">
             <div class="text-center mb-5">
@@ -860,7 +867,7 @@ ${seoBlock}
     </section>` : ''}
 
     <!-- Gallery -->
-    ${data.gallery ? `
+    ${(data.sections?.gallery !== false && data.gallery) ? `
     <section class="section-darker py-5 border-top border-white/5">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2.5rem;">${data.gallery.title}</h2>
@@ -905,7 +912,7 @@ ${seoBlock}
     </section>
 
 
-    ${data.faq?.length ? `
+    ${(data.sections?.faq !== false && data.faq?.length) ? `
     <section id="faq" class="section-dark py-5">
         <div class="container" style="max-width: 800px;">
             <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.faqTitle || "FAQ"}</h2>
@@ -1331,17 +1338,17 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.sections?.about ? `
+    ${(data.sections?.about !== false) ? `
     <section id="about" class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
             <div class="row align-items-center g-5">
                 <div class="col-lg-5"><div class="position-relative"><div class="position-absolute top-0 start-0 w-100 h-100 organic-blob" style="background: ${secondaryColor}; transform: translate(-5%, 5%); opacity: 0.1;"></div><img src="${data.about?.image}" class="img-fluid position-relative z-1 rounded-4 shadow-sm" /></div></div>
-                <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about?.description}</div></div>
+                <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line; text-align: justify;">${data.about?.description}</div></div>
             </div>
         </div>
     </section>` : ''}
 
-    ${data.sections?.benefits ? `
+    ${(data.sections?.features !== false) ? `
     <section id="features" class="py-5" style="background: #F0EBE1;">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.featuresTitle || "Nature's Bounty"}</h2>
@@ -1353,6 +1360,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${(data.sections?.pricing !== false) ? `
     <section id="pricing" class="py-5" style="background: #F0EBE1;">
         <div class="container py-lg-5">
             <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.pricingTitle || "Select Your Pack"}</h2>
@@ -1369,7 +1377,7 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
     <section class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
