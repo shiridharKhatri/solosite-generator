@@ -1182,11 +1182,14 @@ export const GlycopezilTemplate: React.FC = () => {
           <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
             <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
           </div>
-          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/5">
+          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
             <img
-              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
-              className="w-100 h-100 object-contain"
-              alt="Product"
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
+              className="w-full h-full object-contain"
+              alt="Purchased Product"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/image/bottle-snap.webp';
+              }}
             />
           </div>
           <div className="flex flex-col">

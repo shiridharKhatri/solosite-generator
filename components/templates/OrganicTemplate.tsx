@@ -691,11 +691,14 @@ export const OrganicTemplate: React.FC = () => {
           <div className="absolute -top-10 left-0 bg-[#4A3320] text-[#FAF6ED] text-[9px] font-bold px-2 py-1.5 rounded-none opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
             <i className="fa-solid fa-gear mr-1"></i> Popup Settings
           </div>
-          <div className="flex-shrink-0 w-12 h-12 rounded-[15px] bg-[#FAF6ED] border border-[#E6D5C3] overflow-hidden">
+          <div className="flex-shrink-0 w-12 h-12 rounded-[15px] bg-[#FAF6ED] border border-[#E6D5C3] overflow-hidden flex items-center justify-center">
             <img
-              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/banner-img.webp'}
-              className="w-100 h-100 object-contain"
-              alt="Product"
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
+              className="w-full h-full object-contain"
+              alt="Purchased Product"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/image/bottle-snap.webp';
+              }}
             />
           </div>
           <div className="flex flex-col text-left">

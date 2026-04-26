@@ -1473,9 +1473,13 @@ ${seoBlock}
     if (data.seo?.ogImage) imageSources.add(data.seo.ogImage);
     if (data.seo?.twitterImage) imageSources.add(data.seo.twitterImage);
     if (data.seo?.favicon) imageSources.add(data.seo.favicon);
+    if (data.socialProof?.items) data.socialProof.items.forEach((item: any) => { if (item.image) imageSources.add(item.image); });
 
     const sourcesArray = Array.from(imageSources);
     sourcesArray.sort((a, b) => b.length - a.length);
+
+    // Inject blocks BEFORE image replacement loop so they get processed too
+    rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
 
     for (const imgSrc of sourcesArray) {
         try {
@@ -1542,7 +1546,6 @@ ${seoBlock}
     }
 
     cssFolder?.file("style.css", rawCss);
-    rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
     zip.file("index.html", rawHtml);
 
     // Legal Pages - Using user-provided high-quality content
