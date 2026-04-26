@@ -18,14 +18,15 @@ export async function GET(req: NextRequest) {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json({ error: "Invalid Project ID format" }, { status: 400 });
       }
-      const project = await Project.findById(id);
+      // Filter by both ID and userId to ensure ownership
+      const project = await Project.findOne({ _id: id, userId: session.user.id });
       if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
       return NextResponse.json(project);
     }
 
     const status = req.nextUrl.searchParams.get("status");
-    const query: any = {};
+    const query: any = { userId: session.user.id }; // Always filter by the current user
     if (status) query.status = status;
 
     const projects = await Project.find(query).sort({ updatedAt: -1 });
@@ -44,7 +45,7 @@ export async function POST(req: NextRequest) {
   const { name, data, status } = await req.json();
 
   const project = await Project.create({
-    userId: (session.user as any).id, // Record who created it
+    userId: session.user.id, // Record who created it
     name,
     data,
     status: status || 'draft',
@@ -60,8 +61,9 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, data, status, name } = await req.json();
 
-  const project = await Project.findById(id);
-  if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  // Find project that belongs to this user
+  const project = await Project.findOne({ _id: id, userId: session.user.id });
+  if (!project) return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 
   if (data) project.data = data;
   if (status) project.status = status;
@@ -76,7 +78,8 @@ export async function DELETE(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const id = req.nextUrl.searchParams.get("id");
-  const result = await Project.deleteOne({ _id: id });
+  // Delete only if it belongs to the current user
+  const result = await Project.deleteOne({ _id: id, userId: session.user.id });
 
   if (result.deletedCount === 0) {
     return NextResponse.json({ error: "Project not found" }, { status: 404 });
