@@ -178,6 +178,7 @@ export interface ProjectData {
     testimonials: boolean;
     faq: boolean;
     gallery: boolean;
+    pricing: boolean;
   };
   legalPages?: {
     privacyPolicy: string;
@@ -541,9 +542,10 @@ export const initialProjectData: ProjectData = {
   navbar: {
     links: [
       { label: "Features", href: "#features" },
-      { label: "About", href: "#about" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "FAQ", href: "#faq" }
+      { label: "Ingredients", href: "#ingredients" },
+      { label: "Testimonials", href: "#testimonials" },
+      { label: "FAQ", href: "#faq" },
+      { label: "Pricing", href: "#pricing" }
     ]
   },
   socialProof: {
@@ -567,7 +569,8 @@ export const initialProjectData: ProjectData = {
     ingredients: true,
     testimonials: true,
     faq: true,
-    gallery: true
+    gallery: true,
+    pricing: true
   },
   legalPages: {
     privacyPolicy: "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from this site...",
@@ -819,7 +822,7 @@ export const useStore = create<EditorState>((set) => ({
     if (!state.projectData) return state;
     const currentSections = state.projectData.sections || {
       features: true, about: true, research: true, benefits: true, guarantee: true,
-      ingredients: true, testimonials: true, faq: true, gallery: true
+      ingredients: true, testimonials: true, faq: true, gallery: true, pricing: true
     };
     return {
       projectData: {

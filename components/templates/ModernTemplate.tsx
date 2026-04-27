@@ -66,21 +66,39 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
   const [showSettings, setShowSettings] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   return (
-    <div onContextMenu={(e) => {
-      if (onContextMenu) {
-        onContextMenu(e);
-      } else {
-        e.preventDefault();
-        setPos({ x: e.clientX, y: e.clientY });
-        setShowSettings(true);
-      }
-    }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to set link"}>
+    <div 
+      onContextMenu={(e) => {
+        if (onContextMenu) {
+          onContextMenu(e);
+        } else {
+          e.preventDefault();
+          setPos({ x: e.clientX, y: e.clientY });
+          setShowSettings(true);
+        }
+      }} 
+      className={`relative group/link ${className}`}
+    >
       {children}
-      {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
-      <div className="absolute -top-3 -right-3 opacity-0 group-hover/link:opacity-100 transition-opacity bg-blue-500 text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
-        <i className="fa-solid fa-link text-[8px]"></i>
-      </div>
-      {link && <div className="absolute -top-6 left-0 bg-blue-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50">LINK: {link}</div>}
+      {showSettings && (
+        <>
+          <div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} />
+          <LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} />
+        </>
+      )}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos({ x: e.clientX, y: e.clientY });
+          setShowSettings(true);
+        }}
+        className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/link:opacity-100 transition-all bg-blue-600 text-white px-2 py-1 rounded-none shadow-xl z-50 flex items-center gap-1 border-none hover:bg-blue-700 hover:scale-105"
+        title="Edit Link Settings"
+      >
+        <i className="fa-solid fa-link text-[10px]"></i>
+        <span className="text-[8px] font-bold uppercase tracking-widest">Link</span>
+      </button>
+      {link && <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 backdrop-blur-sm">URL: {link}</div>}
     </div>
   );
 };
@@ -330,12 +348,26 @@ export const ModernTemplate: React.FC = () => {
                 </Linkable>
               </div>
               {/* Logos */}
-              <div className="d-flex flex-wrap gap-3 mt-5 justify-content-center justify-content-lg-start" style={{ opacity: 0.4 }}>
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <div key={i} style={{ width: '50px', height: '50px', filter: 'brightness(0) invert(1)' }}>
-                    <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; useStore.getState().updateProjectData({ logos: nl }); }} className="img-fluid" />
+              <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5 mt-5 grayscale opacity-50">
+                {(projectData.logos || []).map((logo, i) => (
+                  <div key={i} className="relative group" style={{ width: '60px' }}>
+                    <EditableImage 
+                      src={logo} 
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} 
+                      onRemove={() => {
+                        const nl = projectData.logos.filter((_, idx) => idx !== i);
+                        updateProjectData({ logos: nl });
+                      }}
+                      className="img-fluid" 
+                    />
                   </div>
                 ))}
+                <button
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
+                  className="w-[60px] h-[60px] border border-dashed border-white/20 flex items-center justify-center text-white/20 hover:border-white/50 hover:text-white/50 transition-all"
+                >
+                  <i className="fa-solid fa-plus text-xs"></i>
+                </button>
               </div>
             </div>
             <div className="col-12 col-lg-5 text-center">
@@ -349,7 +381,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Features */}
       {projectData.sections?.features !== false && (
-        <section className="section-darker py-5 relative group/section">
+        <section id="features" className="section-darker py-5 relative group/section">
           <SectionSettings sectionKey="features" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.featuresTitle || "What Sets Us Apart"} onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })} />
@@ -373,7 +405,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* About */}
       {projectData.sections?.about !== false && (
-        <section className="section-dark py-5 relative group/section">
+        <section id="about" className="section-dark py-5 relative group/section">
           <SectionSettings sectionKey="about" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.about.title || "The Formula"} onChange={(val) => updateAbout({ title: val })} />
@@ -392,7 +424,7 @@ export const ModernTemplate: React.FC = () => {
       )}
       {/* Research */}
       {projectData.research && projectData.sections?.research !== false && (
-        <section className="section-darker py-5 border-t border-white/5 relative group/section">
+        <section id="research" className="section-darker py-5 border-t border-white/5 relative group/section">
           <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
@@ -429,7 +461,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Testimonials */}
       {projectData.sections?.testimonials !== false && (
-        <section className="section-dark py-5 relative group/section">
+        <section id="testimonials" className="section-dark py-5 relative group/section">
           <SectionSettings sectionKey="testimonials" />
           <div className="container">
             <div className="text-center mb-5">
@@ -465,23 +497,39 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Gallery */}
       {projectData.gallery && projectData.sections?.gallery !== false && (
-        <section className="section-darker py-5 border-t border-white/5 relative group/section">
+        <section id="gallery" className="section-darker py-5 border-t border-white/5 relative group/section">
           <SectionSettings sectionKey="gallery" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
             <EditableText tagName="p" className="text-center mb-5 text-white/50" style={{ fontSize: '1rem' }} value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
             <div className="row g-3">
               {projectData.gallery.images.map((img, i) => (
-                <div key={i} className="col-12 col-md-4">
+                <div key={i} className="col-12 col-md-4 relative group">
                   <div className="glass-card p-1 overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    <EditableImage src={img} onChange={(val) => {
-                      const ni = [...projectData.gallery!.images];
-                      ni[i] = val;
-                      updateGallery({ images: ni });
-                    }} className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }} />
+                    <EditableImage 
+                      src={img} 
+                      onChange={(val) => {
+                        const ni = [...projectData.gallery!.images];
+                        ni[i] = val;
+                        updateGallery({ images: ni });
+                      }} 
+                      onRemove={() => {
+                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
+                        updateGallery({ images: ni });
+                      }}
+                      className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }} 
+                    />
                   </div>
                 </div>
               ))}
+              <div className="col-12 col-md-4">
+                <button
+                  onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
+                  className="w-full aspect-video border border-dashed border-white/20 flex items-center justify-center text-white/20 hover:border-white/50 hover:text-white/50 transition-all rounded-3"
+                >
+                  <i className="fa-solid fa-plus text-2xl"></i>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -489,7 +537,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Benefits */}
       {projectData.sections?.benefits !== false && (
-        <section className="section-darker py-5 relative group/section">
+        <section id="benefits" className="section-darker py-5 relative group/section">
           <SectionSettings sectionKey="benefits" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
@@ -519,7 +567,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Guarantee */}
       {projectData.sections?.guarantee !== false && (
-        <section className="py-5 relative group/section" style={{ background: `linear-gradient(135deg, ${primary}30, #0a0a0a)` }}>
+        <section id="guarantee" className="py-5 relative group/section" style={{ background: `linear-gradient(135deg, ${primary}30, #0a0a0a)` }}>
           <SectionSettings sectionKey="guarantee" />
           <div className="container">
             <div className="glass-card p-5">
@@ -543,7 +591,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* Ingredients */}
       {projectData.sections?.ingredients !== false && (
-        <section className="section-dark py-5 relative group/section">
+        <section id="ingredients" className="section-dark py-5 relative group/section">
           <SectionSettings sectionKey="ingredients" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.ingredients.title || "Natural Ingredients"} onChange={(val) => updateIngredient(-1, { title: val })} />
@@ -636,7 +684,7 @@ export const ModernTemplate: React.FC = () => {
 
       {/* FAQ */}
       {projectData.sections?.faq !== false && (
-        <section className="section-dark py-5 relative group/section">
+        <section id="faq" className="section-dark py-5 relative group/section">
           <SectionSettings sectionKey="faq" />
           <div className="container" style={{ maxWidth: '800px' }}>
             <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.faqTitle || "FAQ"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />

@@ -74,13 +74,23 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
         setPos({ x: e.clientX, y: e.clientY }); 
         setShowSettings(true); 
       }
-    }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to modify destination"}>
+    }} className={`relative group/link ${className}`}>
       {children}
       {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
-      <div className="absolute -top-3 -right-3 opacity-0 group-hover/link:opacity-100 transition-opacity bg-blue-600 text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
-        <i className="fa-solid fa-link text-[8px]"></i>
-      </div>
-      {link && <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-blue-900 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none font-mono">↗ {link}</div>}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos({ x: e.clientX, y: e.clientY });
+          setShowSettings(true);
+        }}
+        className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/link:opacity-100 transition-all bg-blue-600 text-white px-2 py-1 rounded-none shadow-xl z-50 flex items-center gap-1 border-none hover:bg-blue-700 hover:scale-105"
+        title="Edit Link Settings"
+      >
+        <i className="fa-solid fa-link text-[10px]"></i>
+        <span className="text-[8px] font-bold uppercase tracking-widest">Link</span>
+      </button>
+      {link && <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-slate-900/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 backdrop-blur-sm">URL: {link}</div>}
     </div>
   );
 };
@@ -347,11 +357,25 @@ export const ClinicalTemplate: React.FC = () => {
             <div className="col-12">
               <span className="data-label text-center mb-4">REGULATORY / SAFETY COMPLIANCE</span>
               <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5">
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <div key={i} className="opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" style={{ width: '60px' }}>
-                    <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} className="img-fluid" />
+                {(projectData.logos || []).map((logo, i) => (
+                  <div key={i} className="relative group" style={{ width: '60px' }}>
+                    <EditableImage 
+                      src={logo} 
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} 
+                      onRemove={() => {
+                        const nl = projectData.logos.filter((_, idx) => idx !== i);
+                        updateProjectData({ logos: nl });
+                      }}
+                      className="img-fluid opacity-60 hover:opacity-100 transition-opacity grayscale hover:grayscale-0" 
+                    />
                   </div>
                 ))}
+                <button
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
+                  className="w-[60px] h-[60px] border border-dashed border-slate-200 flex items-center justify-center text-slate-300 hover:border-blue-500 hover:text-blue-500 transition-all"
+                >
+                  <i className="fa-solid fa-plus text-xs"></i>
+                </button>
               </div>
             </div>
           </div>
@@ -360,7 +384,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* Structured Features Grid */}
       {projectData.sections?.features && (
-        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+        <section id="features" className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="features" />
           <div className="container py-lg-4">
           <span className="data-label text-center mb-2">EFFICACY METRICS</span>
@@ -388,7 +412,7 @@ export const ClinicalTemplate: React.FC = () => {
       )}
 
       {projectData.sections?.about && (
-        <section className="bg-white py-4 border-b border-slate-200 group/section relative">
+        <section id="about" className="bg-white py-4 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="about" />
           <div className="container max-w-[1100px] mx-auto">
           <div className="clinical-header mb-4">
@@ -422,7 +446,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* Research */}
       {projectData.sections?.research && projectData.research && (
-        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+        <section id="research" className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
@@ -460,7 +484,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* Ingredients - Lab Report Style */}
       {projectData.sections?.ingredients && (
-        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+        <section id="ingredients" className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="ingredients" />
           <div className="container py-lg-4">
           <div className="text-center mb-5">
@@ -490,7 +514,8 @@ export const ClinicalTemplate: React.FC = () => {
       )}
 
       {/* Pricing - Tiered Authorization Plans */}
-      <section className="bg-white py-5 border-b border-slate-200" id="pricing">
+      {projectData.sections?.pricing !== false && (
+        <section className="bg-white py-5 border-b border-slate-200" id="pricing">
         <div className="container py-lg-5">
           <div className="text-center mb-5">
             <span className="data-label">DISTRIBUTION TIERS</span>
@@ -565,10 +590,11 @@ export const ClinicalTemplate: React.FC = () => {
           </div>
         </div>
       </section>
+      )}
 
       {/* Benefits Section */}
       {projectData.sections?.benefits && (
-        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+        <section id="benefits" className="py-5 bg-white border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="benefits" />
           <div className="container py-lg-4">
           <div className="text-center mb-5">
@@ -599,7 +625,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* Testimonials Section */}
       {projectData.sections?.testimonials && (
-        <section className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
+        <section id="testimonials" className="py-5 bg-slate-50 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="testimonials" />
           <div className="container py-lg-4">
           <div className="text-center mb-5">
@@ -630,7 +656,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* Gallery */}
       {projectData.sections?.gallery && projectData.gallery && (
-        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+        <section id="gallery" className="py-5 bg-white border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="gallery" />
           <div className="container">
             <div className="clinical-header mb-5 text-center">
@@ -639,16 +665,32 @@ export const ClinicalTemplate: React.FC = () => {
             </div>
             <div className="row g-3">
               {projectData.gallery.images.map((img, i) => (
-                <div key={i} className="col-6 col-md-4">
+                <div key={i} className="col-6 col-md-4 relative group">
                   <div className="clinical-card p-1 shadow-sm overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    <EditableImage src={img} onChange={(val) => {
-                      const ni = [...projectData.gallery!.images];
-                      ni[i] = val;
-                      updateGallery({ images: ni });
-                    }} className="w-100 h-100 rounded" style={{ objectFit: 'cover', maxHeight: '200px' }} />
+                    <EditableImage 
+                      src={img} 
+                      onChange={(val) => {
+                        const ni = [...projectData.gallery!.images];
+                        ni[i] = val;
+                        updateGallery({ images: ni });
+                      }} 
+                      onRemove={() => {
+                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
+                        updateGallery({ images: ni });
+                      }}
+                      className="w-100 h-100 rounded" style={{ objectFit: 'cover', maxHeight: '200px' }} 
+                    />
                   </div>
                 </div>
               ))}
+              <div className="col-6 col-md-4">
+                <button
+                  onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
+                  className="w-full aspect-video border border-dashed border-slate-200 flex items-center justify-center text-slate-300 hover:border-blue-500 hover:text-blue-500 transition-all rounded"
+                >
+                  <i className="fa-solid fa-plus text-2xl"></i>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -677,7 +719,7 @@ export const ClinicalTemplate: React.FC = () => {
 
       {/* FAQ Section */}
       {projectData.sections?.faq && (
-        <section className="py-5 bg-white border-b border-slate-200 group/section relative">
+        <section id="faq" className="py-5 bg-white border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="faq" />
           <div className="container py-lg-4 max-w-[800px]">
           <div className="text-center mb-5">

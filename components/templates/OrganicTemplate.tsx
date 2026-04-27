@@ -74,13 +74,23 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
         setPos({ x: e.clientX, y: e.clientY }); 
         setShowSettings(true); 
       }
-    }} className={`relative group/link ${className}`} title={onContextMenu ? "Right-click for options" : "Right-click to set link"}>
+    }} className={`relative group/link ${className}`}>
       {children}
       {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
-      <div className="absolute -top-3 -right-3 opacity-0 group-hover/link:opacity-100 transition-opacity bg-[#8A7969] text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
-        <i className="fa-solid fa-link text-[8px]"></i>
-      </div>
-      {link && <div className="absolute -top-7 left-1/2 -translate-x-1/2 bg-[#4A3320] text-[#FAF6ED] text-[10px] px-2 py-1 rounded-none opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none">→ {link}</div>}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos({ x: e.clientX, y: e.clientY });
+          setShowSettings(true);
+        }}
+        className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/link:opacity-100 transition-all bg-[#8A7969] text-white px-2 py-1 rounded-none shadow-xl z-50 flex items-center gap-1 border-none hover:bg-[#4A3320] hover:scale-105"
+        title="Edit Link Settings"
+      >
+        <i className="fa-solid fa-link text-[10px]"></i>
+        <span className="text-[8px] font-bold uppercase tracking-widest">Link</span>
+      </button>
+      {link && <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-[#4A3320]/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 backdrop-blur-sm">URL: {link}</div>}
     </div>
   );
 };
@@ -337,18 +347,32 @@ export const OrganicTemplate: React.FC = () => {
       <section className="py-4 border-y border-[#E6D5C3]" style={{ backgroundColor: 'white' }}>
          <div className="container">
             <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
-              {[0, 1, 2, 3, 4].map((i) => (
-                <div key={i} style={{ width: '70px' }}>
-                  <EditableImage src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`} onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} className="img-fluid" style={{ filter: 'opacity(0.7) sepia(0.5) hue-rotate(-30deg)' }} />
-                </div>
-              ))}
+               {(projectData.logos || []).map((logo, i) => (
+                 <div key={i} className="relative group" style={{ width: '80px' }}>
+                    <EditableImage 
+                      src={logo} 
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} 
+                      onRemove={() => {
+                        const nl = projectData.logos.filter((_, idx) => idx !== i);
+                        updateProjectData({ logos: nl });
+                      }}
+                      className="img-fluid grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition-all" 
+                    />
+                 </div>
+               ))}
+               <button
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
+                  className="w-[60px] h-[60px] border border-dashed border-[#E6D5C3] flex items-center justify-center text-[#E6D5C3] hover:border-blue-500 hover:text-blue-500 transition-all"
+                >
+                  <i className="fa-solid fa-plus text-xs"></i>
+                </button>
             </div>
          </div>
       </section>
 
       {/* Ingredients Grid */}
       {projectData.sections?.ingredients && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+        <section id="ingredients" className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
           <SectionSettings sectionKey="ingredients" />
           <div className="container py-lg-5">
            <div className="text-center mb-5 max-w-[600px] mx-auto">
@@ -378,7 +402,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Benefits - Why it Works */}
       {projectData.sections?.benefits && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: '#ffffff' }}>
+        <section id="benefits" className="py-5 group/section relative" style={{ backgroundColor: '#ffffff' }}>
           <SectionSettings sectionKey="benefits" />
           <div className="container py-lg-5">
            <div className="text-center mb-5 max-w-[700px] mx-auto">
@@ -410,7 +434,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Testimonials - Voices of Harmony */}
       {projectData.sections?.testimonials && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+        <section id="testimonials" className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
           <SectionSettings sectionKey="testimonials" />
           <div className="container py-lg-5">
            <div className="text-center mb-5">
@@ -441,7 +465,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Gallery */}
       {projectData.sections?.gallery && projectData.gallery && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: '#FAF6ED' }}>
+        <section id="gallery" className="py-5 group/section relative" style={{ backgroundColor: '#FAF6ED' }}>
           <SectionSettings sectionKey="gallery" />
           <div className="container">
             <div className="text-center mb-5">
@@ -452,14 +476,31 @@ export const OrganicTemplate: React.FC = () => {
               {projectData.gallery.images.map((img, i) => (
                 <div key={i} className="col-6 col-md-4">
                   <div className="p-1 overflow-hidden" style={{ background: 'white', borderRadius: '1.5rem', aspectRatio: '16/9' }}>
-                    <EditableImage src={img} onChange={(val) => {
-                      const ni = [...projectData.gallery!.images];
-                      ni[i] = val;
-                      updateGallery({ images: ni });
-                    }} className="w-100 h-100" style={{ objectFit: 'cover', borderRadius: '1.25rem', maxHeight: '200px' }} />
+                    <EditableImage 
+                      src={img} 
+                      onChange={(val) => {
+                        const ni = [...projectData.gallery!.images];
+                        ni[i] = val;
+                        updateGallery({ images: ni });
+                      }} 
+                      onRemove={() => {
+                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
+                        updateGallery({ images: ni });
+                      }}
+                      className="w-100 h-100" 
+                      style={{ objectFit: 'cover', borderRadius: '1.25rem', maxHeight: '200px' }} 
+                    />
                   </div>
                 </div>
               ))}
+              <div className="col-6 col-md-4">
+                <button
+                  onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
+                  className="w-full aspect-video border border-dashed border-[#E6D5C3] flex items-center justify-center text-[#E6D5C3] hover:border-[#2D4A22] hover:text-[#2D4A22] transition-all rounded-[1.5rem] bg-white"
+                >
+                  <i className="fa-solid fa-plus text-2xl"></i>
+                </button>
+              </div>
             </div>
           </div>
         </section>
@@ -467,7 +508,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Research */}
       {projectData.sections?.research && projectData.research && (
-        <section className="py-5 bg-white border-y group/section relative" style={{ borderColor: '#FAF6ED' }}>
+        <section id="research" className="py-5 bg-white border-y group/section relative" style={{ borderColor: '#FAF6ED' }}>
           <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
@@ -503,7 +544,7 @@ export const OrganicTemplate: React.FC = () => {
       )}
 
       {projectData.sections?.about && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: bgLight }}>
+        <section id="about" className="py-5 group/section relative" style={{ backgroundColor: bgLight }}>
           <SectionSettings sectionKey="about" />
           <div className="container py-lg-5">
           <div className="row align-items-center g-5">
@@ -523,7 +564,8 @@ export const OrganicTemplate: React.FC = () => {
       )}
 
       {/* Pricing - Botanical Garden Theme */}
-      <section className="py-5" style={{ backgroundColor: '#ffffff' }} id="pricing">
+      {projectData.sections?.pricing !== false && (
+        <section className="py-5" style={{ backgroundColor: '#ffffff' }} id="pricing">
         <div className="container py-lg-5">
           <div className="text-center mb-5">
              <i className="fa-solid fa-basket-shopping mb-3 text-2xl" style={{ color: secondary }}></i>
@@ -600,9 +642,10 @@ export const OrganicTemplate: React.FC = () => {
           <AddButton onClick={addPricing} label="Bundle" />
         </div>
       </section>
+      )}
  
       {/* Satisfaction Promise */}
-      <section className="py-5" style={{ backgroundColor: bgAccent }}>
+      <section id="guarantee" className="py-5" style={{ backgroundColor: bgAccent }}>
         <div className="container py-lg-5">
           <div className="p-5 bg-white shadow-md" style={{ borderRadius: '3rem', border: `2px dashed ${bgAccent}` }}>
             <div className="row align-items-center g-5">
@@ -624,7 +667,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* FAQ */}
       {projectData.sections?.faq && (
-        <section className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+        <section id="faq" className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
           <SectionSettings sectionKey="faq" />
           <div className="container max-w-[800px] mx-auto py-lg-4">
           <EditableText tagName="h2" className="text-center fw-bold mb-5 font-serif" style={{ color: primary, fontSize: '2.2rem' }} value={projectData.faqTitle || "Wisdom & Questions"} onChange={(val) => updateProjectData({ faqTitle: val })} />

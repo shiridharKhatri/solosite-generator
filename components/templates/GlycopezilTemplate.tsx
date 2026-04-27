@@ -49,7 +49,6 @@ const Linkable = ({ children, link, onLinkChange, className = "" }: { children: 
     <div
       onContextMenu={handleRightClick}
       className={`relative group/link ${className}`}
-      title="Right-click to set link"
     >
       {children}
       {showSettings && (
@@ -58,10 +57,20 @@ const Linkable = ({ children, link, onLinkChange, className = "" }: { children: 
           <LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} />
         </>
       )}
-      <div className="absolute -top-4 -right-4 opacity-0 group-hover/link:opacity-100 transition-opacity bg-blue-500 text-white w-5 h-5 rounded-none flex items-center justify-center shadow-lg z-50 pointer-events-none">
-        <i className="fa-solid fa-link text-[8px]"></i>
-      </div>
-      {link && <div className="absolute -top-8 left-0 bg-blue-500 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50">LINK: {link}</div>}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          setPos({ x: e.clientX, y: e.clientY });
+          setShowSettings(true);
+        }}
+        className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/link:opacity-100 transition-all bg-blue-600 text-white px-2 py-1 rounded-none shadow-xl z-50 flex items-center gap-1 border-none hover:bg-blue-700 hover:scale-105"
+        title="Edit Link Settings"
+      >
+        <i className="fa-solid fa-link text-[10px]"></i>
+        <span className="text-[8px] font-bold uppercase tracking-widest">Link</span>
+      </button>
+      {link && <div className="absolute -bottom-6 left-1/2 -translate-x-1/2 bg-gray-900/80 text-white text-[8px] font-bold px-1.5 py-0.5 rounded opacity-0 group-hover/link:opacity-100 transition-opacity whitespace-nowrap z-50 backdrop-blur-sm">URL: {link}</div>}
     </div>
   );
 };
@@ -495,20 +504,30 @@ export const GlycopezilTemplate: React.FC = () => {
               </div>
 
               {/* Certification Logos Row - fully separate */}
-              <div className="d-flex justify-content-center flex-wrap gap-2 mt-4 pt-2" style={{ width: '100%' }}>
-                {[0, 1, 2, 3, 4].map((i) => (
-                  <div key={i} style={{ width: '65px', height: '65px' }}>
+              <div className="d-flex justify-content-center flex-wrap gap-3 mt-4 pt-2" style={{ width: '100%' }}>
+                {(projectData.logos || []).map((logo, i) => (
+                  <div key={i} className="relative group" style={{ width: '65px', height: '65px' }}>
                     <EditableImage
-                      src={projectData.logos?.[i] || `/image/logo-${i + 1}.webp`}
+                      src={logo}
                       onChange={(val) => {
                         const newLogos = [...(projectData.logos || [])];
                         newLogos[i] = val;
-                        useStore.getState().updateProjectData({ logos: newLogos });
+                        updateProjectData({ logos: newLogos });
+                      }}
+                      onRemove={() => {
+                        const nl = projectData.logos.filter((_, idx) => idx !== i);
+                        updateProjectData({ logos: nl });
                       }}
                       className="img-fluid"
                     />
                   </div>
                 ))}
+                <button
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
+                  className="w-[65px] h-[65px] border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-all"
+                >
+                  <i className="fa-solid fa-plus text-xs"></i>
+                </button>
               </div>
             </div>
 
@@ -552,7 +571,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Why Choose Section */}
       {projectData.sections?.features !== false && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+          <section id="features" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="features" />
             <EditableText
               tagName="h2"
@@ -597,7 +616,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Understanding the Formula Section */}
       {projectData.sections?.about !== false && (
         <>
-          <section className="container-fluid text-center sectioncolor relative group/section">
+          <section id="about" className="container-fluid text-center sectioncolor relative group/section">
             <SectionSettings sectionKey="about" />
             <EditableText
               tagName="h2"
@@ -644,7 +663,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Research */}
       {projectData.research && projectData.sections?.research !== false && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+          <section id="research" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="research" />
             <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
           </section>
@@ -685,7 +704,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Benefits Section */}
       {projectData.sections?.benefits !== false && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor relative group/section" id="Benefits">
+          <section id="benefits" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="benefits" />
             <EditableText
               tagName="h2"
@@ -734,7 +753,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Money Back Section */}
       {projectData.sections?.guarantee !== false && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor relative group/section">
+          <section id="guarantee" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="guarantee" />
             <EditableText
               tagName="h2"
@@ -789,7 +808,7 @@ export const GlycopezilTemplate: React.FC = () => {
       )}
 
       {/* Ingredients Section */}
-      <section className="container-fluid text-center mt-0 sectioncolor" id="ingredients">
+      <section id="ingredients" className="container-fluid text-center mt-0 sectioncolor">
         <EditableText
           tagName="h2"
           className="text-center fs-1 fw-bold py-4 text-white mb-0"
@@ -842,7 +861,7 @@ export const GlycopezilTemplate: React.FC = () => {
       {/* Gallery */}
       {projectData.gallery && (
         <>
-          <section className="container-fluid text-center mt-0 sectioncolor">
+          <section id="gallery" className="container-fluid text-center mt-0 sectioncolor">
             <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
           </section>
           <section className="container-fluid py-5 bg-white">
@@ -851,15 +870,28 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="row g-3">
                 {projectData.gallery.images.map((img, i) => (
                   <div key={i} className="col-6 col-md-4">
-                    <div className="p-2 border bg-light shadow-sm" style={{ aspectRatio: '16/9' }}>
+                    <div className="p-2 border bg-light shadow-sm relative group" style={{ aspectRatio: '16/9' }}>
                       <EditableImage src={img} onChange={(val) => {
                         const ni = [...projectData.gallery!.images];
                         ni[i] = val;
                         updateGallery({ images: ni });
-                      }} className="w-100 h-100" style={{ objectFit: 'cover', maxHeight: '200px' }} />
+                      }} 
+                      onRemove={() => {
+                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
+                        updateGallery({ images: ni });
+                      }}
+                      className="w-100 h-100" style={{ objectFit: 'cover', maxHeight: '200px' }} />
                     </div>
                   </div>
                 ))}
+                <div className="col-6 col-md-4">
+                  <button
+                    onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
+                    className="w-full aspect-video border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-all"
+                  >
+                    <i className="fa-solid fa-plus text-2xl"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </section>
@@ -869,7 +901,7 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Testimonials Section */}
       {projectData.testimonials && (
-        <section className="container-fluid py-5" style={{ backgroundColor: '#fff' }}>
+        <section id="testimonials" className="container-fluid py-5" style={{ backgroundColor: '#fff' }}>
           <div className="container mx-auto">
             <div className="text-center mb-5">
               <EditableText
@@ -1067,7 +1099,7 @@ export const GlycopezilTemplate: React.FC = () => {
           </div>
         </div>
       </section>
-      <section className="container-fluid text-center mt-0 sectioncolor">
+      <section id="faq" className="container-fluid text-center mt-0 sectioncolor">
         <EditableText
           tagName="h2"
           className="text-center fs-1 fw-bold py-4 text-white mb-0"

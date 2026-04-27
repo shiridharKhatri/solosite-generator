@@ -5,6 +5,7 @@ import React, { useRef } from 'react';
 interface EditableImageProps {
   src: string;
   onChange: (src: string) => void;
+  onRemove?: () => void;
   className?: string;
   alt?: string;
   style?: React.CSSProperties;
@@ -13,6 +14,7 @@ interface EditableImageProps {
 export const EditableImage: React.FC<EditableImageProps> = ({
   src,
   onChange,
+  onRemove,
   className = '',
   alt = 'Editable image',
   style,
@@ -63,10 +65,10 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
   return (
     <div
-      className={`relative group cursor-pointer ${className}`}
-      style={{ ...style, display: 'inline-block', width: style?.width || (style?.maxHeight ? 'auto' : '100%'), height: style?.height }}
+      className={`relative group cursor-pointer flex justify-center items-center ${className}`}
+      style={{ ...style, display: style?.display || 'flex', width: style?.width || (style?.maxHeight ? 'auto' : '100%'), height: style?.height }}
     >
-      <div onClick={handleClick} className="w-full h-full">
+      <div onClick={handleClick} className="w-full h-full flex justify-center items-center">
         {src ? (
           <img
             src={src}
@@ -76,8 +78,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
               objectFit: style?.objectFit || 'contain',
               maxHeight: style?.maxHeight || '70vh',
               minHeight: style?.minHeight || 'auto',
-              width: '100%',
-              height: 'auto'
+              width: style?.width || '100%',
+              height: style?.height || 'auto',
+              margin: '0 auto'
             }}
           />
         ) : (
@@ -91,15 +94,23 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         <span className="text-white text-[10px] font-bold uppercase tracking-widest">Click to replace</span>
       </div>
 
-      {src && (
+      {(src || onRemove) && (
         <button
-          onClick={(e) => { e.stopPropagation(); onChange(''); }}
+          onClick={(e) => { 
+            e.stopPropagation(); 
+            if (onRemove) {
+              onRemove();
+            } else {
+              onChange(''); 
+            }
+          }}
           className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-50 shadow-lg border-none hover:bg-red-600 hover:scale-110"
           title="Remove Image"
         >
           <i className="fa-solid fa-times text-[10px]"></i>
         </button>
       )}
+
 
       <input
         type="file"

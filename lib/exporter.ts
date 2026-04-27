@@ -613,7 +613,7 @@ ${seoBlock}
 
     <!-- FAQ -->
     ${(data.sections?.faq !== false && data.faq?.length) ? `
-    <section class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.faqTitle || "Frequently Asked Questions"}</h2></section>
+    <section id="faq" class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.faqTitle || "Frequently Asked Questions"}</h2></section>
     <section class="container-fluid py-5 bg-white" style="margin-top: -1rem; position: relative; z-index: 10;">
         <div class="container mx-auto" style="max-width: 900px;"><div class="accordion accordion-flush" id="faqAccordion">
             ${(data.faq || []).map((item: any, i: number) => `
@@ -797,7 +797,7 @@ ${seoBlock}
 
     <!-- Research -->
     ${(data.sections?.research !== false && data.research) ? `
-    <section class="section-darker py-5 border-top border-white/5">
+    <section id="research" class="section-darker py-5 border-top border-white/5">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
@@ -989,20 +989,23 @@ ${seoBlock}
     <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom py-3">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="index.html">
-                <div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>
+                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="width: 40px; height: 40px; object-fit: contain;" />` : `<div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>`}
                 <span class="fw-bold fs-5 logo" style="color: ${primaryColor}">${data.productName}</span>
             </a>
+            
             <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
                 <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-3 text-decoration-none" style="background: ${secondaryColor} !important; border: none; font-size: 0.8rem;">Order Now</a>
-        <div class="container px-4 d-flex justify-content-between align-items-center">
-            <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="index.html">
-                <img src="${data.hero?.logoImage}" style="width: 40px; height: 40px; object-fit: contain;" />
-                <span class="fs-5 fw-bold logo" style="color: ${primaryColor}">${data.productName}</span>
-            </a>
-            <div class="d-none d-lg-flex align-items-center gap-5">
-                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium text-secondary hover-dark text-sm p-0">${link.label}</a>`).join('')}
-                <div class="h-6 w-px bg-light mx-2"></div>
-                <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm">${data.hero?.buttonText}</a>
+                <button class="navbar-toggler border-0 shadow-none px-1 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavClinical">
+                    <i class="fa-solid fa-bars fs-3 text-dark"></i>
+                </button>
+            </div>
+
+            <div class="collapse navbar-collapse" id="navbarNavClinical">
+                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0">
+                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium text-secondary hover-dark text-sm p-0">${link.label}</a>`).join('')}
+                    <div class="h-6 w-px bg-light mx-2 d-none d-lg-block"></div>
+                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm d-none d-lg-inline-flex">${data.hero?.buttonText}</a>
+                </div>
             </div>
         </div>
     </nav>

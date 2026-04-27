@@ -25,7 +25,7 @@ export default function EditorPage() {
     updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery,
+    updateResearch, updateGallery, updateNavbar, updateProjectData,
     showLegalModal, setShowLegalModal, updateOrderLink, updateLegalPage,
     isDirty, setDirty
   } = useStore();
@@ -462,6 +462,7 @@ export default function EditorPage() {
                 <div className="space-y-0.5">
                   {[
                     { id: 'hero', name: 'Hero Section', icon: 'fa-bolt' },
+                    { id: 'navbar', name: 'Navbar Links', icon: 'fa-link' },
                     { id: 'about', name: 'About', icon: 'fa-info-circle' },
                     { id: 'research', name: 'Research & Science', icon: 'fa-microscope' },
                     { id: 'ingredients', name: 'Ingredients', icon: 'fa-leaf' },
@@ -554,6 +555,62 @@ export default function EditorPage() {
                         <input type="text" value={projectData.hero.secondaryButtonHref} onChange={(e) => updateHero({ secondaryButtonHref: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" placeholder="order.html" />
                       </div>
                     </div>
+                  </div>
+                )}
+
+                {activeContentTab === 'navbar' && (
+                  <div className="space-y-4">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2">
+                      <i className="fa-solid fa-link text-blue-500"></i> Navigation Links
+                    </div>
+                    <div className="space-y-2">
+                      {(projectData.navbar?.links || []).map((link, idx) => (
+                        <div key={idx} className="flex gap-2 items-center p-3 bg-gray-50 border border-gray-100 group">
+                          <div className="flex-1 space-y-1">
+                            <label className="text-[8px] font-bold text-gray-400 uppercase">Label</label>
+                            <input
+                              type="text"
+                              value={link.label}
+                              onChange={(e) => {
+                                const nl = [...projectData.navbar.links];
+                                nl[idx] = { ...nl[idx], label: e.target.value };
+                                updateNavbar({ links: nl });
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-gray-200 bg-white font-bold text-black"
+                            />
+                          </div>
+                          <div className="flex-[2] space-y-1">
+                            <label className="text-[8px] font-bold text-gray-400 uppercase">URL / Anchor</label>
+                            <input
+                              type="text"
+                              value={link.href}
+                              onChange={(e) => {
+                                const nl = [...projectData.navbar.links];
+                                nl[idx] = { ...nl[idx], href: e.target.value };
+                                updateNavbar({ links: nl });
+                              }}
+                              className="w-full px-2 py-1 text-xs border border-gray-200 bg-white font-mono text-black"
+                              placeholder="#section or https://..."
+                            />
+                          </div>
+                          <button
+                            onClick={() => {
+                              const nl = projectData.navbar.links.filter((_, i) => i !== idx);
+                              updateNavbar({ links: nl });
+                            }}
+                            className="mt-4 w-8 h-8 rounded-none bg-red-50 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all opacity-0 group-hover:opacity-100 border-none"
+                          >
+                            <i className="fa-solid fa-trash-can text-[10px]"></i>
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                    <button
+                      onClick={() => updateNavbar({ links: [...(projectData.navbar?.links || []), { label: 'New Link', href: '#' }] })}
+                      className="w-full py-2 border-2 border-dashed border-gray-200 text-gray-400 text-[10px] font-black uppercase tracking-widest hover:border-blue-500 hover:text-blue-500 transition-all flex items-center justify-center gap-2 bg-transparent"
+                    >
+                      <i className="fa-solid fa-plus"></i> Add Navbar Link
+                    </button>
                   </div>
                 )}
 
