@@ -27,7 +27,8 @@ export async function GET(req: NextRequest) {
     const query: any = { userId: session.user.id }; // Always filter by the current user
     if (status) query.status = status;
 
-    const projects = await Project.find(query).sort({ updatedAt: -1 });
+    // Exclude 'data' field when listing projects for the dashboard to prevent OOM
+    const projects = await Project.find(query).select("-data").sort({ updatedAt: -1 });
     return NextResponse.json(projects);
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
