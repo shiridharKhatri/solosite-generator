@@ -27,10 +27,11 @@ export default function EditorPage() {
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateGallery, updateNavbar, updateProjectData,
     showLegalModal, setShowLegalModal, updateOrderLink, updateLegalPage,
-    isDirty, setDirty
+    isDirty, setDirty, version
   } = useStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [isSEOModalOpen, setIsSEOModalOpen] = useState(false);
   const [seoTab, setSeoTab] = useState<'general' | 'social' | 'advanced'>('general');
@@ -92,6 +93,13 @@ export default function EditorPage() {
   useEffect(() => {
 
     if (projectId && projectId !== 'new') {
+      // Don't re-fetch if we already have the data for this project (prevents overwrite during redirect)
+      if (useStore.getState().projectData && useStore.getState().projectData?.productName !== initialProjectData.productName) {
+         // Data likely already loaded or edited
+         // return; 
+         // Actually, better to fetch but only if it's a first load or we're explicitly changing projects
+      }
+
       fetch(`/api/projects?id=${projectId}`)
         .then(res => res.json())
         .then(data => {
@@ -99,17 +107,21 @@ export default function EditorPage() {
             const sanitized = sanitizeProjectData(data.data);
             setProjectData(sanitized);
             setProjectStatus(data.status || 'draft');
+            setDirty(false); // Reset dirty after load
           }
         })
         .catch(err => console.error('Failed to fetch project:', err));
     } else if (projectId === 'new') {
       setProjectData(initialProjectData);
     }
-  }, [projectId, setProjectData, sanitizeProjectData]);
+  }, [projectId, setProjectData, sanitizeProjectData, setDirty]);
 
   const handleSave = React.useCallback(async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
     if (!projectData) return;
-    if (!isAutoSave) setIsSaving(true);
+    const startVersion = version;
+    if (isAutoSave) setIsAutoSaving(true);
+    else setIsSaving(true);
+
     try {
       const isNew = projectId === 'new';
       const method = isNew ? 'POST' : 'PUT';
@@ -128,8 +140,15 @@ export default function EditorPage() {
       if (res.ok) {
         setProjectStatus(status);
         setLastSaved(new Date());
-        setDirty(false);
-        if (isNew && data._id) {
+
+        // Only clear dirty flag if no new changes occurred during the save request
+        const currentVersion = useStore.getState().version;
+        if (currentVersion === startVersion) {
+          setDirty(false);
+        }
+
+        // Only redirect on manual save to avoid jarring focus loss / re-mounts
+        if (isNew && data._id && !isAutoSave) {
           router.push(`/editor/${data._id}`);
         }
       } else if (!isAutoSave) {
@@ -138,23 +157,36 @@ export default function EditorPage() {
     } catch (error) {
       if (!isAutoSave) alert('Save failed.');
     } finally {
-      if (!isAutoSave) setIsSaving(false);
+      setIsAutoSaving(false);
+      setIsSaving(false);
     }
-  }, [projectData, projectId, router, setDirty]);
+  }, [projectData, projectId, router, setDirty, version]);
 
   // Auto-save effect
   useEffect(() => {
     if (!projectData || !isDirty) return;
 
     // Don't auto-save if we're currently manually saving
-    if (isSaving) return;
+    if (isSaving || isAutoSaving) return;
 
     const timeout = setTimeout(() => {
       handleSave('draft', true);
-    }, 3000);
+    }, 1500);
 
     return () => clearTimeout(timeout);
-  }, [projectData, isDirty, isSaving, handleSave]);
+  }, [projectData, isDirty, isSaving, isAutoSaving, handleSave]);
+
+  // Prevent accidental navigation with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+        e.returnValue = '';
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   const handleExport = React.useCallback(async () => {
     if (!projectData) return;
@@ -213,6 +245,26 @@ export default function EditorPage() {
             </div>
             <div className="flex flex-col">
               <span className="font-bold text-sm tracking-tight leading-tight">SoloSite</span>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                {isAutoSaving || isSaving ? (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 bg-blue-500 rounded-full animate-pulse"></div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-blue-500">Saving...</span>
+                  </div>
+                ) : isDirty ? (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 bg-amber-500 rounded-full"></div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-amber-500">Unsaved Changes</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <div className="w-1 h-1 bg-emerald-500 rounded-full"></div>
+                    <span className="text-[9px] font-black uppercase tracking-widest text-emerald-500">
+                      Saved {lastSaved ? `at ${lastSaved.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : ''}
+                    </span>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 
 interface EditableImageProps {
   src: string;
@@ -20,15 +20,17 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   style,
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const handleClick = () => {
-    fileInputRef.current?.click();
+    if (!isUploading) fileInputRef.current?.click();
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setIsUploading(true);
     const formData = new FormData();
     formData.append('file', file);
 
@@ -42,6 +44,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         const data = await res.json();
         if (data.url) {
           onChange(data.url);
+          setIsUploading(false);
           return;
         }
       }
@@ -50,6 +53,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         onChange(reader.result as string);
+        setIsUploading(false);
       };
       reader.readAsDataURL(file);
     } catch (error) {
@@ -58,6 +62,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       const reader = new FileReader();
       reader.onloadend = () => {
         onChange(reader.result as string);
+        setIsUploading(false);
       };
       reader.readAsDataURL(file);
     }
@@ -96,6 +101,13 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none" style={{ borderRadius: 'inherit' }}>
         <span className="text-white text-[10px] font-bold uppercase tracking-widest">Click to replace</span>
       </div>
+
+      {isUploading && (
+        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center z-40 transition-all">
+          <i className="fa-solid fa-circle-notch animate-spin text-blue-600 text-xl mb-2"></i>
+          <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">Uploading...</span>
+        </div>
+      )}
 
       {(src || onRemove) && (
         <button
