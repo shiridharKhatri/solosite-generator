@@ -40,58 +40,64 @@ export default function EditorPage() {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [activeContentTab, setActiveContentTab] = useState('hero');
 
+  // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
+  const sanitizeProjectData = React.useCallback((data: any) => {
+    const deepMerge = (target: any, source: any): any => {
+      const output = { ...target };
+      if (source && typeof source === 'object' && !Array.isArray(source)) {
+        Object.keys(source).forEach(key => {
+          if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            if (!(key in target) || !target[key]) {
+              output[key] = source[key];
+            } else {
+              output[key] = deepMerge(target[key], source[key]);
+            }
+          } else {
+            if (!(key in target) || target[key] === undefined || target[key] === null || target[key] === "") {
+              output[key] = source[key];
+            }
+          }
+        });
+      }
+      return output;
+    };
+
+    let updatedData = deepMerge(data, initialProjectData);
+
+    // Migration: Ensure each pricing plan has its own guaranteeBadge
+    if (updatedData.pricing) {
+      updatedData.pricing = updatedData.pricing.map((plan: any) => ({
+        ...plan,
+        guaranteeBadge: plan.guaranteeBadge || {
+          text: "60-DAY MONEY-BACK GUARANTEE",
+          icon: "fa-solid fa-lock"
+        }
+      }));
+    }
+
+    // Sanitize corrupted testimonials
+    if (updatedData.testimonials?.items) {
+      updatedData.testimonials.items = updatedData.testimonials.items.map((item: any, i: number) => {
+        if (item.content === '"${item.content}"' || item.content === '${item.content}') {
+          return { ...item, content: initialProjectData.testimonials.items[i]?.content || 'Highly recommend this product!' };
+        }
+        return item;
+      });
+    }
+
+    return updatedData;
+  }, []);
+
   // Fetch project data if editing existing
   useEffect(() => {
+
     if (projectId && projectId !== 'new') {
       fetch(`/api/projects?id=${projectId}`)
         .then(res => res.json())
         .then(data => {
           if (data && data.data) {
-            // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
-            const deepMerge = (target: any, source: any) => {
-              const output = { ...target };
-              if (source && typeof source === 'object' && !Array.isArray(source)) {
-                Object.keys(source).forEach(key => {
-                  if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                    if (!(key in target) || !target[key]) {
-                      output[key] = source[key];
-                    } else {
-                      output[key] = deepMerge(target[key], source[key]);
-                    }
-                  } else {
-                    if (!(key in target) || target[key] === undefined || target[key] === null || target[key] === "") {
-                      output[key] = source[key];
-                    }
-                  }
-                });
-              }
-              return output;
-            };
-
-            const updatedData = deepMerge(data.data, initialProjectData);
-
-            // Migration: Ensure each pricing plan has its own guaranteeBadge
-            if (updatedData.pricing) {
-              updatedData.pricing = updatedData.pricing.map((plan: any) => ({
-                ...plan,
-                guaranteeBadge: plan.guaranteeBadge || {
-                  text: "60-DAY MONEY-BACK GUARANTEE",
-                  icon: "fa-solid fa-lock"
-                }
-              }));
-            }
-
-            // Sanitize corrupted testimonials
-            if (updatedData.testimonials?.items) {
-              updatedData.testimonials.items = updatedData.testimonials.items.map((item: any, i: number) => {
-                if (item.content === '"${item.content}"' || item.content === '${item.content}') {
-                  return { ...item, content: initialProjectData.testimonials.items[i]?.content || 'Highly recommend this product!' };
-                }
-                return item;
-              });
-            }
-
-            setProjectData(updatedData);
+            const sanitized = sanitizeProjectData(data.data);
+            setProjectData(sanitized);
             setProjectStatus(data.status || 'draft');
           }
         })
@@ -99,7 +105,7 @@ export default function EditorPage() {
     } else if (projectId === 'new') {
       setProjectData(initialProjectData);
     }
-  }, [projectId, setProjectData]);
+  }, [projectId, setProjectData, sanitizeProjectData]);
 
   const handleSave = React.useCallback(async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
     if (!projectData) return;
@@ -1168,10 +1174,18 @@ export default function EditorPage() {
                           try {
                             const newData = JSON.parse(textarea.value);
                             // Basic structure validation
-                            if (!newData.productName || typeof newData !== 'object') {
-                              throw new Error('Invalid project data structure. productName is required.');
+                            if (typeof newData !== 'object') {
+                              throw new Error('Invalid project data structure. Object is required.');
                             }
-                            setProjectData(newData);
+
+                            // Use the same robust migration/sanitization used on page load
+                            // We need to define it or make it accessible. 
+                            // Since it's inside the EditorPage component scope now, we can use it.
+                            // However, we need to move the function definition above the return.
+
+                            // For immediate fix, I'll use a direct call to the logic
+                            const sanitized = sanitizeProjectData(newData);
+                            setProjectData(sanitized);
                             setDirty(true);
                             alert('Content synced successfully!');
                           } catch (e: any) {
