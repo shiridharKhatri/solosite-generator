@@ -7,7 +7,6 @@ import { Project } from "@/models/Project";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
-  console.log("API GET Session:", session);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   try {
@@ -31,7 +30,6 @@ export async function GET(req: NextRequest) {
     const projects = await Project.find(query).sort({ updatedAt: -1 });
     return NextResponse.json(projects);
   } catch (err: any) {
-    console.error("Error fetching projects:", err);
     return NextResponse.json({ error: err.message || "Internal Server Error" }, { status: 500 });
   }
 }

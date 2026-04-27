@@ -43,13 +43,12 @@ function DashboardContent() {
           }
         })
         .catch(err => {
-          console.error("Failed to fetch projects:", err);
           setProjects([]);
         });
     }
   }, [status, filterStatus]);
 
-  const deleteProject = async (id: string) => {
+  const deleteProject = React.useCallback(async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
     try {
       const res = await fetch(`/api/projects?id=${id}`, { method: 'DELETE' });
@@ -60,9 +59,9 @@ function DashboardContent() {
         alert(error.error || 'Failed to delete');
       }
     } catch (error) {
-      console.error('Delete failed:', error);
+      // Silently fail or use a toast in production
     }
-  };
+  }, []);
 
 
   if (status === 'loading') return <div className="p-10 text-zinc-900">Loading...</div>;

@@ -637,7 +637,6 @@ ${seoBlock}
     <script>
         // Simple mobile menu toggle if needed
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Site loaded');
         });
     </script>
 

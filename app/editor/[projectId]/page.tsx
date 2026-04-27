@@ -79,7 +79,7 @@ export default function EditorPage() {
     }
   }, [projectId, setProjectData]);
 
-  const handleSave = async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
+  const handleSave = React.useCallback(async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
     if (!projectData) return;
     if (!isAutoSave) setIsSaving(true);
     try {
@@ -108,12 +108,11 @@ export default function EditorPage() {
         alert(data.error || 'Failed to save');
       }
     } catch (error) {
-      console.error('Save failed', error);
       if (!isAutoSave) alert('Save failed.');
     } finally {
       if (!isAutoSave) setIsSaving(false);
     }
-  };
+  }, [projectData, projectId, router, setDirty]);
 
   // Auto-save effect
   useEffect(() => {
@@ -127,9 +126,9 @@ export default function EditorPage() {
     }, 3000);
 
     return () => clearTimeout(timeout);
-  }, [projectData, isDirty, isSaving]);
+  }, [projectData, isDirty, isSaving, handleSave]);
 
-  const handleExport = async () => {
+  const handleExport = React.useCallback(async () => {
     if (!projectData) return;
 
     const defaultName = projectData.productName.toLowerCase().replace(/\s+/g, '-') || 'my-project';
@@ -153,17 +152,16 @@ export default function EditorPage() {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
-      console.error('Export failed', error);
       alert('Export failed.');
     } finally {
       setIsExporting(false);
     }
-  };
+  }, [projectData]);
 
   if (!projectData) return <div>Loading...</div>;
 
-  const renderActiveTemplate = () => {
-    switch (projectData.layoutStyle) {
+  const activeTemplate = React.useMemo(() => {
+    switch (projectData?.layoutStyle) {
       case 'modern':
         return <ModernTemplate />;
       case 'clinical':
@@ -174,7 +172,7 @@ export default function EditorPage() {
       default:
         return <GlycopezilTemplate />;
     }
-  };
+  }, [projectData?.layoutStyle]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
@@ -436,7 +434,7 @@ export default function EditorPage() {
           className={`mx-auto bg-white rounded-md border border-gray-100 transition-all duration-500 ease-in-out relative ${viewport === 'mobile' ? 'max-w-[450px] mobile-preview shadow-2xl' : 'max-w-[1400px]'}`}
           style={{ transform: 'translate(0, 0)', height: 'fit-content', overflow: 'hidden' }}
         >
-          {renderActiveTemplate()}
+          {activeTemplate}
         </div>
       </main>
 

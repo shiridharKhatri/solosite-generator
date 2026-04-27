@@ -13,7 +13,6 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Export error:", error);
-    return NextResponse.json({ error: "Failed to export" }, { status: 500 });
+    return NextResponse.json({ error: "Export failed" }, { status: 500 });
   }
 }
