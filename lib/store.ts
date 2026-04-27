@@ -130,6 +130,8 @@ export interface ProjectData {
       key: string;
       value: string;
     }[];
+    headerScripts?: string;
+    footerScripts?: string;
   };
   theme: {
     primary: string;
@@ -142,6 +144,10 @@ export interface ProjectData {
   guaranteeSubtitle?: string;
   guaranteeHeadline?: string;
   guaranteeDescription?: string;
+  guaranteeBadge: {
+    text: string;
+    icon: string;
+  };
   faqTitle?: string;
   footerHeadline?: string;
   research?: {
@@ -504,6 +510,12 @@ export const initialProjectData: ProjectData = {
     ],
     trustImage: "/image/money-back-guarantee-..webp"
   },
+  guaranteeBadge: {
+    text: "60-DAY MONEY-BACK GUARANTEE",
+    icon: "fa-solid fa-lock"
+  },
+  faqTitle: "Frequently Asked Questions",
+  footerHeadline: "Final Thoughts",
   research: {
     title: "The Science of Blood Support",
     subtitle: "Clinically-focused formulation for maximum metabolic impact.",
@@ -537,7 +549,9 @@ export const initialProjectData: ProjectData = {
     ogDescription: "Plant-powered glucose regulation for everyday vitality.",
     ogImage: "https://www.glycopezil-official.us/assets/image/index-img.webp",
     ogType: "website",
-    twitterCard: "summary_large_image"
+    twitterCard: "summary_large_image",
+    headerScripts: "",
+    footerScripts: ""
   },
   navbar: {
     links: [

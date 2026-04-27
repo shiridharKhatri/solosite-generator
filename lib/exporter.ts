@@ -323,6 +323,7 @@ ${alternatesHtml}
 ${customTagsHtml}
 
     ${schemaJSON ? `<!-- JSON-LD Schema -->\n    <script type="application/ld+json">\n${schemaJSON}\n    </script>` : ''}
+    ${seo.headerScripts ? `<!-- Header Scripts -->\n    ${seo.headerScripts}` : ''}
     `;
 
     if (layoutStyle === 'default' || layoutStyle === 'glycopezil') {
@@ -552,7 +553,7 @@ ${seoBlock}
                 </div>
                 <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;"><ul class="list-unstyled mb-0 text-start d-inline-block">${plan.features.map((f: string) => `<li class="mb-2 small fw-medium"><i class="fa-solid fa-check-circle me-2" style="color: ${primaryColor};"></i>${f}</li>`).join('')}</ul></div>
                 <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-2 fs-6 fw-bold" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
-                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="fa-solid fa-lock"></i><span>60-DAY MONEY-BACK GUARANTEE</span></div>
+                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
             </div></div>
             `).join('')}
         </div></div>
@@ -642,6 +643,7 @@ ${seoBlock}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     ${socialProofBlock}
+    ${seo.footerScripts ? `<!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}
 </body>
 </html>`;
     }
@@ -904,6 +906,7 @@ ${seoBlock}
                     <div class="fw-bold mb-3" style="color: ${secondaryColor}; font-size: 2rem;">${plan.price}</div>
                     <div class="mb-4">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-center gap-2 justify-content-center text-white-50" style="font-size: 0.85rem;"><i class="fa-solid fa-check-circle" style="color: ${secondaryColor}; font-size: 0.7rem;"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="modern-btn w-100 ${plan.isPrimary ? 'modern-btn-primary' : 'modern-btn-outline'}" style="justify-content: center;">${plan.buttonText}</a>
+                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                 </div></div>
                 `).join('')}
             </div>
@@ -1168,6 +1171,7 @@ ${seoBlock}
                         <div class="fw-bold mb-4 font-monospace fs-2" style="color: ${primaryColor};">${plan.price}</div>
                         <div class="text-start border-start border-2 ps-3 mb-4 flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-check text-success me-2"></i>${f}</div>`).join('')}</div>
                         <a href="${plan.buttonHref}" class="clinical-btn-primary w-100 ${plan.isPrimary ? '' : 'bg-white text-dark border'}" style="justify-content: center;">${plan.buttonText}</a>
+                        <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                     </div>
                 </div></div>
                 `).join('')}
@@ -1375,6 +1379,7 @@ ${seoBlock}
                     <div class="fw-bold mb-3 font-serif fs-2" style="color: ${primaryColor}">${plan.price}</div>
                     <div class="mb-4 text-start flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-start gap-2" style="color: #6A5949; font-size: 0.9rem;"><i class="fa-solid fa-check mt-1" style="color: ${secondaryColor}"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="organic-btn-primary w-100" style="justify-content: center;">${plan.buttonText}</a>
+                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                 </div></div>
                 `).join('')}
             </div>
@@ -1489,7 +1494,7 @@ ${seoBlock}
     sourcesArray.sort((a, b) => b.length - a.length);
 
     // Inject blocks BEFORE image replacement loop so they get processed too
-    rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
+    rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}${seo.footerScripts ? `\n    <!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}\n</body>`);
 
     for (const imgSrc of sourcesArray) {
         try {
@@ -1594,7 +1599,7 @@ ${seoBlock}
         pageFooter = rawHtml.substring(footerStartIndex);
         // Ensure the legal pages also have the blocks if they didn't get them from rawHtml
         if (!pageFooter.includes('purchase-proof')) {
-            pageFooter = pageFooter.replace('</body>', `${socialProofBlock}${scrollToTopBlock}</body>`);
+            pageFooter = pageFooter.replace('</body>', `${socialProofBlock}${scrollToTopBlock}${seo.footerScripts ? `\n    <!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}\n</body>`);
         }
     } else {
         // Fallback to basic SEO header

@@ -1234,7 +1234,36 @@ export default function EditorPage() {
                       <span>JSON-LD Schema</span>
                       <span className="text-[10px] bg-gray-200 text-gray-600 px-2 rounded-none">DEV</span>
                     </label>
-                    <textarea rows={4} placeholder='{"@context": "https://schema.org", ...}' value={projectData.seo?.schema || ''} onChange={(e) => updateSEO({ schema: e.target.value })} className="w-full px-4 py-2 bg-gray-900 text-green-400 font-mono border rounded-none text-xs outline-none resize-y"></textarea>
+                    <textarea rows={3} placeholder='{"@context": "https://schema.org", ...}' value={projectData.seo?.schema || ''} onChange={(e) => updateSEO({ schema: e.target.value })} className="w-full px-4 py-2 bg-gray-900 text-green-400 font-mono border rounded-none text-xs outline-none resize-y"></textarea>
+                  </div>
+
+                  <div className="grid grid-cols-1 gap-4 pt-2">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 flex justify-between">
+                        <span>Header Scripts</span>
+                        <span className="text-[10px] text-blue-500 font-black">BEFORE &lt;/HEAD&gt;</span>
+                      </label>
+                      <textarea 
+                        rows={4} 
+                        placeholder="Paste Google Analytics, Meta Pixel, or other head scripts here..." 
+                        value={projectData.seo?.headerScripts || ''} 
+                        onChange={(e) => updateSEO({ headerScripts: e.target.value })} 
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-xs font-mono outline-none resize-y"
+                      ></textarea>
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1 flex justify-between">
+                        <span>Footer Scripts</span>
+                        <span className="text-[10px] text-orange-500 font-black">BEFORE &lt;/BODY&gt;</span>
+                      </label>
+                      <textarea 
+                        rows={4} 
+                        placeholder="Paste tracking noscripts or footer scripts here..." 
+                        value={projectData.seo?.footerScripts || ''} 
+                        onChange={(e) => updateSEO({ footerScripts: e.target.value })} 
+                        className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-xs font-mono outline-none resize-y"
+                      ></textarea>
+                    </div>
                   </div>
                 </div>
               )}

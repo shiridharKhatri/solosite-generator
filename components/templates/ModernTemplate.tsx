@@ -66,7 +66,7 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
   const [showSettings, setShowSettings] = useState(false);
   const [pos, setPos] = useState({ x: 0, y: 0 });
   return (
-    <div 
+    <div
       onContextMenu={(e) => {
         if (onContextMenu) {
           onContextMenu(e);
@@ -75,7 +75,7 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
           setPos({ x: e.clientX, y: e.clientY });
           setShowSettings(true);
         }
-      }} 
+      }}
       className={`relative group/link ${className}`}
     >
       {children}
@@ -351,14 +351,14 @@ export const ModernTemplate: React.FC = () => {
               <div className="d-flex justify-content-center flex-wrap gap-4 gap-md-5 mt-5 grayscale opacity-50">
                 {(projectData.logos || []).map((logo, i) => (
                   <div key={i} className="relative group" style={{ width: '60px' }}>
-                    <EditableImage 
-                      src={logo} 
-                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }} 
+                    <EditableImage
+                      src={logo}
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }}
                       onRemove={() => {
                         const nl = projectData.logos.filter((_, idx) => idx !== i);
                         updateProjectData({ logos: nl });
                       }}
-                      className="img-fluid" 
+                      className="img-fluid"
                     />
                   </div>
                 ))}
@@ -506,18 +506,18 @@ export const ModernTemplate: React.FC = () => {
               {projectData.gallery.images.map((img, i) => (
                 <div key={i} className="col-12 col-md-4 relative group">
                   <div className="glass-card p-1 overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    <EditableImage 
-                      src={img} 
+                    <EditableImage
+                      src={img}
                       onChange={(val) => {
                         const ni = [...projectData.gallery!.images];
                         ni[i] = val;
                         updateGallery({ images: ni });
-                      }} 
+                      }}
                       onRemove={() => {
                         const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
                         updateGallery({ images: ni });
                       }}
-                      className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }} 
+                      className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }}
                     />
                   </div>
                 </div>
@@ -674,6 +674,10 @@ export const ModernTemplate: React.FC = () => {
                       <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
                     </button>
                   </Linkable>
+                  <div className="mt-3 flex items-center justify-center gap-1 opacity-40 font-bold" style={{ fontSize: '10px' }}>
+                    <IconEditor value={projectData.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, icon: val } })} />
+                    <EditableText tagName="span" value={projectData.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, text: val } })} />
+                  </div>
                 </div>
               </div>
             ))}
@@ -824,7 +828,7 @@ export const ModernTemplate: React.FC = () => {
               <div className="space-y-4">
                 {(projectData.socialProof?.items || []).map((item, idx) => (
                   <div key={idx} className="p-3 bg-white/5 border border-white/10 relative group/item">
-                    <button 
+                    <button
                       onClick={() => {
                         const ni = [...(projectData.socialProof?.items || [])];
                         ni.splice(idx, 1);
@@ -868,8 +872,8 @@ export const ModernTemplate: React.FC = () => {
                         }} />
                       </div>
                       <div className="col-md-6">
-                         <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Image URL</label>
-                         <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.image} onChange={(e) => {
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Image URL</label>
+                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.image} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], image: e.target.value };
                           updateSocialProof({ items: ni });
@@ -878,7 +882,7 @@ export const ModernTemplate: React.FC = () => {
                     </div>
                   </div>
                 ))}
-                <button 
+                <button
                   onClick={() => {
                     const ni = [...(projectData.socialProof?.items || []), { name: "New Customer", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
                     updateSocialProof({ items: ni });

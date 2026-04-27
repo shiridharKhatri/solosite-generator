@@ -5,7 +5,7 @@ export async function POST(req: NextRequest) {
   try {
     const { data } = await req.json();
     const zipBlob = await generateProjectZip(data);
-    
+
     return new NextResponse(zipBlob, {
       headers: {
         "Content-Type": "application/zip",

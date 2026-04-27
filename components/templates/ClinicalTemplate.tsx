@@ -580,6 +580,10 @@ export const ClinicalTemplate: React.FC = () => {
                         <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
                       </button>
                     </Linkable>
+                    <div className="mt-3 flex items-center justify-center gap-1 text-slate-400 font-bold" style={{ fontSize: '10px' }}>
+                      <IconEditor value={projectData.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, icon: val } })} />
+                      <EditableText tagName="span" value={projectData.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, text: val } })} />
+                    </div>
                   </div>
                 </div>
               </div>
