@@ -12,6 +12,7 @@ function DashboardContent() {
   const searchParams = useSearchParams();
   const filterStatus = searchParams.get('status');
   const [projects, setProjects] = useState<any[]>([]);
+  const [isProjectsLoading, setIsProjectsLoading] = useState(true);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -23,6 +24,7 @@ function DashboardContent() {
     const url = filterStatus ? `/api/projects?status=${filterStatus}` : '/api/projects';
 
     if (status === 'authenticated') {
+      setIsProjectsLoading(true);
       fetch(url)
         .then(async res => {
           if (!res.ok) {
@@ -44,6 +46,9 @@ function DashboardContent() {
         })
         .catch(err => {
           setProjects([]);
+        })
+        .finally(() => {
+          setIsProjectsLoading(false);
         });
     }
   }, [status, filterStatus]);
@@ -101,38 +106,55 @@ function DashboardContent() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {projects.map((project) => (
-            <div key={project._id} className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-300 card-shadow hover-card-shadow border border-zinc-100/50">
-              <div className="aspect-[16/10] overflow-hidden relative bg-zinc-50">
-                <div className="w-full h-full flex items-center justify-center text-zinc-200">
-                  <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+          {isProjectsLoading ? (
+            <>
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg overflow-hidden border border-zinc-100 shadow-sm animate-pulse">
+                  <div className="aspect-[16/10] bg-zinc-100"></div>
+                  <div className="p-6 space-y-4">
+                    <div className="flex justify-between">
+                      <div className="h-6 bg-zinc-100 rounded-md w-1/2"></div>
+                      <div className="h-5 bg-zinc-100 rounded-md w-1/4"></div>
+                    </div>
+                    <div className="h-3 bg-zinc-50 rounded-md w-1/3"></div>
+                  </div>
                 </div>
-                <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Link href={`/editor/${project._id}`} className="w-12 h-12 rounded-md bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/20">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                  </Link>
-                  <button
-                    onClick={() => deleteProject(project._id)}
-                    className="w-12 h-12 rounded-md bg-white text-rose-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-zinc-200/50"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                  </button>
+              ))}
+            </>
+          ) : (
+            projects.map((project) => (
+              <div key={project._id} className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-300 card-shadow hover-card-shadow border border-zinc-100/50">
+                <div className="aspect-[16/10] overflow-hidden relative bg-zinc-50">
+                  <div className="w-full h-full flex items-center justify-center text-zinc-200">
+                    <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                  </div>
+                  <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Link href={`/editor/${project._id}`} className="w-12 h-12 rounded-md bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/20">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    </Link>
+                    <button
+                      onClick={() => deleteProject(project._id)}
+                      className="w-12 h-12 rounded-md bg-white text-rose-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-zinc-200/50"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                    </button>
+                  </div>
+                </div>
+                <div className="p-6">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-headline text-xl font-bold text-zinc-900">{project.name}</h3>
+                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${project.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {project.status || 'draft'}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <p className="text-zinc-500 font-body text-[11px] uppercase font-bold tracking-wider leading-none">Edited {new Date(project.updatedAt).toLocaleDateString()}</p>
+                  </div>
                 </div>
               </div>
-              <div className="p-6">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-headline text-xl font-bold text-zinc-900">{project.name}</h3>
-                  <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${project.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
-                    {project.status || 'draft'}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  <p className="text-zinc-500 font-body text-[11px] uppercase font-bold tracking-wider leading-none">Edited {new Date(project.updatedAt).toLocaleDateString()}</p>
-                </div>
-              </div>
-            </div>
-          ))}
+            ))
+          )}
 
           <Link href="/editor/new" className="group relative flex flex-col border-2 border-dashed border-zinc-200 rounded-lg aspect-[16/10] items-center justify-center hover:border-primary/50 hover:bg-zinc-50 transition-all duration-300 cursor-pointer">
             <div className="w-16 h-16 rounded-md bg-zinc-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
@@ -148,9 +170,31 @@ function DashboardContent() {
   );
 }
 
+function DashboardSkeleton() {
+  return (
+    <div className="min-h-screen bg-[#fafafa]">
+      <TopNavBar />
+      <main className="max-w-[1440px] mx-auto pt-16 pb-12 px-8">
+        <div className="h-12 w-64 bg-zinc-100 rounded-lg animate-pulse mb-12"></div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-white rounded-lg overflow-hidden border border-zinc-100 animate-pulse">
+              <div className="aspect-[16/10] bg-zinc-100"></div>
+              <div className="p-6 space-y-4">
+                <div className="h-6 bg-zinc-100 rounded-md w-1/2"></div>
+                <div className="h-3 bg-zinc-50 rounded-md w-1/3"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+}
+
 export default function DashboardPage() {
   return (
-    <Suspense fallback={<div className="p-10 text-zinc-900">Loading Dashboard...</div>}>
+    <Suspense fallback={<DashboardSkeleton />}>
       <DashboardContent />
     </Suspense>
   );
