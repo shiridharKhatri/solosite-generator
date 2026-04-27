@@ -13,12 +13,25 @@ export async function POST(req: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    const base64 = buffer.toString("base64");
-    const mimeType = file.type || "image/png";
-    const dataUrl = `data:${mimeType};base64,${base64}`;
+    const fileName = `${uuidv4()}-${file.name.replace(/\s+/g, "-")}`;
+    const publicDir = path.join(process.cwd(), "public");
+    const uploadDir = path.join(publicDir, "uploads");
 
-    return NextResponse.json({ url: dataUrl });
+    // Ensure uploads directory exists
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (err) {
+      // Ignore if directory already exists
+    }
+
+    const filePath = path.join(uploadDir, fileName);
+    await writeFile(filePath, buffer);
+
+    const relativeUrl = `/uploads/${fileName}`;
+
+    return NextResponse.json({ url: relativeUrl });
   } catch (error) {
+    console.error("Upload error:", error);
     return NextResponse.json({ error: "Failed to upload file" }, { status: 500 });
   }
 }

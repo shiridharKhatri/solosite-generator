@@ -635,6 +635,9 @@ export const useStore = create<EditorState>((set) => ({
 
     const replaceInObj = (obj: any): any => {
       if (typeof obj === 'string') {
+        // Skip massive strings (like old base64 images) to avoid OOM
+        if (obj.length > 1000) return obj;
+        
         // Use regex with word boundaries to only replace the product name as a whole word
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`\\b${escapedOldName}\\b`, 'g');

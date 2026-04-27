@@ -40,6 +40,7 @@ export default function EditorPage() {
   const [activeDropdown, setActiveDropdown] = useState<'layout' | 'theme' | 'settings' | null>(null);
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [activeContentTab, setActiveContentTab] = useState('hero');
+  const [isLoading, setIsLoading] = useState(projectId !== 'new');
 
   // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
   const sanitizeProjectData = React.useCallback((data: any) => {
@@ -108,11 +109,16 @@ export default function EditorPage() {
             setProjectData(sanitized);
             setProjectStatus(data.status || 'draft');
             setDirty(false); // Reset dirty after load
+            setIsLoading(false);
           }
         })
-        .catch(err => console.error('Failed to fetch project:', err));
+        .catch(err => {
+          console.error('Failed to fetch project:', err);
+          setIsLoading(false);
+        });
     } else if (projectId === 'new') {
       setProjectData(initialProjectData);
+      setIsLoading(false);
     }
   }, [projectId, setProjectData, sanitizeProjectData, setDirty]);
 
@@ -235,7 +241,31 @@ export default function EditorPage() {
   }, [projectData?.layoutStyle]);
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden">
+    <div className="h-screen flex flex-col bg-gray-50 overflow-hidden relative">
+      {isLoading && (
+        <div className="fixed inset-0 z-[100000] bg-white/80 backdrop-blur-md flex flex-col items-center justify-center animate-in fade-in duration-500">
+          <div className="relative">
+            {/* Pulsing rings */}
+            <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping duration-1000"></div>
+            <div className="absolute inset-0 rounded-full bg-blue-500/10 animate-pulse duration-700 delay-75"></div>
+            
+            {/* Core logo/spinner */}
+            <div className="relative bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 flex items-center justify-center group">
+              <i className="fa-solid fa-cube text-4xl text-blue-600 animate-bounce duration-1000"></i>
+            </div>
+          </div>
+          
+          <div className="mt-8 text-center space-y-2">
+            <h2 className="text-xl font-bold text-slate-800 tracking-tight">Preparing your workspace</h2>
+            <div className="flex items-center justify-center gap-1.5">
+              <span className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+              <span className="w-1 h-1 bg-blue-500 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+              <span className="w-1 h-1 bg-blue-500 rounded-full animate-bounce"></span>
+              <span className="ml-2 text-xs font-black uppercase tracking-widest text-slate-400">Syncing with cloud</span>
+            </div>
+          </div>
+        </div>
+      )}
       <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center justify-between px-6 z-[10000] shadow-sm">
         <div className="flex items-center gap-4">
           {/* Logo & Brand Info */}
