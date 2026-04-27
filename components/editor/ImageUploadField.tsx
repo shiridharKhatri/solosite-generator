@@ -22,7 +22,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
         img.src = event.target?.result as string;
         img.onload = () => {
           const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1200;
+          const MAX_WIDTH = 1000;
           let width = img.width;
           let height = img.height;
           if (width > MAX_WIDTH) {
@@ -33,7 +33,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
-          const webpBase64 = canvas.toDataURL('image/webp', 0.8);
+          const webpBase64 = canvas.toDataURL('image/webp', 0.6);
           resolve(webpBase64);
         };
         img.onerror = reject;
