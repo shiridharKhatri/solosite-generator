@@ -47,12 +47,39 @@ export default function EditorPage() {
         .then(res => res.json())
         .then(data => {
           if (data && data.data) {
-            // Migration: Ensure new sections exist for old projects
-            const updatedData = { ...data.data };
-            if (!updatedData.testimonials) updatedData.testimonials = initialProjectData.testimonials;
-            if (!updatedData.about) updatedData.about = initialProjectData.about;
-            if (!updatedData.research) updatedData.research = initialProjectData.research;
-            if (!updatedData.gallery) updatedData.gallery = initialProjectData.gallery;
+            // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
+            const deepMerge = (target: any, source: any) => {
+              const output = { ...target };
+              if (source && typeof source === 'object' && !Array.isArray(source)) {
+                Object.keys(source).forEach(key => {
+                  if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                    if (!(key in target) || !target[key]) {
+                      output[key] = source[key];
+                    } else {
+                      output[key] = deepMerge(target[key], source[key]);
+                    }
+                  } else {
+                    if (!(key in target) || target[key] === undefined || target[key] === null || target[key] === "") {
+                      output[key] = source[key];
+                    }
+                  }
+                });
+              }
+              return output;
+            };
+
+            const updatedData = deepMerge(data.data, initialProjectData);
+
+            // Migration: Ensure each pricing plan has its own guaranteeBadge
+            if (updatedData.pricing) {
+              updatedData.pricing = updatedData.pricing.map((plan: any) => ({
+                ...plan,
+                guaranteeBadge: plan.guaranteeBadge || {
+                  text: "60-DAY MONEY-BACK GUARANTEE",
+                  icon: "fa-solid fa-lock"
+                }
+              }));
+            }
 
             // Sanitize corrupted testimonials
             if (updatedData.testimonials?.items) {
@@ -62,11 +89,6 @@ export default function EditorPage() {
                 }
                 return item;
               });
-            }
-
-            // Sanitize missing guarantee description
-            if (updatedData.guaranteeDescription === "") {
-              updatedData.guaranteeDescription = initialProjectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${updatedData.productName} comes protected by a comprehensive 60-day satisfaction promise.`;
             }
 
             setProjectData(updatedData);
@@ -432,7 +454,7 @@ export default function EditorPage() {
       <main className="flex-1 overflow-auto bg-gray-100 pt-20 px-8 pb-12 custom-scrollbar">
         <div
           className={`mx-auto bg-white rounded-md border border-gray-100 transition-all duration-500 ease-in-out relative ${viewport === 'mobile' ? 'max-w-[450px] mobile-preview shadow-2xl' : 'max-w-[1400px]'}`}
-          style={{ transform: 'translate(0, 0)', height: 'fit-content', overflow: 'hidden' }}
+          style={{ height: 'fit-content', overflow: 'hidden' }}
         >
           {activeTemplate}
         </div>
@@ -471,6 +493,7 @@ export default function EditorPage() {
                     { id: 'faq', name: 'FAQ', icon: 'fa-question-circle' },
                     { id: 'order', name: 'Order Page (Link)', icon: 'fa-shopping-cart' },
                     { id: 'footer', name: 'Footer', icon: 'fa-shoe-prints' },
+                    { id: 'global-json', name: 'Global Content (JSON)', icon: 'fa-code' },
                   ].map((tab) => (
                     <button
                       key={tab.id}
@@ -1078,6 +1101,90 @@ export default function EditorPage() {
                     </div>
                   </div>
                 )}
+
+                {activeContentTab === 'global-json' && (
+                  <div className="h-full flex flex-col space-y-4">
+
+                    <div className="flex-1 flex flex-col min-h-[400px]">
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Raw Website Schema</label>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => {
+                              const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
+                              if (textarea) {
+                                try {
+                                  const obj = JSON.parse(textarea.value);
+                                  textarea.value = JSON.stringify(obj, null, 2);
+                                } catch (e) {
+                                  alert('Invalid JSON, cannot format.');
+                                }
+                              }
+                            }}
+                            className="text-[10px] font-bold text-purple-600 hover:underline transition-all"
+                          >
+                            Format JSON
+                          </button>
+                          <button
+                            onClick={() => {
+                              const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
+                              if (textarea) {
+                                navigator.clipboard.writeText(textarea.value);
+                                alert('JSON copied to clipboard!');
+                              }
+                            }}
+                            className="text-[10px] font-bold text-emerald-600 hover:underline transition-all"
+                          >
+                            Copy JSON
+                          </button>
+                          <button
+                            onClick={() => {
+                              const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
+                              if (textarea) {
+                                textarea.value = JSON.stringify(projectData, null, 2);
+                              }
+                            }}
+                            className="text-[10px] font-bold text-gray-500 hover:underline transition-all"
+                          >
+                            Reset to Store
+                          </button>
+                        </div>
+                      </div>
+                      <textarea
+                        id="global-json-textarea"
+                        key={projectData ? 'loaded' : 'loading'}
+                        defaultValue={JSON.stringify(projectData, null, 2)}
+                        rows={20}
+                        className="flex-1 w-full p-4 bg-gray-900 text-green-400 font-mono text-xs rounded-none border-none outline-none focus:ring-2 focus:ring-purple-500 resize-none shadow-inner"
+                        spellCheck={false}
+                      />
+                    </div>
+
+                    <div className="flex justify-end pt-2 pb-12">
+                      <button
+                        onClick={() => {
+                          const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
+                          if (!textarea) return;
+                          try {
+                            const newData = JSON.parse(textarea.value);
+                            // Basic structure validation
+                            if (!newData.productName || typeof newData !== 'object') {
+                              throw new Error('Invalid project data structure. productName is required.');
+                            }
+                            setProjectData(newData);
+                            setDirty(true);
+                            alert('Content synced successfully!');
+                          } catch (e: any) {
+                            alert('Error: ' + e.message);
+                          }
+                        }}
+                        className="px-6 py-2.5 bg-purple-600 text-white text-xs font-black uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-lg shadow-purple-100"
+                      >
+                        Sync JSON Content
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -1243,11 +1350,11 @@ export default function EditorPage() {
                         <span>Header Scripts</span>
                         <span className="text-[10px] text-blue-500 font-black">BEFORE &lt;/HEAD&gt;</span>
                       </label>
-                      <textarea 
-                        rows={4} 
-                        placeholder="Paste Google Analytics, Meta Pixel, or other head scripts here..." 
-                        value={projectData.seo?.headerScripts || ''} 
-                        onChange={(e) => updateSEO({ headerScripts: e.target.value })} 
+                      <textarea
+                        rows={4}
+                        placeholder="Paste Google Analytics, Meta Pixel, or other head scripts here..."
+                        value={projectData.seo?.headerScripts || ''}
+                        onChange={(e) => updateSEO({ headerScripts: e.target.value })}
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-xs font-mono outline-none resize-y"
                       ></textarea>
                     </div>
@@ -1256,11 +1363,11 @@ export default function EditorPage() {
                         <span>Footer Scripts</span>
                         <span className="text-[10px] text-orange-500 font-black">BEFORE &lt;/BODY&gt;</span>
                       </label>
-                      <textarea 
-                        rows={4} 
-                        placeholder="Paste tracking noscripts or footer scripts here..." 
-                        value={projectData.seo?.footerScripts || ''} 
-                        onChange={(e) => updateSEO({ footerScripts: e.target.value })} 
+                      <textarea
+                        rows={4}
+                        placeholder="Paste tracking noscripts or footer scripts here..."
+                        value={projectData.seo?.footerScripts || ''}
+                        onChange={(e) => updateSEO({ footerScripts: e.target.value })}
                         className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-xs font-mono outline-none resize-y"
                       ></textarea>
                     </div>

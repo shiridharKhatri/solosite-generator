@@ -19,7 +19,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
       const formData = new FormData();
       formData.append('file', file);
       const res = await fetch('/api/upload', { method: 'POST', body: formData });
-      
+
       if (res.ok) {
         const data = await res.json();
         if (data.url) {
@@ -27,7 +27,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
           return;
         }
       }
-      
+
       // Fallback: Convert to DataURL if upload fails (e.g. read-only filesystem)
       console.warn('Server upload failed, falling back to DataURL');
       const reader = new FileReader();
@@ -36,7 +36,7 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
         onChange(base64String);
       };
       reader.readAsDataURL(file);
-      
+
     } catch (error) {
       console.error('Failed to upload image', error);
       // Even on error, try the DataURL fallback
@@ -84,6 +84,9 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
           <img
             src={value}
             alt="Preview"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://placehold.co/100x100?text=Error';
+            }}
             className="w-full h-full object-cover absolute inset-0 opacity-25"
           />
         ) : null}

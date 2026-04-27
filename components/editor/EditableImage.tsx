@@ -74,6 +74,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
             src={src}
             alt={alt}
             className="w-full h-full block"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Found';
+            }}
             style={{
               objectFit: style?.objectFit || 'contain',
               maxHeight: style?.maxHeight || '70vh',

@@ -545,7 +545,7 @@ ${seoBlock}
                             <div style="position: relative; background: #000; color: #fff; padding: 4px 8px; font-weight: 900; font-size: 11px; border: 1px solid #fff;">${plan.multiplier || 'X1'}</div>
                         </div>
                     </div>
-                    <img src="${plan.image}" class="mx-auto" style="height: 160px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="mx-auto" style="height: 160px; object-fit: contain;" />
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
                     <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
@@ -553,7 +553,7 @@ ${seoBlock}
                 </div>
                 <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;"><ul class="list-unstyled mb-0 text-start d-inline-block">${plan.features.map((f: string) => `<li class="mb-2 small fw-medium"><i class="fa-solid fa-check-circle me-2" style="color: ${primaryColor};"></i>${f}</li>`).join('')}</ul></div>
                 <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-2 fs-6 fw-bold" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
-                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
             </div></div>
             `).join('')}
         </div></div>
@@ -569,7 +569,7 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="ingredient-card shadow-sm border-0">
                         <div class="ingredient-img-frame mx-auto">
-                            <img src="${item.image}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <img src="${item.image || 'https://placehold.co/400x400?text=Ingredient'}" style="width: 100%; height: 100%; object-fit: cover;">
                         </div>
                         <h3 class="fw-bold fs-4 mb-2 text-dark">${item.title}</h3>
                         <p class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${item.description}</p>
@@ -888,7 +888,7 @@ ${seoBlock}
     <section class="py-5" style="background: linear-gradient(135deg, ${primaryColor}30, #0a0a0a);">
         <div class="container">
             <div class="glass-card p-5"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 200px;" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSubtitle || "Zero Risk"}</p></div>
+                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3" style="max-width: 200px;" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSubtitle || "Zero Risk"}</p></div>
                 <div class="col-lg-8"><h3 class="fw-bold mb-3 text-white" style="font-size: 1.6rem;">${data.guaranteeHeadline || "Satisfaction Guaranteed"}</h3><p class="text-white-50" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary mt-3">Claim Your Package <i class="fa-solid fa-arrow-right"></i></a></div>
             </div></div>
         </div>
@@ -902,11 +902,11 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4"><div class="glass-card p-4 h-100 text-center" style="${plan.isPrimary ? `border: 2px solid ${secondaryColor}; transform: scale(1.03);` : ''}">
                     ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: ${primaryColor}; font-size: 10px;">Best Value</span></div>` : ''}
                     <h4 class="fw-bold mb-2 text-uppercase text-white" style="font-size: 0.95rem; letter-spacing: 2px;">${plan.title}</h4>
-                    <img src="${plan.image}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
                     <div class="fw-bold mb-3" style="color: ${secondaryColor}; font-size: 2rem;">${plan.price}</div>
                     <div class="mb-4">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-center gap-2 justify-content-center text-white-50" style="font-size: 0.85rem;"><i class="fa-solid fa-check-circle" style="color: ${secondaryColor}; font-size: 0.7rem;"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="modern-btn w-100 ${plan.isPrimary ? 'modern-btn-primary' : 'modern-btn-outline'}" style="justify-content: center;">${plan.buttonText}</a>
-                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                 </div></div>
                 `).join('')}
             </div>
@@ -1125,7 +1125,7 @@ ${seoBlock}
             <h2 class="fw-bold mb-5" style="color: ${primaryColor}">${data.ingredients?.title || "Active Constituents"}</h2>
             <div class="row g-3 justify-content-center">
                 ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 d-flex text-start overflow-hidden"><div class="w-25 bg-light d-flex align-items-center justify-content-center border-end p-2"><img src="${item.image}" class="w-100 rounded-circle border border-white shadow-sm" /></div><div class="w-75 p-3 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-1 text-primary font-monospace" style="font-size: 0.85rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.5;">${item.description}</p></div></div></div>
+                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 d-flex text-start overflow-hidden"><div class="w-25 bg-light d-flex align-items-center justify-content-center border-end p-2"><img src="${item.image || 'https://placehold.co/100x100?text=Ing'}" class="w-100 rounded-circle border border-white shadow-sm" /></div><div class="w-75 p-3 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-1 text-primary font-monospace" style="font-size: 0.85rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.5;">${item.description}</p></div></div></div>
                 `).join('')}
             </div>
         </div>
@@ -1167,11 +1167,11 @@ ${seoBlock}
                 <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}">
                     <div class="p-3 border-bottom ${plan.isPrimary ? 'bg-primary text-white' : 'bg-white text-dark'}"><h4 class="fw-bold mb-0 text-uppercase fs-6">${plan.title}</h4></div>
                     <div class="p-4 flex-grow-1 d-flex flex-column">
-                        <img src="${plan.image}" class="img-fluid mx-auto mb-4" style="height: 120px; object-fit: contain;" />
+                        <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto mb-4" style="height: 120px; object-fit: contain;" />
                         <div class="fw-bold mb-4 font-monospace fs-2" style="color: ${primaryColor};">${plan.price}</div>
                         <div class="text-start border-start border-2 ps-3 mb-4 flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-check text-success me-2"></i>${f}</div>`).join('')}</div>
                         <a href="${plan.buttonHref}" class="clinical-btn-primary w-100 ${plan.isPrimary ? '' : 'bg-white text-dark border'}" style="justify-content: center;">${plan.buttonText}</a>
-                        <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                        <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                     </div>
                 </div></div>
                 `).join('')}
@@ -1269,7 +1269,7 @@ ${seoBlock}
                 <div class="col-12 col-lg-6 text-center position-relative">
                     <div class="position-absolute top-50 start-50 translate-middle organic-blob" style="width: 120%; height: 120%; background: #F0EBE1; z-index: 0;"></div>
                     <div class="position-relative z-1 d-inline-block p-4">
-                        <img src="${data.hero?.image}" class="img-fluid" style="max-height: 500px; object-fit: contain;" />
+                        <img src="${data.hero?.image || 'https://placehold.co/800x800?text=Hero+Image'}" class="img-fluid" style="max-height: 500px; object-fit: contain;" />
                     </div>
                 </div>
             </div>
@@ -1375,11 +1375,11 @@ ${seoBlock}
                 <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}" style="${plan.isPrimary ? 'transform: scale(1.05); z-index: 10;' : ''}">
                     ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: white; font-size: 10px;">Best Choice</span></div>` : ''}
                     <h4 class="fw-bold mb-2 font-serif text-uppercase" style="color: ${primaryColor}">${plan.title}</h4>
-                    <img src="${plan.image}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
                     <div class="fw-bold mb-3 font-serif fs-2" style="color: ${primaryColor}">${plan.price}</div>
                     <div class="mb-4 text-start flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-start gap-2" style="color: #6A5949; font-size: 0.9rem;"><i class="fa-solid fa-check mt-1" style="color: ${secondaryColor}"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="organic-btn-primary w-100" style="justify-content: center;">${plan.buttonText}</a>
-                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${data.guaranteeBadge?.icon || 'fa-solid fa-lock'}"></i><span>${data.guaranteeBadge?.text || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
                 </div></div>
                 `).join('')}
             </div>
@@ -1389,7 +1389,7 @@ ${seoBlock}
     <section class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
             <div class="organic-card p-5 bg-white"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || ''}" class="img-fluid mb-3" style="max-width: 220px;" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Nature's Promise"}</p></div>
+                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3" style="max-width: 220px;" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Nature's Promise"}</p></div>
                 <div class="col-lg-8"><h2 class="fw-bold mb-3 font-serif" style="color: ${primaryColor}">${data.guaranteeHeadline || "Pure Satisfaction Promise"}</h2><p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="organic-btn-primary mt-4">Order Now <i class="fa-solid fa-seedling"></i></a></div>
             </div></div>
         </div>

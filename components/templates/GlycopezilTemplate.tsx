@@ -1085,9 +1085,9 @@ export const GlycopezilTemplate: React.FC = () => {
                       </button>
                     </Linkable>
 
-                    <div className="mt-3 flex items-center justify-center gap-1 text-muted fw-bold" style={{ fontSize: '10px' }}>
-                      <IconEditor value={projectData.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, icon: val } })} />
-                      <EditableText tagName="span" value={projectData.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updateProjectData({ guaranteeBadge: { ...projectData.guaranteeBadge, text: val } })} />
+                    <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
+                      <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
+                      <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                     </div>
                   </div>
                 </div>

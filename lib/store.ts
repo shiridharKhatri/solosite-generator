@@ -63,6 +63,10 @@ export interface ProjectData {
     features: string[];
     image?: string;
     isPrimary?: boolean;
+    guaranteeBadge?: {
+      text: string;
+      icon: string;
+    };
     buttonText: string;
     icon?: string;
     buttonHref: string;
@@ -144,7 +148,7 @@ export interface ProjectData {
   guaranteeSubtitle?: string;
   guaranteeHeadline?: string;
   guaranteeDescription?: string;
-  guaranteeBadge: {
+  guaranteeBadge?: {
     text: string;
     icon: string;
   };
@@ -402,7 +406,11 @@ export const initialProjectData: ProjectData = {
       features: ["30 Day Supply", "60-Day Guarantee"],
       image: "/image/bottle-snap.webp",
       buttonText: "Buy Now For $69",
-      buttonHref: "order.html"
+      buttonHref: "order.html",
+      guaranteeBadge: {
+        text: "60-DAY MONEY-BACK GUARANTEE",
+        icon: "fa-solid fa-lock"
+      }
     },
     {
       title: "Best Value Bundle",
@@ -413,7 +421,11 @@ export const initialProjectData: ProjectData = {
       image: "/image/bottle-snap.webp",
       isPrimary: true,
       buttonText: "Buy Now For $294",
-      buttonHref: "order.html"
+      buttonHref: "order.html",
+      guaranteeBadge: {
+        text: "60-DAY MONEY-BACK GUARANTEE",
+        icon: "fa-solid fa-lock"
+      }
     },
     {
       title: "Popular Choice",
@@ -423,7 +435,11 @@ export const initialProjectData: ProjectData = {
       features: ["90 Day Supply", "Significant Savings"],
       image: "/image/bottle-snap.webp",
       buttonText: "Buy Now For $177",
-      buttonHref: "order.html"
+      buttonHref: "order.html",
+      guaranteeBadge: {
+        text: "60-DAY MONEY-BACK GUARANTEE",
+        icon: "fa-solid fa-lock"
+      }
     }
   ],
   faq: [
@@ -510,10 +526,6 @@ export const initialProjectData: ProjectData = {
     ],
     trustImage: "/image/money-back-guarantee-..webp"
   },
-  guaranteeBadge: {
-    text: "60-DAY MONEY-BACK GUARANTEE",
-    icon: "fa-solid fa-lock"
-  },
   faqTitle: "Frequently Asked Questions",
   footerHeadline: "Final Thoughts",
   research: {
@@ -541,6 +553,12 @@ export const initialProjectData: ProjectData = {
     secondary: "#fbbf24"
   },
   layoutStyle: "default",
+  featuresTitle: "Why Choose Glycopezil?",
+  pricingTitle: "Select Your Discounted Package",
+  guaranteeTitle: "100% Satisfaction Guaranteed",
+  guaranteeSubtitle: "Zero Risk",
+  guaranteeHeadline: "Try Glycopezil Risk-Free For 60 Days",
+  guaranteeDescription: "We are so confident in the metabolic power of Glycopezil that we back every single bottle with our ironclad 60-day money-back guarantee. If you are not absolutely wowed by the results you see in the mirror or how you feel each morning, simply contact our support team for a full, prompt refund of every penny—no questions asked.",
   seo: {
     title: "Glycopezil Official Site | Advanced Glucose Management",
     description: "Glycopezil delivers plant-powered glucose regulation for everyday vitality. Achieve stable blood sugar, enhanced metabolic function, and renewed energy. Shop the official store.",
