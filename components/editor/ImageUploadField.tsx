@@ -13,39 +13,46 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
 
+  const compressImage = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = (event) => {
+        const img = new Image();
+        img.src = event.target?.result as string;
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          const MAX_WIDTH = 1200;
+          let width = img.width;
+          let height = img.height;
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width;
+            width = MAX_WIDTH;
+          }
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          ctx?.drawImage(img, 0, 0, width, height);
+          const webpBase64 = canvas.toDataURL('image/webp', 0.8);
+          resolve(webpBase64);
+        };
+        img.onerror = reject;
+      };
+      reader.onerror = reject;
+    });
+  };
+
   const uploadFile = async (file: File) => {
     setIsUploading(true);
     try {
+      const compressedBase64 = await compressImage(file);
+      onChange(compressedBase64);
+      
       const formData = new FormData();
       formData.append('file', file);
-      const res = await fetch('/api/upload', { method: 'POST', body: formData });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.url) {
-          onChange(data.url);
-          return;
-        }
-      }
-
-      // Fallback: Convert to DataURL if upload fails (e.g. read-only filesystem)
-      console.warn('Server upload failed, falling back to DataURL');
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        onChange(base64String);
-      };
-      reader.readAsDataURL(file);
-
+      fetch('/api/upload', { method: 'POST', body: formData }).catch(e => {});
     } catch (error) {
       console.error('Failed to upload image', error);
-      // Even on error, try the DataURL fallback
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
-        onChange(base64String);
-      };
-      reader.readAsDataURL(file);
     } finally {
       setIsUploading(false);
     }
