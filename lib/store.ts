@@ -144,10 +144,7 @@ export interface ProjectData {
     secondary: string;
   };
   layoutStyle?: 'default' | 'modern' | 'clinical' | 'organic';
-  featuresTitle?: string;
-  pricingTitle?: string;
-  guaranteeTitle?: string;
-  guaranteeSubtitle?: string;
+
   guaranteeHeadline?: string;
   guaranteeDescription?: string;
   guaranteeBadge?: {
@@ -169,6 +166,8 @@ export interface ProjectData {
   faqSubtitle?: string;
   guaranteeTitle?: string;
   guaranteeSubtitle?: string;
+  footerHeadline?: string;
+
 
   socialProof?: {
     enabled: boolean;
@@ -214,7 +213,7 @@ interface EditorState {
   updateIngredient: (index: number, item: any) => void;
   addIngredient: () => void;
   removeIngredient: (index: number) => void;
-  updateBenefit: (index: number, item: Partial<ProjectData['benefits']['items'][0]>) => void;
+  updateBenefit: (index: number, item: Partial<ProjectData['benefits'] & ProjectData['benefits']['items'][0]>) => void;
   addBenefit: () => void;
   removeBenefit: (index: number) => void;
   updatePricing: (index: number, plan: Partial<ProjectData['pricing'][0]>) => void;
@@ -531,7 +530,7 @@ export const initialProjectData: ProjectData = {
     ],
     trustImage: "/image/money-back-guarantee-..webp"
   },
-  faqTitle: "Frequently Asked Questions",
+
   footerHeadline: "Final Thoughts",
   research: {
     title: "The Science of Blood Support",
@@ -554,6 +553,8 @@ export const initialProjectData: ProjectData = {
   featuresSubtitle: "Our commitment to quality, purity, and effectiveness makes us a leader in natural blood support.",
   pricingTitle: "Select Your Dynamic Package",
   pricingSubtitle: "Choose the bundle that best fits your needs and start your journey today.",
+  faqTitle: "Common Questions Answered",
+  faqSubtitle: "Find answers to frequently asked questions about our formula and how to use it.",
   guaranteeTitle: "Pure Ingredients & Thoroughly Verified",
   guaranteeSubtitle: "Your satisfaction is our priority. We stand behind our product with a 60-day money-back guarantee. Zero Risk",
   guaranteeHeadline: "Try Glycopezil Risk-Free For 60 Days",
@@ -634,7 +635,7 @@ export const useStore = create<EditorState>((set) => ({
       if (typeof obj === 'string') {
         // Skip massive strings (like old base64 images) to avoid OOM
         if (obj.length > 1000) return obj;
-        
+
         // Use regex with word boundaries to only replace the product name as a whole word
         const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         const regex = new RegExp(`\\b${escapedOldName}\\b`, 'g');

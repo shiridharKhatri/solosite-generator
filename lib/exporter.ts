@@ -1530,8 +1530,13 @@ ${seoBlock}
                 fetchUrl = baseUrlOrigin + path;
             }
 
-            const res = await fetch(fetchUrl);
-            if (res.ok) {
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+            const res = await fetch(fetchUrl, { signal: controller.signal }).catch(() => null);
+            clearTimeout(timeoutId);
+
+            if (res && res.ok) {
                 const blob = await res.blob();
                 let extension = imgSrc.split('.').pop()?.split(/[#?]/)[0] || 'png';
                 if (extension.length > 4) extension = 'png';

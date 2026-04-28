@@ -704,7 +704,6 @@ export const GlycopezilTemplate: React.FC = () => {
               </div>
               <div className="row align-items-center g-5">
                 <div className="col-lg-6">
-                  <EditableText tagName="h3" className="fw-bold fs-2 mb-3" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
                   <EditableText tagName="div" className="fs-5 text-muted mb-5" value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} style={{ whiteSpace: 'pre-line' }} />
                   <div className="row g-4 pt-4 border-top">
                     {projectData.research.stats.map((stat, i) => (
