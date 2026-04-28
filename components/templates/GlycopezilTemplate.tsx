@@ -585,6 +585,15 @@ export const GlycopezilTemplate: React.FC = () => {
 
           <section className="container-fluid py-5 sectioncolor1">
             <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.featuresSubtitle || ""}
+                  onChange={(val) => useStore.getState().updateProjectData({ featuresSubtitle: val })}
+                />
+              </div>
               <div className="row justify-content-center text-center gap-4">
                 {projectData.features?.map((feature, i) => (
                   <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 p-4 bgbadge relative group">
@@ -630,8 +639,17 @@ export const GlycopezilTemplate: React.FC = () => {
             </div>
           </section>
 
-          <section className="container-fluid sectioncolor1 py-3 border-bottom">
+          <section className="container-fluid py-5 sectioncolor1 border-bottom">
             <div className="container">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.about.subtitle || ""}
+                  onChange={(val) => updateAbout({ subtitle: val })}
+                />
+              </div>
               <div className="clearfix">
                 {/* Image Section - Floated Right for Newspaper Style */}
                 <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
@@ -675,6 +693,15 @@ export const GlycopezilTemplate: React.FC = () => {
           </section>
           <section className="container-fluid py-5 bg-light">
             <div className="container">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.research.subtitle || ""}
+                  onChange={(val) => updateResearch({ subtitle: val })}
+                />
+              </div>
               <div className="row align-items-center g-5">
                 <div className="col-lg-6">
                   <EditableText tagName="h3" className="fw-bold fs-2 mb-3" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
@@ -724,6 +751,15 @@ export const GlycopezilTemplate: React.FC = () => {
 
           <section className="container-fluid bg-light py-5">
             <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.benefits.subtitle || ""}
+                  onChange={(val) => updateBenefit(-1, { subtitle: val })}
+                />
+              </div>
               <EditableText
                 tagName="p"
                 className="fs-5 text-center mb-5 max-w-4xl mx-auto text-gray-700"
@@ -774,7 +810,17 @@ export const GlycopezilTemplate: React.FC = () => {
           </section>
 
           <section className="container-fluid py-5 bg-white">
-            <div className="container bg-white border ing p-4 p-lg-5 mx-auto">
+            <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.guaranteeSubtitle || ""}
+                  onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })}
+                />
+              </div>
+              <div className="container bg-white border ing p-4 p-lg-5 mx-auto">
               <div className="row align-items-center g-5">
                 <div className="col-lg-4 text-center">
                   <EditableImage
@@ -813,6 +859,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 </div>
               </div>
             </div>
+            </div>
           </section>
         </>
       )}
@@ -831,6 +878,15 @@ export const GlycopezilTemplate: React.FC = () => {
 
       <section className="container-fluid py-5 bg-light">
         <div className="container mx-auto">
+          <div className="text-center mb-5">
+            <EditableText
+              tagName="p"
+              className="fs-5 text-muted mx-auto"
+              style={{ maxWidth: '700px' }}
+              value={projectData.ingredients.subtitle || ""}
+              onChange={(val) => updateIngredient(-1, { subtitle: val })}
+            />
+          </div>
           <div className="row g-4 justify-content-center">
             {projectData.ingredients?.items?.map((item, i) => (
               <div key={i} className="col-12 col-md-6 col-lg-4">
@@ -976,6 +1032,15 @@ export const GlycopezilTemplate: React.FC = () => {
 
       <section className="container-fluid py-5" style={{ backgroundColor: '#f9f9f9' }}>
         <div className="container mx-auto">
+          <div className="text-center mb-5">
+            <EditableText
+              tagName="p"
+              className="fs-5 text-muted mx-auto"
+              style={{ maxWidth: '700px' }}
+              value={projectData.pricingSubtitle || ""}
+              onChange={(val) => useStore.getState().updateProjectData({ pricingSubtitle: val })}
+            />
+          </div>
           <div className="row g-4 justify-content-center">
             {projectData.pricing?.map((plan, i) => (
               <div key={i} className="col-12 col-md-6 col-lg-4 mb-4 relative" style={{ zIndex: plan.isPrimary ? 10 : 1 }}>
@@ -1092,7 +1157,18 @@ export const GlycopezilTemplate: React.FC = () => {
         />
       </section>
 
-      <section className="container-fluid py-5 bg-light">
+      <section className="container-fluid py-5 bg-white">
+        <div className="container">
+          <div className="text-center mb-5">
+            <EditableText
+              tagName="p"
+              className="fs-5 text-muted mx-auto"
+              style={{ maxWidth: '700px' }}
+              value={projectData.faqSubtitle || ""}
+              onChange={(val) => useStore.getState().updateProjectData({ faqSubtitle: val })}
+            />
+          </div>
+        </div>
         <div className="container mx-auto max-w-4xl">
           <div className="accordion accordion-flush" id="glycopezilFAQ">
             {projectData.faq?.map((item, i) => (

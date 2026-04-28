@@ -425,22 +425,35 @@ ${seoBlock}
     </section>
 
     <!-- Features -->
-    <section id="features" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.featuresTitle || "Key Benefits"}</h2></div></section>
+    ${(data.sections?.features !== false) ? `
+    <section id="features" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.featuresTitle || 'Features'}</h2>
+        </div>
+    </section>
+
     <section class="container-fluid py-5 sectioncolor1">
-        <div class="container mx-auto">
-            <div class="row justify-content-center g-4">
+        <div class="container">
+            ${data.featuresSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.featuresSubtitle}</p></div>` : ''}
+            <div class="row g-4 justify-content-center">
                 ${(data.features || []).map((f: any) => `
                 <div class="col-12 col-sm-6 col-md-4 col-lg-3"><div class="bgbadge text-center h-100"><img src="${f.image}" class="img-fluid mb-4" style="height: 120px; object-fit: contain;" /><h3 class="fw-bold fs-4 mb-3">${f.title}</h3><p class="fs-5 text-muted">${f.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
-    </section>
+    </section>` : ''}
 
     <!-- About -->
     ${(data.sections?.about !== false) ? `
-    <section id="about" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.about?.title || "Understanding the Formula"}</h2></div></section>
-    <section class="container-fluid py-3 sectioncolor1 border-bottom">
+    <section id="about" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.about?.title || 'About'}</h2>
+        </div>
+    </section>
+
+    <section class="container-fluid py-5 sectioncolor1 border-bottom">
+        <div class="container">
+            ${data.about?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.about.subtitle}</p></div>` : ''}
             <div class="clearfix">
                 <!-- Image Section - Floated Right for Newspaper Style -->
                 <div class="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
@@ -454,27 +467,18 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    <!-- Benefits -->
-    ${(data.sections?.benefits !== false) ? `
-    <section id="benefits" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.benefits?.title || "Powerful Advantages"}</h2></div></section>
-    <section class="container-fluid py-5 sectioncolor1">
-        <div class="container">
-            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="max-width: 896px;">${data.benefits?.description || ''}</p>
-            <div class="row g-4 justify-content-center">
-                ${(data.benefits?.items || []).map((b: any) => `
-                <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${b.title}</h3><p class="fs-5 text-muted mb-0">${b.description}</p></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
- 
+    <!-- Research -->
     ${(data.sections?.research !== false && data.research) ? `
-    <section id="research" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.research.title}</h2></div></section>
+    <section id="research" class="container-fluid text-center sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.research.title}</h2>
+        </div>
+    </section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
+            ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.research.subtitle}</p></div>` : ''}
             <div class="row align-items-center g-5">
                 <div class="col-lg-6 text-center text-lg-start">
-                    <h3 class="fw-bold mb-3 fs-2">${data.research.subtitle}</h3>
                     <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${data.research.description}</p>
                     <div class="row g-4 mt-2">
                         ${data.research.stats.map((stat: any) => `
@@ -494,21 +498,72 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    <!-- Benefits -->
+    ${(data.sections?.benefits !== false) ? `
+    <section id="benefits" class="container-fluid text-center sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.benefits?.title || 'Benefits'}</h2>
+        </div>
+    </section>
+    <section class="container-fluid py-5 sectioncolor1">
+        <div class="container">
+            ${data.benefits?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.benefits.subtitle}</p></div>` : ''}
+            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="max-width: 896px;">${data.benefits?.description || ''}</p>
+            <div class="row g-4 justify-content-center">
+                ${(data.benefits?.items || []).map((b: any) => `
+                <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${b.title}</h3><p class="fs-5 text-muted mb-0">${b.description}</p></div></div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
+    <!-- Ingredients -->
+    ${(data.sections?.ingredients !== false) ? `
+    <section id="ingredients" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.ingredients?.title || 'Ingredients'}</h2>
+        </div>
+    </section>
+
+    <section class="container-fluid py-5 sectioncolor1">
+        <div class="container">
+            ${data.ingredients?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p></div>` : ''}
+            <div class="row g-4 justify-content-center">
+                ${(data.ingredients?.items || []).map((item: any) => `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="ingredient-card shadow-sm border-0">
+                        <div class="ingredient-img-frame mx-auto">
+                            <img src="${item.image || 'https://placehold.co/400x400?text=Ingredient'}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h3 class="fw-bold fs-4 mb-2 text-dark">${item.title}</h3>
+                        <p class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${item.description}</p>
+                    </div>
+                </div>
+                `).join('')}
+            </div>
+        </div>
+    </section>` : ''}
 
     <!-- Money Back -->
-    <section class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.guaranteeTitle || "Verified Quality"}</h2></div></section>
+    <section id="guarantee" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.guaranteeTitle || 'Guarantee'}</h2>
+        </div>
+    </section>
     <section class="container-fluid py-5 bg-white">
-        <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center">
-                    <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px;" />
-                    <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}</p>
-                </div>
-                <div class="col-lg-8 text-center text-lg-start">
-                    <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
-                    <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${data.guaranteeDescription || `Your happiness is our highest priority. Every order of ${data.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}</p>
-                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Grab Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
+        <div class="container mx-auto">
+            ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.guaranteeSubtitle}</p></div>` : ''}
+            <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-4 text-center">
+                        <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px;" />
+                        <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}</p>
+                    </div>
+                    <div class="col-lg-8 text-center text-lg-start">
+                        <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
+                        <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${data.guaranteeDescription || defaultGuaranteeDescription}</p>
+                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Grab Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -516,9 +571,16 @@ ${seoBlock}
 
     <!-- Pricing -->
     ${(data.sections?.pricing !== false) ? `
-    <section id="pricing" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.pricingTitle || "Select Your Dynamic Package"}</h2></div></section>
-    <section class="container-fluid py-5 bg-light">
-        <div class="container"><div class="row g-4 justify-content-center">
+    <section id="pricing" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.pricingTitle || 'Pricing'}</h2>
+        </div>
+    </section>
+
+    <section class="container-fluid py-5" style="background-color: #f9f9f9;">
+        <div class="container">
+            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.pricingSubtitle}</p></div>` : ''}
+            <div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
             <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-md fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
@@ -542,27 +604,6 @@ ${seoBlock}
             </div></div>
             `).join('')}
         </div></div>
-    </section>` : ''}
-
-    <!-- Ingredients -->
-    ${(data.sections?.ingredients !== false) ? `
-    <section id="ingredients" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.ingredients?.title || "Key Ingredients"}</h2></div></section>
-    <section class="container-fluid py-5 sectioncolor1">
-        <div class="container">
-            <div class="row g-4 justify-content-center">
-                ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="ingredient-card shadow-sm border-0">
-                        <div class="ingredient-img-frame mx-auto">
-                            <img src="${item.image || 'https://placehold.co/400x400?text=Ingredient'}" style="width: 100%; height: 100%; object-fit: cover;">
-                        </div>
-                        <h3 class="fw-bold fs-4 mb-2 text-dark">${item.title}</h3>
-                        <p class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${item.description}</p>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
     </section>` : ''}
 
     <!-- Testimonials -->
@@ -604,20 +645,30 @@ ${seoBlock}
 
     <!-- FAQ -->
     ${(data.sections?.faq !== false && data.faq?.length) ? `
-    <section id="faq" class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.faqTitle || "Frequently Asked Questions"}</h2></div></section>
-    <section class="container-fluid py-5 bg-white" style="margin-top: -1rem; position: relative; z-index: 10;">
-        <div class="container mx-auto" style="max-width: 900px;"><div class="accordion accordion-flush" id="faqAccordion">
-            ${(data.faq || []).map((item: any, i: number) => `
-            <div class="accordion-item mb-3 border rounded shadow-sm overflow-hidden">
-                <h3 class="accordion-header">
-                    <button class="accordion-button fw-bold fs-5 p-4 bg-white shadow-none ${i === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">${item.question}</button>
-                </h3>
-                <div id="collapse${i}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}" data-bs-parent="#faqAccordion">
-                    <div class="accordion-body fs-5 text-muted p-4 border-top bg-light">${item.answer}</div>
+    <section id="faq" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.faqTitle || 'FAQ'}</h2>
+        </div>
+    </section>
+
+    <section class="container-fluid py-5 bg-white">
+        <div class="container">
+            ${data.faqSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.faqSubtitle}</p></div>` : ''}
+            <div class="container mx-auto" style="max-width: 800px;">
+                <div class="accordion accordion-flush" id="faqAccordion">
+                    ${(data.faq || []).map((item: any, i: number) => `
+                    <div class="accordion-item mb-3 border rounded shadow-sm overflow-hidden">
+                        <h3 class="accordion-header">
+                            <button class="accordion-button fw-bold fs-5 p-4 bg-white shadow-none ${i === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">${item.question}</button>
+                        </h3>
+                        <div id="collapse${i}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}" data-bs-parent="#faqAccordion">
+                            <div class="accordion-body fs-5 text-muted p-4 border-top bg-light">${item.answer}</div>
+                        </div>
+                    </div>
+                    `).join('')}
                 </div>
             </div>
-            `).join('')}
-        </div></div>
+        </div>
     </section>` : ''}
 
     <!-- Footer -->

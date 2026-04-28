@@ -25,6 +25,7 @@ export interface ProjectData {
   }[];
   about: {
     title: string;
+    subtitle?: string;
     description: string;
     stats: { label: string; value: string }[];
     image: string;
@@ -47,6 +48,7 @@ export interface ProjectData {
   };
   benefits: {
     title: string;
+    subtitle?: string;
     description: string;
     items: { title: string; description: string; href?: string }[];
   };
@@ -152,8 +154,6 @@ export interface ProjectData {
     text: string;
     icon: string;
   };
-  faqTitle?: string;
-  footerHeadline?: string;
   research?: {
     title: string;
     subtitle: string;
@@ -161,6 +161,14 @@ export interface ProjectData {
     image: string;
     stats: { label: string; value: string }[];
   };
+  featuresTitle?: string;
+  featuresSubtitle?: string;
+  pricingTitle?: string;
+  pricingSubtitle?: string;
+  faqTitle?: string;
+  faqSubtitle?: string;
+  guaranteeTitle?: string;
+  guaranteeSubtitle?: string;
 
   socialProof?: {
     enabled: boolean;
@@ -283,6 +291,7 @@ export const initialProjectData: ProjectData = {
   ],
   about: {
     title: "Understanding the Glycopezil Formula",
+    subtitle: "A deeper look into how our advanced botanical formula supports your wellness journey.",
     description: "Glycopezil is a cutting-edge, nature-inspired blood support supplement engineered to foster balanced glucose readings, strengthen metabolic resilience, and deliver unwavering energy across your entire day. Many Glycopezil reviews confirm that with the demands of contemporary living, from ultra-processed meals and emotional pressure to prolonged sitting, having reliable blood sugar support matters. Glycopezil collaborates with your body's inherent biochemistry to encourage stable blood sugar and total metabolic vitality.\n\nEach Glycopezil active ingredient has been carefully selected. This meticulously developed formula incorporates targeted botanicals celebrated for their capacity to promote efficient glucose processing, calibrated insulin signaling, and robust cellular energy generation. Does Glycopezil work? By empowering the body to handle glucose with greater precision, these blood support drops foster reliable energy output, smooth out blood sugar volatility, and nurture lasting metabolic steadiness and overall vigor.\n\nWhen incorporated consistently into a health-conscious routine, Glycopezil assists in sustaining daily vigor, calibrated metabolic processes, and prolonged wellness over time. Looking to buy Glycopezil? It is offered exclusively through this authorized website, the only place where Glycopezil is for sale with guaranteed authenticity. This organic blood sugar companion is thoughtfully composed to assist in preserving optimal glucose levels while encouraging steady metabolic engagement. Understanding how to take Glycopezil is straightforward, simply follow the recommended Glycopezil dosage per day for best results.\n\nPresented in convenient daily drops, Glycopezil functions to bolster glucose equilibrium and organic metabolic pathways. Through its pristine, plant-centered composition, it furnishes a straightforward and potent method to help safeguard healthy blood sugar, maintain energy throughout waking hours, and encourage sustained wellness over the long term.",
     stats: [
       { label: "Rating", value: "4.8/5" },
@@ -541,10 +550,12 @@ export const initialProjectData: ProjectData = {
     secondary: "#fbbf24"
   },
   layoutStyle: "default",
-  featuresTitle: "Why Choose Glycopezil?",
-  pricingTitle: "Select Your Discounted Package",
-  guaranteeTitle: "100% Satisfaction Guaranteed",
-  guaranteeSubtitle: "Zero Risk",
+  featuresTitle: "What Sets Glycopezil Apart?",
+  featuresSubtitle: "Our commitment to quality, purity, and effectiveness makes us a leader in natural blood support.",
+  pricingTitle: "Select Your Dynamic Package",
+  pricingSubtitle: "Choose the bundle that best fits your needs and start your journey today.",
+  guaranteeTitle: "Pure Ingredients & Thoroughly Verified",
+  guaranteeSubtitle: "Your satisfaction is our priority. We stand behind our product with a 60-day money-back guarantee. Zero Risk",
   guaranteeHeadline: "Try Glycopezil Risk-Free For 60 Days",
   guaranteeDescription: "We are so confident in the metabolic power of Glycopezil that we back every single bottle with our ironclad 60-day money-back guarantee. If you are not absolutely wowed by the results you see in the mirror or how you feel each morning, simply contact our support team for a full, prompt refund of every penny—no questions asked.",
   seo: {
