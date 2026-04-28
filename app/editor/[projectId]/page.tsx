@@ -25,7 +25,7 @@ export default function EditorPage() {
     updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar, updateProjectData,
+    updateResearch, updateNavbar, updateProjectData,
     showLegalModal, setShowLegalModal, updateOrderLink, updateLegalPage,
     isDirty, setDirty, version
   } = useStore();
@@ -575,7 +575,6 @@ export default function EditorPage() {
                     { id: 'research', name: 'Research & Science', icon: 'fa-microscope' },
                     { id: 'ingredients', name: 'Ingredients', icon: 'fa-leaf' },
                     { id: 'testimonials', name: 'Testimonials', icon: 'fa-star' },
-                    { id: 'gallery', name: 'Trust Gallery', icon: 'fa-images' },
                     { id: 'benefits', name: 'Benefits', icon: 'fa-check-circle' },
                     { id: 'pricing', name: 'Pricing Plans', icon: 'fa-tags' },
                     { id: 'faq', name: 'FAQ', icon: 'fa-question-circle' },
@@ -907,36 +906,7 @@ export default function EditorPage() {
                   </div>
                 )}
 
-                {activeContentTab === 'gallery' && projectData.gallery && (
-                  <div className="space-y-4">
-                    <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
-                      <input type="text" value={projectData.gallery.title} onChange={(e) => updateGallery({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 font-bold text-sm" />
-                    </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
-                      <input type="text" value={projectData.gallery.subtitle} onChange={(e) => updateGallery({ subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 text-sm" />
-                    </div>
-                    <div className="space-y-3 pt-4">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Gallery Images</label>
-                      <div className="grid grid-cols-3 gap-3">
-                        {projectData.gallery.images.map((img, idx) => (
-                          <div key={idx} className="space-y-2">
-                            <ImageUploadField
-                              label={`Image #${idx + 1}`}
-                              value={img}
-                              onChange={(url) => {
-                                const newImages = [...projectData.gallery!.images];
-                                newImages[idx] = url;
-                                updateGallery({ images: newImages });
-                              }}
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
+
 
                 {activeContentTab === 'ingredients' && (
                   <div className="space-y-3">

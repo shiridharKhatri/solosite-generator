@@ -852,23 +852,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    <!-- Gallery -->
-    ${(data.sections?.gallery !== false && data.gallery) ? `
-    <section class="section-darker py-5 border-top border-white/5">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2.5rem;">${data.gallery.title}</h2>
-            <p class="text-center mb-5 text-white-50" style="font-size: 1rem;">${data.gallery.subtitle}</p>
-            <div class="row g-3">
-                ${data.gallery.images.map((img: any) => `
-                <div class="col-12 col-md-4">
-                    <div class="glass-card p-1 overflow-hidden" style="aspect-ratio: 16/9;">
-                        <img src="${img}" class="w-100 h-100 rounded-3" style="object-fit: cover; max-height: 200px;" />
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
+
 
     <section class="py-5" style="background: linear-gradient(135deg, ${primaryColor}30, #0a0a0a);">
         <div class="container">
@@ -1075,21 +1059,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.sections?.gallery && data.gallery ? `
-    <section id="gallery" class="py-5 bg-white border-bottom">
-        <div class="container">
-            <div class="text-center mb-5"><span class="data-label">VERIFIED PROOF</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.gallery.title}</h2><p class="text-muted mx-auto" style="max-width: 600px;">${data.gallery.subtitle}</p></div>
-            <div class="row g-3">
-                ${data.gallery.images.map((img: any) => `
-                <div class="col-6 col-md-4">
-                  <div class="clinical-card p-1 shadow-sm overflow-hidden" style="aspect-ratio: 16/9;">
-                    <img src="${img}" class="w-100 h-100 rounded" style="object-fit: cover; max-height: 200px;" />
-                  </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
+
 
     ${data.sections?.benefits ? `
     <section id="benefits" class="py-5 bg-light border-bottom">
@@ -1295,25 +1265,7 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${data.sections?.gallery && data.gallery ? `
-    <section id="gallery" class="py-5" style="background-color: #FAF6ED;">
-        <div class="container">
-            <div class="text-center mb-5">
-                <div class="d-inline-block p-1 px-3 rounded-pill bg-success text-white small fw-bold mb-3">Community Trust</div>
-                <h2 class="fw-bold mb-2" style="color: #2D4A22; font-size: 2.5rem;">${data.gallery.title}</h2>
-                <p class="text-muted fs-5">${data.gallery.subtitle}</p>
-            </div>
-            <div class="row g-3">
-                ${data.gallery.images.map((img: any) => `
-                <div class="col-6 col-md-4">
-                  <div class="p-1 overflow-hidden" style="background: white; border-radius: 1.5rem; aspect-ratio: 16/9;">
-                    <img src="${img}" class="w-100 h-100" style="object-fit: cover; border-radius: 1.25rem; max-height: 200px;" />
-                  </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
+
 
     ${data.sections?.ingredients ? `
     <section id="ingredients" class="py-5" style="background: #F0EBE1;">
@@ -1468,7 +1420,7 @@ ${seoBlock}
     if (data.logos) data.logos.forEach((l: string) => { if (l) imageSources.add(l); });
     if (data.footer?.trustImage) imageSources.add(data.footer.trustImage);
     if (data.testimonials?.items) data.testimonials.items.forEach((t: any) => { if (t.image) imageSources.add(t.image); });
-    if (data.gallery?.images) data.gallery.images.forEach((img: string) => { if (img) imageSources.add(img); });
+
     if (data.research?.image) imageSources.add(data.research.image);
     if (data.seo?.ogImage) imageSources.add(data.seo.ogImage);
     if (data.seo?.twitterImage) imageSources.add(data.seo.twitterImage);
