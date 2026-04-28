@@ -875,23 +875,30 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Testimonials Section */}
       {projectData.testimonials && (
-        <section id="testimonials" className="container-fluid py-5" style={{ backgroundColor: '#fff' }}>
-          <div className="container mx-auto">
-            <div className="text-center mb-5">
+        <>
+          <section id="testimonials" className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="testimonials" />
+            <div className="container">
               <EditableText
                 tagName="h2"
-                className="fs-1 fw-bold mb-3"
+                className="text-center fs-1 fw-bold py-3 text-white mb-0"
                 value={projectData.testimonials.title}
                 onChange={(val) => useStore.getState().updateTestimonials(-1, { title: val })}
               />
-              <EditableText
-                tagName="p"
-                className="fs-5 text-muted mx-auto"
-                style={{ maxWidth: '700px' }}
-                value={projectData.testimonials.subtitle || ""}
-                onChange={(val) => useStore.getState().updateTestimonials(-1, { subtitle: val })}
-              />
             </div>
+          </section>
+
+          <section className="container-fluid py-5" style={{ backgroundColor: '#fff' }}>
+            <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-muted mx-auto"
+                  style={{ maxWidth: '700px' }}
+                  value={projectData.testimonials.subtitle || ""}
+                  onChange={(val) => useStore.getState().updateTestimonials(-1, { subtitle: val })}
+                />
+              </div>
 
             <div className="row g-4 justify-content-center">
               {projectData.testimonials.items.map((item, i) => (
@@ -951,7 +958,8 @@ export const GlycopezilTemplate: React.FC = () => {
             </div>
           </div>
         </section>
-      )}
+      </>
+    )}
 
 
       {/* Pricing Section */}

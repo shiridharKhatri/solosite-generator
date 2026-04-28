@@ -567,10 +567,15 @@ ${seoBlock}
 
     <!-- Testimonials -->
     ${(data.sections?.testimonials !== false && data.testimonials) ? `
-    <section id="testimonials" class="container py-5 bg-white">
+    <section id="testimonials" class="container-fluid text-center mt-0 sectioncolor">
+        <div class="container">
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.testimonials.title}</h2>
+        </div>
+    </section>
+
+    <section class="container py-5 bg-white">
         <div class="container py-lg-5">
             <div class="text-center mb-5">
-                <h2 class="fs-1 fw-bold mb-3">${data.testimonials.title}</h2>
                 <p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.testimonials.subtitle || ''}</p>
             </div>
             <div class="row g-4 justify-content-center">
