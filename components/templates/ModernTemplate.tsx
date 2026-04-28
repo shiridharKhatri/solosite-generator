@@ -112,7 +112,7 @@ export const ModernTemplate: React.FC = () => {
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar,
+    updateResearch, updateNavbar,
     updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
     showLegalModal, setShowLegalModal
   } = useStore();
@@ -495,45 +495,7 @@ export const ModernTemplate: React.FC = () => {
         </section>
       )}
 
-      {/* Gallery */}
-      {projectData.gallery && projectData.sections?.gallery !== false && (
-        <section id="gallery" className="section-darker py-5 border-t border-white/5 relative group/section">
-          <SectionSettings sectionKey="gallery" />
-          <div className="container">
-            <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
-            <EditableText tagName="p" className="text-center mb-5 text-white/50" style={{ fontSize: '1rem' }} value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
-            <div className="row g-3">
-              {projectData.gallery.images.map((img, i) => (
-                <div key={i} className="col-12 col-md-4 relative group">
-                  <div className="glass-card p-1 overflow-hidden" style={{ aspectRatio: '16/9' }}>
-                    <EditableImage
-                      src={img}
-                      onChange={(val) => {
-                        const ni = [...projectData.gallery!.images];
-                        ni[i] = val;
-                        updateGallery({ images: ni });
-                      }}
-                      onRemove={() => {
-                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
-                        updateGallery({ images: ni });
-                      }}
-                      className="w-100 h-100 rounded-3" style={{ objectFit: 'cover', maxHeight: '250px' }}
-                    />
-                  </div>
-                </div>
-              ))}
-              <div className="col-12 col-md-4">
-                <button
-                  onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
-                  className="w-full aspect-video border border-dashed border-white/20 flex items-center justify-center text-white/20 hover:border-white/50 hover:text-white/50 transition-all rounded-3"
-                >
-                  <i className="fa-solid fa-plus text-2xl"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Benefits */}
       {projectData.sections?.benefits !== false && (

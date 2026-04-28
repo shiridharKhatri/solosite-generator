@@ -358,7 +358,7 @@ ${seoBlock}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css" />
     <style>
-      .sectioncolor { background-color: ${primaryColor}; color: white; padding: 3rem 0; }
+      .sectioncolor { background-color: ${primaryColor}; color: white; }
       .sectioncolor1 { background-color: #f8f9fa; padding: 5rem 0; }
       .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
       .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
@@ -425,7 +425,7 @@ ${seoBlock}
     </section>
 
     <!-- Features -->
-    <section id="features" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.featuresTitle || "Key Benefits"}</h2></section>
+    <section id="features" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.featuresTitle || "Key Benefits"}</h2></div></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container mx-auto">
             <div class="row justify-content-center g-4">
@@ -438,8 +438,8 @@ ${seoBlock}
 
     <!-- About -->
     ${(data.sections?.about !== false) ? `
-    <section id="about" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.about?.title || "Understanding the Formula"}</h2></section>
-    <section class="container-fluid py-4 sectioncolor1 border-bottom">
+    <section id="about" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.about?.title || "Understanding the Formula"}</h2></div></section>
+    <section class="container-fluid py-3 sectioncolor1 border-bottom">
         <div class="container">
             <div class="clearfix">
                 <!-- Image Section - Floated Right for Newspaper Style -->
@@ -456,7 +456,7 @@ ${seoBlock}
 
     <!-- Benefits -->
     ${(data.sections?.benefits !== false) ? `
-    <section id="benefits" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.benefits?.title || "Powerful Advantages"}</h2></section>
+    <section id="benefits" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.benefits?.title || "Powerful Advantages"}</h2></div></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
             <p class="fs-5 text-center mb-5  mx-auto text-muted" style="max-width: 896px;">${data.benefits?.description || ''}</p>
@@ -469,7 +469,7 @@ ${seoBlock}
     </section>` : ''}
  
     ${(data.sections?.research !== false && data.research) ? `
-    <section id="research" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.research.title}</h2></section>
+    <section id="research" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.research.title}</h2></div></section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
             <div class="row align-items-center g-5">
@@ -494,25 +494,10 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
-    ${(data.sections?.gallery !== false && data.gallery) ? `
-    <section id="gallery" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.gallery.title}</h2></section>
-    <section class="container-fluid py-5 sectioncolor1 border-bottom">
-        <div class="container">
-            <p class="fs-5 text-center mb-5 text-muted mx-auto" style="max-width: 700px;">${data.gallery.subtitle}</p>
-            <div class="row g-3">
-                ${data.gallery.images.map((img: any) => `
-                <div class="col-6 col-md-4">
-                  <div class="p-2 border bg-light shadow-sm" style="aspect-ratio: 16/9;">
-                    <img src="${img}" class="w-100 h-100" style="object-fit: cover; max-height: 200px;" />
-                  </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
+
 
     <!-- Money Back -->
-    <section class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.guaranteeTitle || "Verified Quality"}</h2></section>
+    <section class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.guaranteeTitle || "Verified Quality"}</h2></div></section>
     <section class="container-fluid py-5 bg-white">
         <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
             <div class="row align-items-center g-5">
@@ -531,7 +516,7 @@ ${seoBlock}
 
     <!-- Pricing -->
     ${(data.sections?.pricing !== false) ? `
-    <section id="pricing" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.pricingTitle || "Select Your Dynamic Package"}</h2></section>
+    <section id="pricing" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.pricingTitle || "Select Your Dynamic Package"}</h2></div></section>
     <section class="container-fluid py-5 bg-light">
         <div class="container"><div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
@@ -552,7 +537,7 @@ ${seoBlock}
                     <span class="fs-6 text-muted">/ bottle</span>
                 </div>
                 <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;"><ul class="list-unstyled mb-0 text-start d-inline-block">${plan.features.map((f: string) => `<li class="mb-2 small fw-medium"><i class="fa-solid fa-check-circle me-2" style="color: ${primaryColor};"></i>${f}</li>`).join('')}</ul></div>
-                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-2 fs-6 fw-bold" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
+                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3 fs-6 fw-bold" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
                 <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
             </div></div>
             `).join('')}
@@ -561,7 +546,7 @@ ${seoBlock}
 
     <!-- Ingredients -->
     ${(data.sections?.ingredients !== false) ? `
-    <section id="ingredients" class="container-fluid text-center sectioncolor"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.ingredients?.title || "Key Ingredients"}</h2></section>
+    <section id="ingredients" class="container-fluid text-center sectioncolor"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.ingredients?.title || "Key Ingredients"}</h2></div></section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
             <div class="row g-4 justify-content-center">
@@ -614,7 +599,7 @@ ${seoBlock}
 
     <!-- FAQ -->
     ${(data.sections?.faq !== false && data.faq?.length) ? `
-    <section id="faq" class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><h2 class="text-center py-4 fw-bold text-white mb-0" style="font-size: clamp(1.8rem, 5vw, 2.5rem);">${data.faqTitle || "Frequently Asked Questions"}</h2></section>
+    <section id="faq" class="container-fluid text-center sectioncolor" style="position: relative; z-index: 20;"><div class="container"><h2 class="text-center py-3 fw-bold text-white mb-0 fs-1">${data.faqTitle || "Frequently Asked Questions"}</h2></div></section>
     <section class="container-fluid py-5 bg-white" style="margin-top: -1rem; position: relative; z-index: 10;">
         <div class="container mx-auto" style="max-width: 900px;"><div class="accordion accordion-flush" id="faqAccordion">
             ${(data.faq || []).map((item: any, i: number) => `

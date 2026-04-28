@@ -101,7 +101,7 @@ export const OrganicTemplate: React.FC = () => {
     updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar,
+    updateResearch, updateNavbar,
     updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
     showLegalModal, setShowLegalModal
   } = useStore();
@@ -463,48 +463,7 @@ export const OrganicTemplate: React.FC = () => {
       </section>
       )}
 
-      {/* Gallery */}
-      {projectData.sections?.gallery && projectData.gallery && (
-        <section id="gallery" className="py-5 group/section relative" style={{ backgroundColor: '#FAF6ED' }}>
-          <SectionSettings sectionKey="gallery" />
-          <div className="container">
-            <div className="text-center mb-5">
-              <EditableText tagName="h2" className="fw-bold mb-2" style={{ color: '#2D4A22', fontSize: '2.5rem' }} value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
-              <EditableText tagName="p" className="text-[#6A5949] fs-5" value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
-            </div>
-            <div className="row g-3">
-              {projectData.gallery.images.map((img, i) => (
-                <div key={i} className="col-6 col-md-4">
-                  <div className="p-1 overflow-hidden" style={{ background: 'white', borderRadius: '1.5rem', aspectRatio: '16/9' }}>
-                    <EditableImage 
-                      src={img} 
-                      onChange={(val) => {
-                        const ni = [...projectData.gallery!.images];
-                        ni[i] = val;
-                        updateGallery({ images: ni });
-                      }} 
-                      onRemove={() => {
-                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
-                        updateGallery({ images: ni });
-                      }}
-                      className="w-100 h-100" 
-                      style={{ objectFit: 'cover', borderRadius: '1.25rem', maxHeight: '200px' }} 
-                    />
-                  </div>
-                </div>
-              ))}
-              <div className="col-6 col-md-4">
-                <button
-                  onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
-                  className="w-full aspect-video border border-dashed border-[#E6D5C3] flex items-center justify-center text-[#E6D5C3] hover:border-[#2D4A22] hover:text-[#2D4A22] transition-all rounded-[1.5rem] bg-white"
-                >
-                  <i className="fa-solid fa-plus text-2xl"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+
 
       {/* Research */}
       {projectData.sections?.research && projectData.research && (

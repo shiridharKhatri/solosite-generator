@@ -161,11 +161,7 @@ export interface ProjectData {
     image: string;
     stats: { label: string; value: string }[];
   };
-  gallery?: {
-    title: string;
-    subtitle: string;
-    images: string[];
-  };
+
   socialProof?: {
     enabled: boolean;
     interval: number;
@@ -187,7 +183,6 @@ export interface ProjectData {
     ingredients: boolean;
     testimonials: boolean;
     faq: boolean;
-    gallery: boolean;
     pricing: boolean;
   };
   legalPages?: {
@@ -228,7 +223,7 @@ interface EditorState {
   addTestimonial: () => void;
   removeTestimonial: (index: number) => void;
   updateResearch: (research: Partial<ProjectData['research']>) => void;
-  updateGallery: (gallery: Partial<ProjectData['gallery']>) => void;
+
   updateNavbar: (navbar: Partial<ProjectData['navbar']>) => void;
   updateSocialProof: (proof: Partial<ProjectData['socialProof']>) => void;
   updateSectionVisibility: (section: keyof NonNullable<ProjectData['sections']>, visible: boolean) => void;
@@ -540,15 +535,7 @@ export const initialProjectData: ProjectData = {
       { label: "Safety Tested", value: "100%" }
     ]
   },
-  gallery: {
-    title: "Global Community Trust",
-    subtitle: "Join thousands who have already taken the first step toward better wellness.",
-    images: [
-      "/image/index-img.webp",
-      "/image/banner-img.webp",
-      "/image/bottle-snap.webp"
-    ]
-  },
+
   theme: {
     primary: "#2C0D67",
     secondary: "#fbbf24"
@@ -602,7 +589,6 @@ export const initialProjectData: ProjectData = {
     ingredients: true,
     testimonials: true,
     faq: true,
-    gallery: true,
     pricing: true
   },
   legalPages: {
@@ -855,11 +841,7 @@ export const useStore = create<EditorState>((set) => ({
     isDirty: true,
     version: state.version + 1
   })),
-  updateGallery: (gallery) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, gallery: { ...state.projectData.gallery, ...gallery } as any } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
+
   updateNavbar: (navbar) => set((state) => ({
     projectData: state.projectData ? { ...state.projectData, navbar: { ...state.projectData.navbar, ...navbar } } : null,
     isDirty: true,
@@ -874,7 +856,7 @@ export const useStore = create<EditorState>((set) => ({
     if (!state.projectData) return state;
     const currentSections = state.projectData.sections || {
       features: true, about: true, research: true, benefits: true, guarantee: true,
-      ingredients: true, testimonials: true, faq: true, gallery: true, pricing: true
+      ingredients: true, testimonials: true, faq: true, pricing: true
     };
     return {
       projectData: {

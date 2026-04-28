@@ -113,7 +113,7 @@ export const GlycopezilTemplate: React.FC = () => {
     updateFAQ, addFAQ, removeFAQ,
     updatePricing, addPricing, removePricing,
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
-    updateResearch, updateGallery, updateNavbar,
+    updateResearch, updateNavbar,
     updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
     showLegalModal, setShowLegalModal
   } = useStore();
@@ -573,12 +573,14 @@ export const GlycopezilTemplate: React.FC = () => {
         <>
           <section id="features" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="features" />
-            <EditableText
-              tagName="h2"
-              className="text-center fs-1 py-4 fw-bold text-white mb-0"
-              value={projectData.featuresTitle || "What Sets " + projectData.productName + " Apart?"}
-              onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })}
-            />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 py-3 fw-bold text-white mb-0"
+                value={projectData.featuresTitle || "What Sets " + projectData.productName + " Apart?"}
+                onChange={(val) => useStore.getState().updateProjectData({ featuresTitle: val })}
+              />
+            </div>
           </section>
 
           <section className="container-fluid py-5 sectioncolor1">
@@ -618,15 +620,17 @@ export const GlycopezilTemplate: React.FC = () => {
         <>
           <section id="about" className="container-fluid text-center sectioncolor relative group/section">
             <SectionSettings sectionKey="about" />
-            <EditableText
-              tagName="h2"
-              className="text-center fs-1 py-4 fw-bold text-white mb-0"
-              value={projectData.about.title || "Understanding the " + projectData.productName + " Formula"}
-              onChange={(val) => updateAbout({ title: val })}
-            />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 py-3 fw-bold text-white mb-0"
+                value={projectData.about.title || "Understanding the " + projectData.productName + " Formula"}
+                onChange={(val) => updateAbout({ title: val })}
+              />
+            </div>
           </section>
 
-          <section className="container-fluid sectioncolor1 py-4 border-bottom">
+          <section className="container-fluid sectioncolor1 py-3 border-bottom">
             <div className="container">
               <div className="clearfix">
                 {/* Image Section - Floated Right for Newspaper Style */}
@@ -665,7 +669,9 @@ export const GlycopezilTemplate: React.FC = () => {
         <>
           <section id="research" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="research" />
-            <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
+            <div className="container">
+              <EditableText tagName="h2" className="text-center fs-1 py-3 fw-bold text-white mb-0" value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
+            </div>
           </section>
           <section className="container-fluid py-5 bg-light">
             <div className="container">
@@ -706,12 +712,14 @@ export const GlycopezilTemplate: React.FC = () => {
         <>
           <section id="benefits" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="benefits" />
-            <EditableText
-              tagName="h2"
-              className="text-center fs-1 fw-bold py-4 text-white mb-0"
-              value={projectData.benefits.title || "Powerful Advantages of " + projectData.productName}
-              onChange={(val) => updateBenefit(-1, { title: val })}
-            />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 fw-bold py-3 text-white mb-0"
+                value={projectData.benefits.title || "Powerful Advantages of " + projectData.productName}
+                onChange={(val) => updateBenefit(-1, { title: val })}
+              />
+            </div>
           </section>
 
           <section className="container-fluid bg-light py-5">
@@ -755,12 +763,14 @@ export const GlycopezilTemplate: React.FC = () => {
         <>
           <section id="guarantee" className="container-fluid text-center mt-0 sectioncolor relative group/section">
             <SectionSettings sectionKey="guarantee" />
-            <EditableText
-              tagName="h2"
-              className="text-center fs-1 fw-bold py-4 text-white mb-0"
-              value={projectData.guaranteeTitle || "Pure Ingredients & Thoroughly Verified"}
-              onChange={(val) => useStore.getState().updateProjectData({ guaranteeTitle: val })}
-            />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 fw-bold py-3 text-white mb-0"
+                value={projectData.guaranteeTitle || "Pure Ingredients & Thoroughly Verified"}
+                onChange={(val) => useStore.getState().updateProjectData({ guaranteeTitle: val })}
+              />
+            </div>
           </section>
 
           <section className="container-fluid py-5 bg-white">
@@ -809,12 +819,14 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Ingredients Section */}
       <section id="ingredients" className="container-fluid text-center mt-0 sectioncolor">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 fw-bold py-4 text-white mb-0"
-          value={projectData.ingredients.title || "Purposefully Chosen Natural Ingredients"}
-          onChange={(val) => updateIngredient(-1, { title: val })}
-        />
+        <div className="container">
+          <EditableText
+            tagName="h2"
+            className="text-center fs-1 fw-bold py-3 text-white mb-0"
+            value={projectData.ingredients.title || "Purposefully Chosen Natural Ingredients"}
+            onChange={(val) => updateIngredient(-1, { title: val })}
+          />
+        </div>
       </section>
 
       <section className="container-fluid py-5 bg-light">
@@ -858,45 +870,7 @@ export const GlycopezilTemplate: React.FC = () => {
         </div>
       </section>
 
-      {/* Gallery */}
-      {projectData.gallery && (
-        <>
-          <section id="gallery" className="container-fluid text-center mt-0 sectioncolor">
-            <EditableText tagName="h2" className="text-center fs-1 py-4 fw-bold text-white mb-0" value={projectData.gallery.title} onChange={(val) => updateGallery({ title: val })} />
-          </section>
-          <section className="container-fluid py-5 bg-white">
-            <div className="container">
-              <EditableText tagName="p" className="text-center fs-5 mb-5 text-muted" value={projectData.gallery.subtitle} onChange={(val) => updateGallery({ subtitle: val })} />
-              <div className="row g-3">
-                {projectData.gallery.images.map((img, i) => (
-                  <div key={i} className="col-6 col-md-4">
-                    <div className="p-2 border bg-light shadow-sm relative group" style={{ aspectRatio: '16/9' }}>
-                      <EditableImage src={img} onChange={(val) => {
-                        const ni = [...projectData.gallery!.images];
-                        ni[i] = val;
-                        updateGallery({ images: ni });
-                      }} 
-                      onRemove={() => {
-                        const ni = projectData.gallery!.images.filter((_, idx) => idx !== i);
-                        updateGallery({ images: ni });
-                      }}
-                      className="w-100 h-100" style={{ objectFit: 'cover', maxHeight: '200px' }} />
-                    </div>
-                  </div>
-                ))}
-                <div className="col-6 col-md-4">
-                  <button
-                    onClick={() => updateGallery({ images: [...(projectData.gallery?.images || []), ""] })}
-                    className="w-full aspect-video border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-500 hover:text-blue-500 transition-all"
-                  >
-                    <i className="fa-solid fa-plus text-2xl"></i>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </section>
-        </>
-      )}
+
 
 
       {/* Testimonials Section */}
@@ -982,12 +956,14 @@ export const GlycopezilTemplate: React.FC = () => {
 
       {/* Pricing Section */}
       <section className="container-fluid text-center mt-0 sectioncolor" id="pricing">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 fw-bold py-4 text-white mb-0"
-          value={projectData.pricingTitle || "Select Your Dynamic Package"}
-          onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })}
-        />
+        <div className="container">
+          <EditableText
+            tagName="h2"
+            className="text-center fs-1 fw-bold py-3 text-white mb-0"
+            value={projectData.pricingTitle || "Select Your Dynamic Package"}
+            onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })}
+          />
+        </div>
       </section>
 
       <section className="container-fluid py-5" style={{ backgroundColor: '#f9f9f9' }}>
@@ -1078,7 +1054,7 @@ export const GlycopezilTemplate: React.FC = () => {
 
                     <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
                       <button
-                        className="btn-custom-pill w-100 py-2.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
+                        className="btn-custom-pill w-100 py-3.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
                         style={{ backgroundColor: plan.isPrimary ? projectData.theme?.secondary : '#333', color: plan.isPrimary ? '#000' : '#fff', border: 'none' }}
                       >
                         <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
@@ -1102,7 +1078,7 @@ export const GlycopezilTemplate: React.FC = () => {
       <section id="faq" className="container-fluid text-center mt-0 sectioncolor">
         <EditableText
           tagName="h2"
-          className="text-center fs-1 fw-bold py-4 text-white mb-0"
+          className="text-center fs-1 fw-bold py-3 text-white mb-0"
           value={projectData.faqTitle || "Common Questions Answered"}
           onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })}
         />

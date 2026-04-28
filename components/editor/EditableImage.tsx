@@ -48,7 +48,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           canvas.height = height;
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
-          
+
           // Use 0.6 quality for even better compression (still looks great)
           const webpBase64 = canvas.toDataURL('image/webp', 0.6);
           resolve(webpBase64);
@@ -64,16 +64,16 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     if (!file) return;
 
     setIsUploading(true);
-    
+
     try {
       // Always compress first to save space and prevent OOM
       const compressedBase64 = await compressImage(file);
-      
+
       // Try to upload to server (which will now just store this compressed base64 or save to disk)
       // For now, we'll just use the compressed base64 directly to guarantee it works in production
       onChange(compressedBase64);
       setIsUploading(false);
-      
+
       // Optional: still call the API if you want server-side processing, 
       // but the above line makes it work immediately and reliably.
     } catch (error) {
@@ -125,12 +125,12 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
       {(src || onRemove) && (
         <button
-          onClick={(e) => { 
-            e.stopPropagation(); 
+          onClick={(e) => {
+            e.stopPropagation();
             if (onRemove) {
               onRemove();
             } else {
-              onChange(''); 
+              onChange('');
             }
           }}
           className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-50 shadow-lg border-none hover:bg-red-600 hover:scale-110"
