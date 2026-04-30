@@ -1,4 +1,11 @@
 'use client';
+import { marked } from 'marked';
+import TurndownService from 'turndown';
+
+marked.setOptions({
+  breaks: true,
+  gfm: true
+});
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -96,9 +103,9 @@ export default function EditorPage() {
     if (projectId && projectId !== 'new') {
       // Don't re-fetch if we already have the data for this project (prevents overwrite during redirect)
       if (useStore.getState().projectData && useStore.getState().projectData?.productName !== initialProjectData.productName) {
-         // Data likely already loaded or edited
-         // return; 
-         // Actually, better to fetch but only if it's a first load or we're explicitly changing projects
+        // Data likely already loaded or edited
+        // return; 
+        // Actually, better to fetch but only if it's a first load or we're explicitly changing projects
       }
 
       fetch(`/api/projects?id=${projectId}`)
@@ -182,6 +189,21 @@ export default function EditorPage() {
     return () => clearTimeout(timeout);
   }, [projectData, isDirty, isSaving, isAutoSaving, handleSave]);
 
+  const handleLegalPaste = React.useCallback((e: React.ClipboardEvent, field: 'privacyPolicy' | 'termsAndConditions' | 'disclaimer') => {
+    const html = e.clipboardData.getData('text/html');
+    if (html) {
+      e.preventDefault();
+      const turndownService = new TurndownService({
+        headingStyle: 'atx',
+        hr: '---',
+        bulletListMarker: '-',
+        codeBlockStyle: 'fenced'
+      });
+      const markdown = turndownService.turndown(html);
+      updateLegalPage(field, markdown);
+    }
+  }, [updateLegalPage]);
+
   // Prevent accidental navigation with unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -248,13 +270,13 @@ export default function EditorPage() {
             {/* Pulsing rings */}
             <div className="absolute inset-0 rounded-full bg-blue-500/20 animate-ping duration-1000"></div>
             <div className="absolute inset-0 rounded-full bg-blue-500/10 animate-pulse duration-700 delay-75"></div>
-            
+
             {/* Core logo/spinner */}
             <div className="relative bg-white p-6 rounded-3xl shadow-2xl border border-slate-100 flex items-center justify-center group">
               <i className="fa-solid fa-cube text-4xl text-blue-600 animate-bounce duration-1000"></i>
             </div>
           </div>
-          
+
           <div className="mt-8 text-center space-y-2">
             <h2 className="text-xl font-bold text-slate-800 tracking-tight">Preparing your workspace</h2>
             <div className="flex items-center justify-center gap-1.5">
@@ -1469,33 +1491,79 @@ export default function EditorPage() {
               </button>
             </div>
             <div className="p-6 overflow-y-auto space-y-6 bg-white custom-scrollbar">
-              <div className="grid grid-cols-12 gap-5">
-                <div className="col-span-12 space-y-1.5">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Privacy Policy</label>
-                  <textarea
-                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
-                    value={projectData.legalPages?.privacyPolicy}
-                    onChange={(e) => updateLegalPage('privacyPolicy', e.target.value)}
-                    placeholder="Enter your Privacy Policy content here..."
-                  />
+              <div className="grid grid-cols-12 gap-8">
+                <div className="col-span-12 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Privacy Policy (Markdown Supported)</label>
+                    <div className="flex gap-2">
+                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
+                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <textarea
+                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
+                      value={projectData.legalPages?.privacyPolicy}
+                      onChange={(e) => updateLegalPage('privacyPolicy', e.target.value)}
+                      onPaste={(e) => handleLegalPaste(e, 'privacyPolicy')}
+                      placeholder="Enter your Privacy Policy content here..."
+                    />
+                    <div
+                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
+                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.privacyPolicy || '') }}
+                    />
+                  </div>
                 </div>
-                <div className="col-span-12 space-y-1.5">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Terms & Conditions</label>
-                  <textarea
-                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
-                    value={projectData.legalPages?.termsAndConditions}
-                    onChange={(e) => updateLegalPage('termsAndConditions', e.target.value)}
-                    placeholder="Enter your Terms & Conditions here..."
-                  />
+                <style jsx global>{`
+                  .markdown-preview h1, .markdown-preview h2, .markdown-preview h3 { font-weight: 800; margin: 1.5rem 0 0.5rem; color: #111; }
+                  .markdown-preview p { margin-bottom: 1rem; line-height: 1.6; }
+                  .markdown-preview ul, .markdown-preview ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+                  .markdown-preview li { margin-bottom: 0.25rem; }
+                  .markdown-preview strong { font-weight: 700; color: #000; }
+                `}</style>
+                <div className="col-span-12 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Terms & Conditions (Markdown Supported)</label>
+                    <div className="flex gap-2">
+                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
+                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <textarea
+                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
+                      value={projectData.legalPages?.termsAndConditions}
+                      onChange={(e) => updateLegalPage('termsAndConditions', e.target.value)}
+                      onPaste={(e) => handleLegalPaste(e, 'termsAndConditions')}
+                      placeholder="Enter your Terms & Conditions here..."
+                    />
+                    <div
+                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
+                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.termsAndConditions || '') }}
+                    />
+                  </div>
                 </div>
-                <div className="col-span-12 space-y-1.5">
-                  <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Disclaimer</label>
-                  <textarea
-                    className="w-full p-4 border border-gray-200 text-sm h-40 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar"
-                    value={projectData.legalPages?.disclaimer}
-                    onChange={(e) => updateLegalPage('disclaimer', e.target.value)}
-                    placeholder="Enter medical/legal disclaimers here..."
-                  />
+                <div className="col-span-12 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Disclaimer (Markdown Supported)</label>
+                    <div className="flex gap-2">
+                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
+                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <textarea
+                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
+                      value={projectData.legalPages?.disclaimer}
+                      onChange={(e) => updateLegalPage('disclaimer', e.target.value)}
+                      onPaste={(e) => handleLegalPaste(e, 'disclaimer')}
+                      placeholder="Enter medical/legal disclaimers here..."
+                    />
+                    <div
+                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
+                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.disclaimer || '') }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>

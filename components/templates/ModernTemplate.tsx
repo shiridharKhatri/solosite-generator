@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
+import { CountdownTimer } from './CountdownTimer';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
@@ -114,7 +115,7 @@ export const ModernTemplate: React.FC = () => {
     updateFooter, updateProductName, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateNavbar,
     updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
-    showLegalModal, setShowLegalModal
+    showLegalModal, setShowLegalModal, updateTimer
   } = useStore();
 
   const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
@@ -248,10 +249,11 @@ export const ModernTemplate: React.FC = () => {
             <div style={{ width: '40px', height: '40px', flexShrink: 0 }}>
               <EditableImage
                 src={projectData.hero.logoImage || "https://placehold.co/100x100?text=Logo"}
+                alt={projectData.hero.logoImageAlt}
                 onChange={(val) => updateHero({ logoImage: val })}
+                onAltChange={(val) => updateHero({ logoImageAlt: val })}
                 className="w-full h-full rounded-none bg-white/5 border border-dashed border-white/10"
                 style={{ objectFit: 'contain' }}
-                alt="Brand Logo"
               />
             </div>
             <EditableText tagName="span" className="fs-4 fw-bold logo gradient-text" value={projectData.productName} onChange={() => { }} />
@@ -274,7 +276,7 @@ export const ModernTemplate: React.FC = () => {
                 <EditableText
                   tagName="span"
                   className="nav-link fw-medium cursor-pointer p-0 no-underline"
-                  style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.85rem' }}
+                  style={{ color: 'rgba(255,255,255,0.95)', fontSize: '0.85rem' }}
                   value={link.label}
                   onChange={(val) => {
                     const nl = [...projectData.navbar.links];
@@ -333,7 +335,7 @@ export const ModernTemplate: React.FC = () => {
                 </span>
               </div>
               <EditableText tagName="h1" value={projectData.hero.title} onChange={(val) => updateHero({ title: val })} className="fw-bold mb-4 gradient-text" style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1.1 }} />
-              <EditableText tagName="p" value={projectData.hero.subtitle} onChange={(val) => updateHero({ subtitle: val })} className="hero-subtitle mb-5 mx-auto mx-lg-0" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, maxWidth: '550px', fontSize: '0.95rem' }} />
+              <EditableText tagName="p" value={projectData.hero.subtitle} onChange={(val) => updateHero({ subtitle: val })} className="hero-subtitle mb-5 mx-auto mx-lg-0 w-100" style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.8, fontSize: '0.95rem' }} />
               <div className="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start">
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
                   <button className="modern-btn modern-btn-primary">
@@ -352,8 +354,10 @@ export const ModernTemplate: React.FC = () => {
                 {(projectData.logos || []).map((logo, i) => (
                   <div key={i} className="relative group" style={{ width: '60px' }}>
                     <EditableImage
-                      src={logo}
-                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }}
+                      src={logo.src}
+                      alt={logo.alt}
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = { ...nl[i], src: val }; updateProjectData({ logos: nl }); }}
+                      onAltChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = { ...nl[i], alt: val }; updateProjectData({ logos: nl }); }}
                       onRemove={() => {
                         const nl = projectData.logos.filter((_, idx) => idx !== i);
                         updateProjectData({ logos: nl });
@@ -363,16 +367,44 @@ export const ModernTemplate: React.FC = () => {
                   </div>
                 ))}
                 <button
-                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), { src: "", alt: "" }] })}
                   className="w-[60px] h-[60px] border border-dashed border-white/20 flex items-center justify-center text-white/20 hover:border-white/50 hover:text-white/50 transition-all"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
+
+              {projectData.timer?.enabled && (
+                <div className="mt-10 mb-2 flex justify-center w-full px-4">
+                  <CountdownTimer
+                    minutes={projectData.timer.minutes}
+                    text={projectData.timer.text}
+                    onUpdate={updateTimer}
+                  />
+                </div>
+              )}
+              {!projectData.timer?.enabled && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={() => updateTimer({ enabled: true })}
+                    className="px-5 py-2 border border-dashed border-red-500/30 flex items-center gap-2 text-red-500/70 hover:border-red-500 hover:text-red-500 transition-all bg-red-500/5 text-xs font-bold uppercase tracking-widest"
+                  >
+                    <i className="fa-solid fa-bolt"></i>
+                    Activate Urgency Timer
+                  </button>
+                </div>
+              )}
             </div>
             <div className="col-12 col-lg-5 text-center">
               <div className="p-4 rounded-[2rem]" style={{ background: `linear-gradient(135deg, ${primary}40, transparent)` }}>
-                <EditableImage src={projectData.hero.image || '/image/index-img.webp'} onChange={(val) => updateHero({ image: val })} className="img-fluid mx-auto d-block" style={{ maxHeight: '450px', objectFit: 'contain' }} alt="Product" />
+                <EditableImage
+                  src={projectData.hero.image || '/image/index-img.webp'}
+                  alt={projectData.hero.imageAlt}
+                  onChange={(val) => updateHero({ image: val })}
+                  onAltChange={(val) => updateHero({ imageAlt: val })}
+                  className="img-fluid position-relative z-10"
+                  style={{ maxHeight: '500px', objectFit: 'contain' }}
+                />
               </div>
             </div>
           </div>
@@ -391,9 +423,16 @@ export const ModernTemplate: React.FC = () => {
                 <div key={i} className="col-12 col-sm-6 col-lg-3">
                   <div className="glass-card p-4 h-100 text-center relative">
                     <RemoveButton onClick={() => removeFeature(i)} />
-                    <EditableImage src={feature.image || '/image/gmo.webp'} onChange={(val) => updateFeature(i, { image: val })} className="img-fluid mx-auto mb-3" style={{ height: '80px', objectFit: 'contain', filter: 'brightness(0) invert(1)', opacity: 0.7 }} />
+                    <EditableImage
+                      src={feature.image || '/image/gmo.webp'}
+                      alt={feature.imageAlt}
+                      onChange={(val) => updateFeature(i, { image: val })}
+                      onAltChange={(val) => updateFeature(i, { imageAlt: val })}
+                      className="img-fluid mb-4"
+                      style={{ height: '50px', objectFit: 'contain' }}
+                    />
                     <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
-                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', lineHeight: 1.6 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
                   </div>
                 </div>
               ))}
@@ -412,11 +451,18 @@ export const ModernTemplate: React.FC = () => {
             <div className="row align-items-center g-5">
               <div className="col-12 col-lg-5 text-center">
                 <div className="glass-card p-4">
-                  <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid rounded-3" style={{ maxHeight: '400px', objectFit: 'contain' }} />
+                  <EditableImage
+                    src={projectData.about.image || '/image/banner-img.webp'}
+                    alt={projectData.about.imageAlt}
+                    onChange={(val) => updateAbout({ image: val })}
+                    onAltChange={(val) => updateAbout({ imageAlt: val })}
+                    className="img-fluid rounded-3"
+                    style={{ maxHeight: '400px', objectFit: 'contain' }}
+                  />
                 </div>
               </div>
               <div className="col-12 col-lg-7">
-                <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.9, fontSize: '0.95rem', whiteSpace: 'pre-line' }} />
+                <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.9, fontSize: '0.95rem', whiteSpace: 'pre-line' }} />
               </div>
             </div>
           </div>
@@ -429,11 +475,11 @@ export const ModernTemplate: React.FC = () => {
           <div className="container">
             <div className="row align-items-center g-5">
               <div className="col-lg-6">
-                <EditableText tagName="h2" className="fw-bold fs-1 mb-4 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
-                <EditableText tagName="p" className="fs-5 text-white mb-4 opacity-75" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
-                <EditableText tagName="div" className="text-white-50 mb-5" style={{ lineHeight: 1.9, fontSize: '0.95rem' }} value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} />
+                <EditableText tagName="h2" className="fw-bold fs-1 mb-4 gradient-text" style={{ fontSize: '2.5rem' }} value={projectData.research?.title || ""} onChange={(val) => updateResearch({ title: val })} />
+                <EditableText tagName="p" className="fs-5 text-white mb-4 opacity-75" value={projectData.research?.subtitle || ""} onChange={(val) => updateResearch({ subtitle: val })} />
+                <EditableText tagName="div" className="text-white-50 mb-5" style={{ lineHeight: 1.9, fontSize: '0.95rem' }} value={projectData.research?.description || ""} onChange={(val) => updateResearch({ description: val })} />
                 <div className="row g-4">
-                  {projectData.research.stats.map((stat, i) => (
+                  {(projectData.research?.stats || []).map((stat, i) => (
                     <div key={i} className="col-4">
                       <EditableText tagName="div" className="fw-bold fs-2" style={{ color: secondary }} value={stat.value} onChange={(val) => {
                         const ns = [...projectData.research!.stats];
@@ -451,7 +497,14 @@ export const ModernTemplate: React.FC = () => {
               </div>
               <div className="col-lg-6">
                 <div className="glass-card p-2 text-center">
-                  <EditableImage src={projectData.research.image} onChange={(val) => updateResearch({ image: val })} className="img-fluid rounded-3" style={{ maxHeight: '450px', width: 'auto', objectFit: 'contain' }} />
+                  <EditableImage
+                    src={projectData.research?.image || '/image/banner-img.webp'}
+                    alt={projectData.research?.imageAlt}
+                    onChange={(val) => updateResearch({ image: val })}
+                    onAltChange={(val) => updateResearch({ imageAlt: val })}
+                    className="img-fluid rounded-3"
+                    style={{ maxHeight: '450px', width: 'auto', objectFit: 'contain' }}
+                  />
                 </div>
               </div>
             </div>
@@ -475,7 +528,13 @@ export const ModernTemplate: React.FC = () => {
                     <RemoveButton onClick={() => removeTestimonial(i)} />
                     <div className="mb-4 d-flex align-items-center gap-3">
                       <div className="w-12 h-12 rounded-none overflow-hidden border border-white/10 p-0.5">
-                        <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-100 h-100 object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500" />
+                        <EditableImage
+                          src={item.image || "https://i.pravatar.cc/150"}
+                          alt={item.imageAlt}
+                          onChange={(val) => updateTestimonials(i, { image: val })}
+                          onAltChange={(val) => updateTestimonials(i, { imageAlt: val })}
+                          className="w-100 h-100 object-cover grayscale group-hover/card:grayscale-0 transition-all duration-500"
+                        />
                       </div>
                       <div>
                         <EditableText tagName="h5" className="fw-bold mb-0 text-white text-sm" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
@@ -503,7 +562,9 @@ export const ModernTemplate: React.FC = () => {
           <SectionSettings sectionKey="benefits" />
           <div className="container">
             <EditableText tagName="h2" className="text-center fw-bold mb-2 gradient-text" style={{ fontSize: '2rem' }} value={projectData.benefits.title || "Benefits"} onChange={(val) => updateBenefit(-1, { title: val })} />
-            <EditableText tagName="p" className="text-center mb-5 mx-auto" style={{ color: 'rgba(255,255,255,0.4)', maxWidth: '700px', fontSize: '0.9rem' }} value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+            {projectData.benefits.description && (
+              <EditableText tagName="p" className="text-center mb-4 mx-auto w-100" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem' }} value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+            )}
             <div className="row g-4">
               {projectData.benefits?.items?.map((benefit, i) => (
                 <div key={i} className="col-12 col-md-6 relative">
@@ -515,7 +576,7 @@ export const ModernTemplate: React.FC = () => {
                       </div>
                       <div>
                         <EditableText tagName="h4" className="fw-bold mb-1" style={{ color: '#fff', fontSize: '1rem' }} value={benefit.title} onChange={(val) => updateBenefit(i, { title: val })} />
-                        <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
+                        <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
                       </div>
                     </div>
                   </div>
@@ -535,12 +596,19 @@ export const ModernTemplate: React.FC = () => {
             <div className="glass-card p-5">
               <div className="row align-items-center g-5">
                 <div className="col-lg-4 text-center">
-                  <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-3" style={{ maxWidth: '200px' }} />
+                  <EditableImage
+                    src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
+                    alt={projectData.footer.trustImageAlt}
+                    onChange={(val) => updateFooter({ trustImage: val })}
+                    onAltChange={(val) => updateFooter({ trustImageAlt: val })}
+                    className="img-fluid mb-3"
+                    style={{ maxWidth: '200px' }}
+                  />
                   <EditableText tagName="p" className="fw-semibold mb-0" style={{ color: secondary, fontSize: '0.9rem' }} value={projectData.guaranteeSubtitle || "Zero Risk"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })} />
                 </div>
                 <div className="col-lg-8">
                   <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: '#fff', fontSize: '1.6rem' }} value={projectData.guaranteeHeadline || "60-Day Money Back"} onChange={(val) => useStore.getState().updateProjectData({ guaranteeHeadline: val })} />
-                  <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.5)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
+                  <EditableText tagName="p" style={{ color: 'rgba(255,255,255,0.9)', lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })} />
                   <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                     <button className="modern-btn modern-btn-primary mt-3">Claim Your Package <i className="fa-solid fa-arrow-right"></i></button>
                   </Linkable>
@@ -563,10 +631,16 @@ export const ModernTemplate: React.FC = () => {
                   <div className="glass-card p-4 h-100 text-center relative">
                     <RemoveButton onClick={() => removeIngredient(i)} />
                     <div className="mx-auto mb-3 rounded-none overflow-hidden" style={{ width: '120px', height: '120px', border: `3px solid ${secondary}30` }}>
-                      <EditableImage src={item.image || '/image/ingredient-schisandra.png'} onChange={(val) => updateIngredient(i, { image: val })} className="w-100 h-100" style={{ objectFit: 'cover' }} />
+                      <EditableImage
+                        src={item.image || '/image/ingredient-schisandra.png'}
+                        alt={item.imageAlt}
+                        onChange={(val) => updateIngredient(i, { image: val })}
+                        onAltChange={(val) => updateIngredient(i, { imageAlt: val })}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                     <EditableText tagName="h4" className="fw-bold mb-2" style={{ color: '#fff', fontSize: '1rem' }} value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
-                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.85rem', lineHeight: 1.6 }} value={item.description} onChange={(val) => updateIngredient(i, { description: val })} />
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', lineHeight: 1.6 }} value={item.description} onChange={(val) => updateIngredient(i, { description: val })} />
                   </div>
                 </div>
               ))}
@@ -612,20 +686,27 @@ export const ModernTemplate: React.FC = () => {
                       <div className="relative">
                         <div className="absolute inset-0 bg-white/20 translate-x-1 translate-y-1" />
                         <EditableText
-                          className="relative bg-white text-black px-3 py-1 rounded-none flex items-center justify-center font-black text-xs border border-black shadow-[0_0_15px_rgba(255,255,255,0.3)] min-w-[40px]"
+                          className="relative bg-white text-black px-3 py-1 rounded-none flex items-center justify-center font-black text-xs border border-black shadow-[0_0_15px_rgba(255,255,255,0.7)] min-w-[40px]"
                           value={plan.multiplier || "X1"}
                           onChange={(val) => updatePricing(i, { multiplier: val })}
                         />
                       </div>
                     </div>
-                    <EditableImage src={plan.image || '/image/bottle-snap.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto transition-all duration-700 group-hover/img:scale-110 group-hover/img:rotate-2" style={{ height: '140px', objectFit: 'contain' }} />
+                    <EditableImage
+                      src={plan.image || 'https://placehold.co/400x400?text=Product'}
+                      alt={plan.imageAlt}
+                      onChange={(val) => updatePricing(i, { image: val })}
+                      onAltChange={(val) => updatePricing(i, { imageAlt: val })}
+                      className="img-fluid mx-auto transition-all duration-700 group-hover/img:scale-110 group-hover/img:rotate-2"
+                      style={{ height: '140px', objectFit: 'contain' }}
+                    />
                   </div>
                   <div className="flex justify-center items-baseline gap-1 mb-3">
                     <EditableText tagName="span" className="fw-bold" style={{ color: secondary, fontSize: '2rem' }} value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
                   </div>
                   <div className="mb-4">
                     {plan.features.map((f, fi) => (
-                      <div key={fi} className="mb-2 d-flex align-items-center gap-2 justify-content-center" style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.85rem' }}>
+                      <div key={fi} className="mb-2 d-flex align-items-center gap-2 justify-content-center" style={{ color: 'rgba(255,255,255,0.9)', fontSize: '0.85rem' }}>
                         <i className="fa-solid fa-check-circle" style={{ color: secondary, fontSize: '0.7rem' }}></i>
                         <EditableText tagName="span" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
                       </div>
@@ -652,18 +733,18 @@ export const ModernTemplate: React.FC = () => {
       {projectData.sections?.faq !== false && (
         <section id="faq" className="section-dark py-5 relative group/section">
           <SectionSettings sectionKey="faq" />
-          <div className="container" style={{ maxWidth: '800px' }}>
+          <div className="container w-100">
             <EditableText tagName="h2" className="text-center fw-bold mb-5 gradient-text" style={{ fontSize: '2rem' }} value={projectData.faqTitle || "FAQ"} onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })} />
             {projectData.faq?.map((item, i) => (
               <div key={i} className="glass-card mb-3 relative">
                 <RemoveButton onClick={() => removeFAQ(i)} />
                 <div className="p-4 cursor-pointer d-flex justify-content-between align-items-center" onClick={() => setOpenFaq(openFaq === i ? null : i)}>
                   <EditableText tagName="span" className="fw-bold" style={{ color: '#fff', fontSize: '0.95rem' }} value={item.question} onChange={(val) => updateFAQ(i, { question: val })} />
-                  <i className={`fa-solid fa-chevron-down transition-transform ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.3)', fontSize: '0.8rem' }}></i>
+                  <i className={`fa-solid fa-chevron-down transition-transform ${openFaq === i ? 'rotate-180' : ''}`} style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem' }}></i>
                 </div>
                 {openFaq === i && (
                   <div className="px-4 pb-4">
-                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.4)', fontSize: '0.9rem', lineHeight: 1.7 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
+                    <EditableText tagName="p" className="mb-0" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.9rem', lineHeight: 1.7 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
                   </div>
                 )}
               </div>
@@ -677,7 +758,7 @@ export const ModernTemplate: React.FC = () => {
       <footer className="py-5 text-center" style={{ background: '#050505', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
         <div className="container">
           <EditableText tagName="h2" className="fw-bold gradient-text mb-3" style={{ fontSize: '1.5rem' }} value={projectData.footerHeadline || "Final Thoughts"} onChange={(val) => useStore.getState().updateProjectData({ footerHeadline: val })} />
-          <EditableText tagName="p" className="mx-auto mb-4" style={{ color: 'rgba(255,255,255,0.35)', maxWidth: '700px', fontSize: '0.9rem', lineHeight: 1.7 }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
+          <EditableText tagName="p" className="mx-auto mb-4 w-100" style={{ color: 'rgba(255,255,255,0.35)', fontSize: '0.9rem', lineHeight: 1.7 }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
           <hr style={{ borderColor: 'rgba(255,255,255,0.05)' }} className="my-4" />
           <div className="flex flex-wrap justify-center gap-6 mb-12">
             {projectData.footer.links.map((link, i) => (
@@ -735,7 +816,7 @@ export const ModernTemplate: React.FC = () => {
             <img
               src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
               className="w-full h-full object-contain"
-              alt="Purchased Product"
+              alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Purchased Product"}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/image/bottle-snap.webp';
               }}
@@ -835,9 +916,17 @@ export const ModernTemplate: React.FC = () => {
                       </div>
                       <div className="col-md-6">
                         <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Image URL</label>
-                        <input type="text" className="w-full p-1.5 bg-black/40 border border-white/10 text-white text-[11px] outline-none" value={item.image} onChange={(e) => {
+                        <input type="text" className="w-full p-2 bg-white/5 border border-white/10 text-white text-xs outline-none focus:border-blue-500" value={item.image} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-white/30 uppercase block mb-1">Alt Tag</label>
+                        <input type="text" className="w-full p-2 bg-white/5 border border-white/10 text-white text-xs outline-none focus:border-blue-500" value={item.imageAlt} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], imageAlt: e.target.value };
                           updateSocialProof({ items: ni });
                         }} />
                       </div>

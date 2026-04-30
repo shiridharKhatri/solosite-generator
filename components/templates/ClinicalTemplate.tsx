@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
+import { CountdownTimer } from './CountdownTimer';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
@@ -32,33 +33,33 @@ const SchemaEditor = ({ plan, onChange, onClose, x, y }: { plan: any; onChange: 
   <div className="fixed bg-white rounded-none shadow-2xl border border-blue-200 p-4 z-[99999] w-80 animate-in zoom-in-95 duration-200 text-left" style={{ left: Math.min(x, typeof window !== 'undefined' ? window.innerWidth - 340 : x), top: Math.min(y, typeof window !== 'undefined' ? window.innerHeight - 400 : y) }} onClick={(e) => e.stopPropagation()}>
     <div className="flex justify-between items-center mb-4 border-b border-slate-100 pb-2">
       <span className="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-2"><i className="fa-solid fa-barcode text-blue-600"></i> Product Schema</span>
-      <button onClick={onClose} className="text-slate-400 hover:text-slate-900 transition-colors"><i className="fa-solid fa-times"></i></button>
+      <button onClick={onClose} className="text-slate-600 hover:text-slate-900 transition-colors"><i className="fa-solid fa-times"></i></button>
     </div>
     <div className="space-y-4">
       <div>
-        <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">GTIN / Barcode</label>
+        <label className="text-[10px] font-bold text-slate-700 uppercase mb-1 block">GTIN / Barcode</label>
         <input type="text" className="w-full text-sm p-2 bg-slate-50 border border-slate-200 rounded focus:ring-2 focus:ring-blue-500/20 outline-none font-mono" value={plan.gtin || ''} onChange={(e) => onChange({ gtin: e.target.value })} placeholder="e.g. 5901234123457" />
       </div>
       <div>
-        <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Category</label>
+        <label className="text-[10px] font-bold text-slate-700 uppercase mb-1 block">Category</label>
         <input type="text" className="w-full text-sm p-2 bg-slate-50 border border-slate-200 rounded focus:ring-2 focus:ring-blue-500/20 outline-none" value={plan.category || ''} onChange={(e) => onChange({ category: e.target.value })} placeholder="e.g. Consumable" />
       </div>
       <div>
-        <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">SKU</label>
+        <label className="text-[10px] font-bold text-slate-700 uppercase mb-1 block">SKU</label>
         <input type="text" className="w-full text-sm p-2 bg-slate-50 border border-slate-200 rounded focus:ring-2 focus:ring-blue-500/20 outline-none font-mono" value={plan.sku || ''} onChange={(e) => onChange({ sku: e.target.value })} placeholder="e.g. BATT-X001" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">UNCL Code</label>
+          <label className="text-[10px] font-bold text-slate-700 uppercase mb-1 block">UNCL Code</label>
           <input type="text" className="w-full text-sm p-2 bg-slate-50 border border-slate-200 rounded focus:ring-2 focus:ring-blue-500/20 outline-none font-mono" value={plan.unclCode || ''} onChange={(e) => onChange({ unclCode: e.target.value })} placeholder="e.g. 711" />
         </div>
         <div>
-          <label className="text-[10px] font-bold text-slate-500 uppercase mb-1 block">Role</label>
+          <label className="text-[10px] font-bold text-slate-700 uppercase mb-1 block">Role</label>
           <input type="text" className="w-full text-sm p-2 bg-slate-50 border border-slate-200 rounded focus:ring-2 focus:ring-blue-500/20 outline-none" value={plan.productRole || ''} onChange={(e) => onChange({ productRole: e.target.value })} placeholder="e.g. Consumable" />
         </div>
       </div>
     </div>
-    <p className="mt-4 text-[9px] text-slate-400 italic">Details used for automatic SEO JSON-LD generation.</p>
+    <p className="mt-4 text-[9px] text-slate-600 italic">Details used for automatic SEO JSON-LD generation.</p>
   </div>
 );
 
@@ -103,7 +104,7 @@ export const ClinicalTemplate: React.FC = () => {
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateNavbar,
     updateSocialProof, updateSectionVisibility, updateLegalPage, updateProjectData,
-    showLegalModal, setShowLegalModal
+    showLegalModal, setShowLegalModal, updateTimer
   } = useStore();
 
   const SectionSettings = ({ sectionKey }: { sectionKey: keyof NonNullable<ProjectData['sections']> }) => (
@@ -253,10 +254,11 @@ export const ClinicalTemplate: React.FC = () => {
             <div style={{ width: '40px', height: '40px', flexShrink: 0 }}>
               <EditableImage
                 src={projectData.hero.logoImage || "https://placehold.co/100x100?text=Logo"}
+                alt={projectData.hero.logoImageAlt}
                 onChange={(val) => updateHero({ logoImage: val })}
+                onAltChange={(val) => updateHero({ logoImageAlt: val })}
                 className="w-full h-full rounded border border-dashed border-slate-200 bg-slate-50"
                 style={{ objectFit: 'contain' }}
-                alt="Brand Logo"
               />
             </div>
             <EditableText tagName="span" className="fs-5 fw-bold logo" style={{ color: primary }} value={projectData.productName} onChange={() => { }} />
@@ -278,7 +280,7 @@ export const ClinicalTemplate: React.FC = () => {
                 }} />
                 <EditableText
                   tagName="span"
-                  className="nav-link fw-medium cursor-pointer p-0 text-slate-500 hover:text-slate-800 text-sm no-underline"
+                  className="nav-link fw-medium cursor-pointer p-0 text-slate-700 hover:text-slate-800 text-sm no-underline"
                   value={link.label}
                   onChange={(val) => {
                     const nl = [...projectData.navbar.links];
@@ -348,7 +350,14 @@ export const ClinicalTemplate: React.FC = () => {
             </div>
             <div className="col-12 col-lg-6">
               <div className="position-relative p-5 bg-slate-50 border border-slate-200 rounded-none text-center h-100 flex items-center justify-center min-h-[400px]">
-                <EditableImage src={projectData.hero.image || '/image/index-img.webp'} onChange={(val) => updateHero({ image: val })} className="img-fluid position-relative z-10" style={{ maxHeight: '350px', objectFit: 'contain' }} alt="Formula" />
+                <EditableImage
+                  src={projectData.hero.image || '/image/index-img.webp'}
+                  alt={projectData.hero.imageAlt}
+                  onChange={(val) => updateHero({ image: val })}
+                  onAltChange={(val) => updateHero({ imageAlt: val })}
+                  className="img-fluid position-relative z-10"
+                  style={{ maxHeight: '350px', objectFit: 'contain' }}
+                />
               </div>
             </div>
           </div>
@@ -360,8 +369,10 @@ export const ClinicalTemplate: React.FC = () => {
                 {(projectData.logos || []).map((logo, i) => (
                   <div key={i} className="relative group" style={{ width: '60px' }}>
                     <EditableImage
-                      src={logo}
-                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = val; updateProjectData({ logos: nl }); }}
+                      src={logo.src}
+                      alt={logo.alt}
+                      onChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = { ...nl[i], src: val }; updateProjectData({ logos: nl }); }}
+                      onAltChange={(val) => { const nl = [...(projectData.logos || [])]; nl[i] = { ...nl[i], alt: val }; updateProjectData({ logos: nl }); }}
                       onRemove={() => {
                         const nl = projectData.logos.filter((_, idx) => idx !== i);
                         updateProjectData({ logos: nl });
@@ -371,12 +382,33 @@ export const ClinicalTemplate: React.FC = () => {
                   </div>
                 ))}
                 <button
-                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), ""] })}
-                  className="w-[60px] h-[60px] border border-dashed border-slate-200 flex items-center justify-center text-slate-300 hover:border-blue-500 hover:text-blue-500 transition-all"
+                  onClick={() => updateProjectData({ logos: [...(projectData.logos || []), { src: "", alt: "" }] })}
+                  className="w-[60px] h-[60px] border border-dashed border-slate-200 flex items-center justify-center text-slate-300 hover:border-blue-400 hover:text-blue-400 transition-all"
                 >
                   <i className="fa-solid fa-plus text-xs"></i>
                 </button>
               </div>
+
+              {projectData.timer?.enabled && (
+                <div className="mt-8 mb-4 flex justify-center">
+                  <CountdownTimer
+                    minutes={projectData.timer.minutes}
+                    text={projectData.timer.text}
+                    onUpdate={updateTimer}
+                  />
+                </div>
+              )}
+              {!projectData.timer?.enabled && (
+                <div className="mt-4 flex justify-center">
+                  <button
+                    onClick={() => updateTimer({ enabled: true })}
+                    className="px-4 py-2 border border-dashed border-red-200 flex items-center gap-2 text-red-400 hover:border-red-500 hover:text-red-500 transition-all bg-red-50/30 text-xs font-bold uppercase"
+                  >
+                    <i className="fa-solid fa-clock"></i>
+                    Add Urgency Timer
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -398,7 +430,13 @@ export const ClinicalTemplate: React.FC = () => {
                     <div className="d-flex flex-column h-100">
                       <div className="mb-4 pb-3 border-b border-slate-100 flex items-center justify-between">
                         <EditableText tagName="h4" className="fw-semibold mb-0" style={{ color: primary, fontSize: '1rem' }} value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
-                        <EditableImage src={feature.image || '/image/gmo.webp'} onChange={(val) => updateFeature(i, { image: val })} className="h-8 w-8 object-contain opacity-50 grayscale" />
+                        <EditableImage
+                          src={feature.image || '/image/gmo.webp'}
+                          alt={feature.imageAlt}
+                          onChange={(val) => updateFeature(i, { image: val })}
+                          onAltChange={(val) => updateFeature(i, { imageAlt: val })}
+                          className="h-8 w-8 object-contain opacity-50 grayscale"
+                        />
                       </div>
                       <EditableText tagName="p" className="mb-0 text-slate-600" style={{ fontSize: '0.85rem', lineHeight: 1.6 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
                     </div>
@@ -414,7 +452,7 @@ export const ClinicalTemplate: React.FC = () => {
       {projectData.sections?.about && (
         <section id="about" className="bg-white py-4 border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="about" />
-          <div className="container max-w-[1100px] mx-auto">
+          <div className="container w-100 mx-auto">
             <div className="clinical-header mb-4">
               <span className="data-label">PROTOCOL SUMMARY</span>
               <EditableText tagName="h2" className="fw-bold mb-0" style={{ color: primary, fontSize: '2.3rem' }} value={projectData.about.title || "The Formula"} onChange={(val) => updateAbout({ title: val })} />
@@ -424,7 +462,14 @@ export const ClinicalTemplate: React.FC = () => {
               {/* Image Section - Floated Left for Newspaper/Journal Style */}
               <div className="float-lg-start me-lg-5 mb-4 col-12 col-lg-5 px-0">
                 <div className="p-2 bg-slate-50 border border-slate-200 rounded shadow-sm">
-                  <EditableImage src={projectData.about.image || '/image/banner-img.webp'} onChange={(val) => updateAbout({ image: val })} className="img-fluid rounded border border-slate-100 mx-auto" style={{ maxHeight: '380px', objectFit: 'contain' }} />
+                  <EditableImage
+                    src={projectData.about.image || '/image/banner-img.webp'}
+                    alt={projectData.about.imageAlt}
+                    onChange={(val) => updateAbout({ image: val })}
+                    onAltChange={(val) => updateAbout({ imageAlt: val })}
+                    className="img-fluid rounded border border-slate-100 mx-auto"
+                    style={{ maxHeight: '380px', objectFit: 'contain' }}
+                  />
                   <div className="text-center mt-2 pb-1">
                     <span className="data-label" style={{ fontSize: '10px' }}>FIG 1.1: SYSTEMIC DISPERSION PROFILE</span>
                   </div>
@@ -434,8 +479,8 @@ export const ClinicalTemplate: React.FC = () => {
               {/* Text Section - Wrapped around image */}
               <div className="protocol-text">
                 <div className="p-3 bg-slate-50 border-l-2 border-slate-300 mb-3 d-flex gap-3 align-items-center">
-                  <i className="fa-solid fa-circle-info text-slate-400"></i>
-                  <p className="mb-0 text-[11px] font-mono text-slate-500 uppercase tracking-tight">Clinical Note: Data suggests 60-day adherence for optimal metabolic synchronization.</p>
+                  <i className="fa-solid fa-circle-info text-slate-600"></i>
+                  <p className="mb-0 text-[11px] font-mono text-slate-700 uppercase tracking-tight">Clinical Note: Data suggests 60-day adherence for optimal metabolic synchronization.</p>
                 </div>
                 <EditableText tagName="div" value={projectData.about.description} onChange={(val) => updateAbout({ description: val })} className="text-slate-700 font-serif" style={{ lineHeight: '1.7', fontSize: '1.05rem', whiteSpace: 'pre-line', textAlign: 'justify' }} />
               </div>
@@ -452,18 +497,18 @@ export const ClinicalTemplate: React.FC = () => {
             <div className="row align-items-center g-5">
               <div className="col-lg-7">
                 <div className="p-3 mb-2 d-inline-block rounded-none bg-blue-900 text-white px-4 small fw-bold uppercase tracking-wider">Clinical Research Profile</div>
-                <EditableText tagName="h2" className="fw-bold fs-1 mb-4" style={{ color: primary }} value={projectData.research.title} onChange={(val) => updateResearch({ title: val })} />
-                <EditableText tagName="p" className="fs-5 text-slate-800 mb-4 fw-medium" value={projectData.research.subtitle} onChange={(val) => updateResearch({ subtitle: val })} />
-                <EditableText tagName="div" className="text-slate-500 mb-5" style={{ lineHeight: 1.8, fontSize: '1rem' }} value={projectData.research.description} onChange={(val) => updateResearch({ description: val })} />
+                <EditableText tagName="h2" className="fw-bold fs-1 mb-4" style={{ color: primary }} value={projectData.research?.title || ""} onChange={(val) => updateResearch({ title: val })} />
+                <EditableText tagName="p" className="fs-5 text-slate-800 mb-4 fw-medium" value={projectData.research?.subtitle || ""} onChange={(val) => updateResearch({ subtitle: val })} />
+                <EditableText tagName="div" className="text-slate-700 mb-5" style={{ lineHeight: 1.8, fontSize: '1rem' }} value={projectData.research?.description || ""} onChange={(val) => updateResearch({ description: val })} />
                 <div className="row g-4 pt-3 border-t">
-                  {projectData.research.stats.map((stat, i) => (
+                  {(projectData.research?.stats || []).map((stat, i) => (
                     <div key={i} className="col-4 text-center">
                       <EditableText tagName="div" className="fw-bold fs-2 text-slate-900" value={stat.value} onChange={(val) => {
                         const ns = [...projectData.research!.stats];
                         ns[i] = { ...stat, value: val };
                         updateResearch({ stats: ns });
                       }} />
-                      <EditableText tagName="div" className="text-slate-500 small uppercase font-bold" style={{ fontSize: '11px' }} value={stat.label} onChange={(val) => {
+                      <EditableText tagName="div" className="text-slate-700 small uppercase font-bold" style={{ fontSize: '11px' }} value={stat.label} onChange={(val) => {
                         const ns = [...projectData.research!.stats];
                         ns[i] = { ...stat, label: val };
                         updateResearch({ stats: ns });
@@ -474,7 +519,14 @@ export const ClinicalTemplate: React.FC = () => {
               </div>
               <div className="col-lg-5 text-center">
                 <div className="p-2 bg-white border rounded shadow-lg d-inline-block">
-                  <EditableImage src={projectData.research.image} onChange={(val) => updateResearch({ image: val })} className="img-fluid rounded" style={{ maxHeight: '400px', width: 'auto', objectFit: 'contain' }} />
+                  <EditableImage
+                    src={projectData.research?.image || '/image/banner-img.webp'}
+                    alt={projectData.research?.imageAlt}
+                    onChange={(val) => updateResearch({ image: val })}
+                    onAltChange={(val) => updateResearch({ imageAlt: val })}
+                    className="img-fluid rounded"
+                    style={{ maxHeight: '400px', width: 'auto', objectFit: 'contain' }}
+                  />
                 </div>
               </div>
             </div>
@@ -498,7 +550,13 @@ export const ClinicalTemplate: React.FC = () => {
                   <div className="clinical-card p-0 h-100 relative overflow-hidden flex">
                     <RemoveButton onClick={() => removeIngredient(i)} />
                     <div className="w-1/3 bg-slate-100 flex items-center justify-center border-r border-slate-200 p-3">
-                      <EditableImage src={item.image || '/image/ingredient-schisandra.png'} onChange={(val) => updateIngredient(i, { image: val })} className="w-full h-auto object-cover rounded-none border-2 border-white shadow-sm" />
+                      <EditableImage
+                        src={item.image || '/image/ingredient-schisandra.png'}
+                        alt={item.imageAlt}
+                        onChange={(val) => updateIngredient(i, { image: val })}
+                        onAltChange={(val) => updateIngredient(i, { imageAlt: val })}
+                        className="w-full h-auto object-cover rounded-none border-2 border-white shadow-sm"
+                      />
                     </div>
                     <div className="w-2/3 p-4 flex flex-col justify-center">
                       <EditableText tagName="h4" className="fw-bold mb-1 text-sm font-mono text-blue-700" value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
@@ -522,7 +580,7 @@ export const ClinicalTemplate: React.FC = () => {
               <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.pricingTitle || "Select Supply"} onChange={(val) => updateProjectData({ pricingTitle: val })} />
             </div>
 
-            <div className="row g-4 justify-content-center max-w-[1000px] mx-auto">
+            <div className="row g-4 justify-content-center w-100 mx-auto">
               {projectData.pricing?.map((plan, i) => (
                 <div key={i} className="col-12 col-md-4 relative">
                   <RemoveButton onClick={() => removePricing(i)} />
@@ -562,7 +620,14 @@ export const ClinicalTemplate: React.FC = () => {
                             />
                           </div>
                         </div>
-                        <EditableImage src={plan.image || '/image/bottle-snap.webp'} onChange={(val) => updatePricing(i, { image: val })} className="img-fluid mx-auto transition-transform duration-500 hover:scale-105" style={{ height: '120px', objectFit: 'contain' }} />
+                        <EditableImage
+                          src={plan.image || '/image/bottle-snap.webp'}
+                          alt={plan.imageAlt}
+                          onChange={(val) => updatePricing(i, { image: val })}
+                          onAltChange={(val) => updatePricing(i, { imageAlt: val })}
+                          className="img-fluid mx-auto transition-transform duration-500 hover:scale-105"
+                          style={{ height: '120px', objectFit: 'contain' }}
+                        />
                       </div>
                       <EditableText tagName="div" className="fw-bold mb-4 font-mono text-3xl text-slate-800" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
 
@@ -580,7 +645,7 @@ export const ClinicalTemplate: React.FC = () => {
                           <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
                         </button>
                       </Linkable>
-                      <div className="mt-3 flex items-center justify-center gap-1 text-slate-400 font-bold text-[10px]">
+                      <div className="mt-3 flex items-center justify-center gap-1 text-slate-600 font-bold text-[10px]">
                         <IconEditor value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
                         <EditableText tagName="span" value={plan.guaranteeBadge?.text || projectData.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                       </div>
@@ -601,10 +666,12 @@ export const ClinicalTemplate: React.FC = () => {
         <section id="benefits" className="py-5 bg-white border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="benefits" />
           <div className="container py-lg-4">
-            <div className="text-center mb-5">
+            <div className="text-center mb-4">
               <span className="data-label">OUTCOME ANALYSIS</span>
               <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.benefits.title || "Expected Results"} onChange={(val) => updateBenefit(-1, { title: val })} />
-              <EditableText tagName="p" className="text-slate-500 mt-2 max-w-[700px] mx-auto text-sm" value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+              {projectData.benefits.description && (
+                <EditableText tagName="p" className="text-slate-700 mt-2 mx-auto text-sm w-100" value={projectData.benefits.description} onChange={(val) => updateBenefit(-1, { description: val })} />
+              )}
             </div>
             <div className="row g-4">
               {projectData.benefits.items.map((benefit, i) => (
@@ -616,7 +683,7 @@ export const ClinicalTemplate: React.FC = () => {
                     </div>
                     <div>
                       <EditableText tagName="h4" className="fw-bold mb-1 text-sm" value={benefit.title} onChange={(val) => updateBenefit(i, { title: val })} />
-                      <EditableText tagName="p" className="mb-0 text-slate-500 text-xs" style={{ lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
+                      <EditableText tagName="p" className="mb-0 text-slate-700 text-xs" style={{ lineHeight: 1.6 }} value={benefit.description} onChange={(val) => updateBenefit(i, { description: val })} />
                     </div>
                   </div>
                 </div>
@@ -642,10 +709,16 @@ export const ClinicalTemplate: React.FC = () => {
                   <div className="clinical-card p-4 h-100 bg-white">
                     <RemoveButton onClick={() => removeTestimonial(i)} />
                     <div className="d-flex align-items-center gap-3 mb-3 border-b border-slate-100 pb-3">
-                      <EditableImage src={item.image || "https://i.pravatar.cc/150"} onChange={(val) => updateTestimonials(i, { image: val })} className="w-12 h-12 object-cover grayscale" />
+                      <EditableImage
+                        src={item.image || "https://i.pravatar.cc/150"}
+                        alt={item.imageAlt}
+                        onChange={(val) => updateTestimonials(i, { image: val })}
+                        onAltChange={(val) => updateTestimonials(i, { imageAlt: val })}
+                        className="w-12 h-12 object-cover grayscale"
+                      />
                       <div>
                         <EditableText tagName="h5" className="fw-bold mb-0 text-xs" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
-                        <EditableText tagName="p" className="mb-0 text-[10px] text-slate-400 font-mono" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
+                        <EditableText tagName="p" className="mb-0 text-[10px] text-slate-600 font-mono" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
                       </div>
                     </div>
                     <EditableText tagName="p" className="mb-0 text-slate-600 italic text-xs" style={{ lineHeight: 1.6 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
@@ -666,12 +739,19 @@ export const ClinicalTemplate: React.FC = () => {
           <div className="p-5 bg-slate-50 border border-slate-200 rounded shadow-sm">
             <div className="row align-items-center g-5">
               <div className="col-lg-4 text-center">
-                <EditableImage src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} onChange={(val) => updateFooter({ trustImage: val })} className="img-fluid mb-3 mx-auto" style={{ maxWidth: '250px' }} />
-                <EditableText tagName="p" className="data-label mb-0" style={{ color: secondary }} value={projectData.guaranteeSubtitle || "Security Protocol"} onChange={(val) => updateProjectData({ guaranteeSubtitle: val })} />
+                <EditableImage
+                  src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
+                  alt={projectData.footer.trustImageAlt}
+                  onChange={(val) => updateFooter({ trustImage: val })}
+                  onAltChange={(val) => updateFooter({ trustImageAlt: val })}
+                  className="img-fluid mb-3 mx-auto"
+                  style={{ maxWidth: '250px' }}
+                />
+                <EditableText tagName="p" className="data-label mb-0" style={{ color: secondary }} value={projectData.guaranteeSmallText || "Security Protocol"} onChange={(val) => updateProjectData({ guaranteeSmallText: val })} />
               </div>
               <div className="col-lg-8">
                 <EditableText tagName="h3" className="fw-bold mb-3" style={{ color: primary, fontSize: '1.8rem' }} value={projectData.guaranteeHeadline || "60-Day Satisfaction Protocol"} onChange={(val) => updateProjectData({ guaranteeHeadline: val })} />
-                <EditableText tagName="p" className="text-slate-500" style={{ lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => updateProjectData({ guaranteeDescription: val })} />
+                <EditableText tagName="p" className="text-slate-700" style={{ lineHeight: 1.8, fontSize: '0.95rem' }} value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`} onChange={(val) => updateProjectData({ guaranteeDescription: val })} />
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
                   <button className="clinical-btn-primary mt-3">Order Now <i className="fa-solid fa-arrow-right"></i></button>
                 </Linkable>
@@ -685,7 +765,7 @@ export const ClinicalTemplate: React.FC = () => {
       {projectData.sections?.faq && (
         <section id="faq" className="py-5 bg-white border-b border-slate-200 group/section relative">
           <SectionSettings sectionKey="faq" />
-          <div className="container py-lg-4 max-w-[800px]">
+          <div className="container py-lg-4 w-100">
             <div className="text-center mb-5">
               <span className="data-label">TECHNICAL INQUIRIES</span>
               <EditableText tagName="h2" className="fw-bold clinical-header border-0 px-0 d-inline-block" style={{ color: primary }} value={projectData.faqTitle || "Protocol FAQ"} onChange={(val) => updateProjectData({ faqTitle: val })} />
@@ -695,7 +775,7 @@ export const ClinicalTemplate: React.FC = () => {
                 <div key={i} className="border border-slate-200 p-4 relative">
                   <RemoveButton onClick={() => removeFAQ(i)} />
                   <EditableText tagName="h5" className="fw-bold text-sm mb-2 text-slate-800" value={item.question} onChange={(val) => updateFAQ(i, { question: val })} />
-                  <EditableText tagName="p" className="mb-0 text-slate-500 text-xs" style={{ lineHeight: 1.6 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
+                  <EditableText tagName="p" className="mb-0 text-slate-700 text-xs" style={{ lineHeight: 1.6 }} value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} />
                 </div>
               ))}
             </div>
@@ -708,7 +788,7 @@ export const ClinicalTemplate: React.FC = () => {
       <footer className="bg-slate-900 text-slate-300 py-5 font-mono text-sm">
         <div className="container text-center">
           <EditableText tagName="h2" className="fw-bold mb-2 text-white font-sans" style={{ fontSize: '1.2rem' }} value={projectData.footerHeadline || "End of Document"} onChange={(val) => updateProjectData({ footerHeadline: val })} />
-          <EditableText tagName="p" className="mx-auto mb-4 opacity-60 text-xs" style={{ maxWidth: '600px' }} value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
+          <EditableText tagName="p" className="mx-auto mb-4 opacity-60 text-xs w-100" value={projectData.footer.companyInfo} onChange={(val) => updateFooter({ companyInfo: val })} />
 
           <div className="d-flex flex-wrap justify-content-center gap-4 mb-4 border-y border-slate-800 py-3">
             {projectData.footer.links.map((link, i) => (
@@ -744,7 +824,7 @@ export const ClinicalTemplate: React.FC = () => {
             <img
               src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
               className="w-full h-full object-contain"
-              alt="Purchased Product"
+              alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Purchased Product"}
               onError={(e) => {
                 (e.target as HTMLImageElement).src = '/image/bottle-snap.webp';
               }}
@@ -756,9 +836,9 @@ export const ClinicalTemplate: React.FC = () => {
             </div>
             <div className="text-slate-800 text-xs leading-tight">
               <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-600">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
-              <span className="text-slate-500">{projectData.socialProof?.items[proofIndex]?.content}</span>
+              <span className="text-slate-700">{projectData.socialProof?.items[proofIndex]?.content}</span>
             </div>
-            <small className="text-slate-400 text-[9px] mt-1 uppercase tracking-wider font-bold">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Protocol</small>
+            <small className="text-slate-600 text-[9px] mt-1 uppercase tracking-wider font-bold">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Protocol</small>
           </div>
         </div>
       )}
@@ -770,16 +850,16 @@ export const ClinicalTemplate: React.FC = () => {
           <div className="bg-white w-full max-w-xl rounded shadow-2xl z-10 overflow-hidden border border-slate-200">
             <div className="p-4 border-b border-slate-100 d-flex justify-content-between align-items-center bg-slate-50">
               <h3 className="m-0 fs-6 fw-bold text-slate-800 uppercase tracking-widest">Popup Configuration</h3>
-              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-slate-400 hover:text-slate-600">
+              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-slate-600 hover:text-slate-600">
                 <i className="fa-solid fa-times fs-5"></i>
               </button>
             </div>
             <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
               <div className="flex items-center justify-between p-3 bg-slate-50 border border-slate-200">
-                <span className="text-xs font-bold text-slate-500 uppercase">Display Widget</span>
+                <span className="text-xs font-bold text-slate-700 uppercase">Display Widget</span>
                 <button
                   onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
-                  className={`px-4 py-1.5 rounded text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-500'}`}
+                  className={`px-4 py-1.5 rounded text-[10px] font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'}`}
                 >
                   {projectData.socialProof?.enabled ? 'ACTIVE' : 'INACTIVE'}
                 </button>
@@ -787,17 +867,17 @@ export const ClinicalTemplate: React.FC = () => {
 
               <div className="row g-3">
                 <div className="col-md-6">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Display Duration (ms)</label>
+                  <label className="text-[10px] font-bold text-slate-600 uppercase mb-1 block">Display Duration (ms)</label>
                   <input type="number" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.displayTime} onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })} />
                 </div>
                 <div className="col-md-6">
-                  <label className="text-[10px] font-bold text-slate-400 uppercase mb-1 block">Interval (ms)</label>
+                  <label className="text-[10px] font-bold text-slate-600 uppercase mb-1 block">Interval (ms)</label>
                   <input type="number" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-sm outline-none focus:border-blue-500" value={projectData.socialProof?.interval} onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })} />
                 </div>
               </div>
 
               <div className="space-y-4">
-                <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Items to Cycle</label>
+                <label className="text-[10px] font-bold text-slate-600 uppercase block mb-1">Items to Cycle</label>
                 {(projectData.socialProof?.items || []).map((item, idx) => (
                   <div key={idx} className="p-3 bg-slate-50 border border-slate-200 relative group/item">
                     <button
@@ -812,7 +892,7 @@ export const ClinicalTemplate: React.FC = () => {
                     </button>
                     <div className="row g-2">
                       <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Name</label>
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Name</label>
                         <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.name} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], name: e.target.value };
@@ -820,7 +900,7 @@ export const ClinicalTemplate: React.FC = () => {
                         }} />
                       </div>
                       <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Location</label>
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Location</label>
                         <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.location} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], location: e.target.value };
@@ -828,7 +908,7 @@ export const ClinicalTemplate: React.FC = () => {
                         }} />
                       </div>
                       <div className="col-md-12">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Content</label>
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Content</label>
                         <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.content} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], content: e.target.value };
@@ -836,7 +916,7 @@ export const ClinicalTemplate: React.FC = () => {
                         }} />
                       </div>
                       <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Time</label>
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Time</label>
                         <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.timeAgo} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], timeAgo: e.target.value };
@@ -844,10 +924,18 @@ export const ClinicalTemplate: React.FC = () => {
                         }} />
                       </div>
                       <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-slate-400 uppercase block mb-1">Image</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-slate-200 text-slate-800 text-[11px] outline-none" value={item.image} onChange={(e) => {
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Image URL</label>
+                        <input type="text" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-xs outline-none focus:border-blue-500" value={item.image} onChange={(e) => {
                           const ni = [...(projectData.socialProof?.items || [])];
                           ni[idx] = { ...ni[idx], image: e.target.value };
+                          updateSocialProof({ items: ni });
+                        }} />
+                      </div>
+                      <div className="col-md-6">
+                        <label className="text-[9px] font-bold text-slate-600 uppercase block mb-1">Alt Tag</label>
+                        <input type="text" className="w-full p-2 bg-white border border-slate-200 text-slate-800 text-xs outline-none focus:border-blue-500" value={item.imageAlt} onChange={(e) => {
+                          const ni = [...(projectData.socialProof?.items || [])];
+                          ni[idx] = { ...ni[idx], imageAlt: e.target.value };
                           updateSocialProof({ items: ni });
                         }} />
                       </div>

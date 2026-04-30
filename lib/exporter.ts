@@ -1,4 +1,10 @@
 import JSZip from 'jszip';
+import { marked } from 'marked';
+
+marked.setOptions({
+    breaks: true,
+    gfm: true
+});
 
 export async function generateProjectZip(data: any) {
     const zip = new JSZip();
@@ -102,7 +108,7 @@ ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5<
     <!-- Social Proof -->
     <div id="purchase-proof" class="purchase-proof">
       <div class="proof-image">
-        <img id="proof-img" src="${data.socialProof?.items[0]?.image || data.hero.image}" alt="Product">
+        <img id="proof-img" src="${data.socialProof?.items[0]?.image || data.hero.image}" alt="${data.socialProof?.items[0]?.imageAlt || 'Product'}">
       </div>
       <div class="proof-content">
         <div class="proof-stars">
@@ -116,12 +122,12 @@ ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5<
       </div>
     </div>
     <style>
-      .purchase-proof { position: fixed; bottom: 30px; left: 30px; background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #eee; font-size: 13px; max-width: 320px; z-index: 9999; transform: translateX(-150%); transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); color: #333; line-height: 1.4; font-family: sans-serif; }
+      .purchase-proof { position: fixed; bottom: 30px; left: 30px; background: #111; border-radius: 12px; padding: 16px; border: 1px solid #333; font-size: 13px; max-width: 320px; z-index: 9999; transform: translateX(-150%); transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); color: #fff; line-height: 1.4; font-family: sans-serif; }
       .purchase-proof.active { transform: translateX(0); }
-      .proof-image { width: 60px; height: 60px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #f8f9fa; border: 1px solid #f0f0f0; }
+      .proof-image { width: 60px; height: 60px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid #333; }
       .proof-image img { width: 100%; height: 100%; object-fit: contain; }
       .proof-stars { color: #fbbf24; font-size: 10px; margin-bottom: 4px; }
-      .proof-time { font-size: 10px; color: #999; margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+      .proof-time { font-size: 10px; color: #aaa; margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
       @media (max-width: 576px) { .purchase-proof { display: none !important; } }
     </style>
     <script>
@@ -137,6 +143,7 @@ ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5<
         function showNext() {
           const item = items[index];
           img.src = item.image || '${data.hero.image}';
+          img.alt = item.imageAlt || 'Product';
           text.innerHTML = '<strong style="color: #16a34a;">' + item.name + '</strong> from <strong style="color: #16a34a;">' + item.location + '</strong> <br>' + item.content;
           time.innerText = item.timeAgo + ' • Verified Buyer';
           
@@ -342,6 +349,7 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
 .btn-custom-pill { background-color: ${secondaryColor}; color: black; font-weight: 700; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.05); padding: 0.75rem 2rem; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; }
 .btn-custom-pill:hover { opacity: 0.9; transform: translateY(-2px); color: black; }
 .about-description { text-align: justify; }
+.text-muted { color: #444 !important; }
 @media (max-width: 992px) { 
     .title-scale { font-size: 1.6rem !important; } 
     .about-description { text-align: center !important; }
@@ -362,7 +370,7 @@ ${seoBlock}
       .sectioncolor1 { background-color: #f8f9fa; padding: 5rem 0; }
       .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
       .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
-      .ingredient-img-frame { width: 160px; height: 160px; border-radius: 50%; border: 10px solid #fcfcfc; overflow: hidden; background: #f9fafb; margin-bottom: 1.5rem; outline: 2px solid ${secondaryColor}; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+      .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; overflow: hidden; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
       .pricing-card { border-radius: 2rem; transition: all 0.3s; }
       .pricing-card.primary { border: 4px solid ${secondaryColor} !important; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
       .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 2rem; transition: all 0.3s; }
@@ -378,7 +386,7 @@ ${seoBlock}
         <nav class="navbar navbar-expand-lg sticky-top border-bottom bg-white py-2">
             <div class="container px-3 d-flex justify-content-between align-items-center mx-auto">
                 <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="Logo" />` : ''}
+                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
                     <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
                 </a>
                 <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
@@ -403,18 +411,18 @@ ${seoBlock}
             <div class="row align-items-center">
                 <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0">
                     <div class="position-relative d-inline-block mb-3">
-                        <img src="${data.hero?.image || ''}" class="img-fluid mx-auto d-block" style="max-height: 50vh; object-fit: contain;" />
+                        <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="img-fluid mx-auto d-block" style="max-height: 50vh; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                         <div class="position-absolute top-0 end-0" style="width: 80px; transform: translate(25%, -25%);">
-                            <img src="${data.hero?.badgeImage || ''}" class="img-fluid" />
+                            <img src="${data.hero?.badgeImage || ''}" alt="${data.hero?.badgeImageAlt || 'Supplement Facts'}" class="img-fluid" style="${data.hero.badgeImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
                         </div>
                     </div>
                     <div class="d-flex justify-content-center flex-wrap gap-2 mt-4 pt-2">
-                        ${(data.logos || []).filter((l: string) => l && l.trim() !== '').map((logo: string) => `<div style="width: 65px; height: 65px;"><img src="${logo}" class="img-fluid" /></div>`).join('')}
+                        ${(data.logos || []).map((logo: any) => `<div style="width: 65px; height: 65px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
                 <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start pt-3 pt-lg-4">
                     <h1 class="fw-bold mb-3" style="font-size: clamp(1.5rem, 4vw, 2.75rem); line-height: 1.15;">${data.hero?.title}</h1>
-                    <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; max-width: 600px; white-space: pre-line; text-align: justify;">${data.hero?.subtitle}</p>
+                    <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; width: 100%; white-space: pre-line; text-align: justify;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
                         <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none" style="min-width: 200px; background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
                         <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; min-width: 200px; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
@@ -434,10 +442,10 @@ ${seoBlock}
 
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.featuresSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.featuresSubtitle}</p></div>` : ''}
+            ${data.featuresSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.featuresSubtitle}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
                 ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3"><div class="bgbadge text-center h-100"><img src="${f.image}" class="img-fluid mb-4" style="height: 120px; object-fit: contain;" /><h3 class="fw-bold fs-4 mb-3">${f.title}</h3><p class="fs-5 text-muted">${f.description}</p></div></div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3"><div class="bgbadge text-center h-100"><img src="${f.image}" alt="${f.imageAlt || f.title}" class="img-fluid mb-4" style="height: 120px; object-fit: contain; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><h3 class="fw-bold fs-4 mb-3">${f.title}</h3><p class="fs-5 text-muted">${f.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
@@ -453,12 +461,12 @@ ${seoBlock}
 
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
-            ${data.about?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.about.subtitle}</p></div>` : ''}
+            ${data.about?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.about.subtitle}</p></div>` : ''}
             <div class="clearfix">
                 <!-- Image Section - Floated Right for Newspaper Style -->
                 <div class="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
-                    <div class="d-inline-block p-3 bg-white rounded-3 shadow-md border border-light w-100">
-                        <img src="${data.about?.image}" class="img-fluid rounded w-100" style="max-height: 380px; object-fit: contain;" />
+                    <div class="d-inline-block p-3 bg-white shadow-md border border-light w-100" style="${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 8px;'}">
+                        <img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product'}" class="img-fluid rounded w-100" style="max-height: 380px; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                         <div class="mt-2" style="font-size: 9px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2em; border-top: 1px solid #eee; pt-2;">Editorial: Clinical Formula Composition</div>
                     </div>
                 </div>
@@ -476,7 +484,7 @@ ${seoBlock}
     </section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
-            ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.research.subtitle}</p></div>` : ''}
+            ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.research.subtitle}</p></div>` : ''}
             <div class="row align-items-center g-5">
                 <div class="col-lg-6 text-center text-lg-start">
                     <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${data.research.description}</p>
@@ -491,7 +499,7 @@ ${seoBlock}
                 </div>
                 <div class="col-lg-6">
                     <div class="p-3 bg-white border rounded shadow-sm">
-                        <img src="${data.research.image}" class="img-fluid rounded w-100" style="max-height: 400px; object-fit: contain;" />
+                        <img src="${data.research.image}" alt="${data.research.imageAlt || 'Clinical Research'}" class="img-fluid rounded w-100" style="max-height: 400px; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                     </div>
                 </div>
             </div>
@@ -507,8 +515,8 @@ ${seoBlock}
     </section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.benefits?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.benefits.subtitle}</p></div>` : ''}
-            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="max-width: 896px;">${data.benefits?.description || ''}</p>
+            ${data.benefits?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.benefits.subtitle}</p></div>` : ''}
+            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="width: 100%;">${data.benefits?.description || ''}</p>
             <div class="row g-4 justify-content-center">
                 ${(data.benefits?.items || []).map((b: any) => `
                 <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${b.title}</h3><p class="fs-5 text-muted mb-0">${b.description}</p></div></div>
@@ -527,13 +535,13 @@ ${seoBlock}
 
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.ingredients?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p></div>` : ''}
+            ${data.ingredients?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.ingredients.subtitle}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
                 ${(data.ingredients?.items || []).map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="ingredient-card shadow-sm border-0">
-                        <div class="ingredient-img-frame mx-auto">
-                            <img src="${item.image || 'https://placehold.co/400x400?text=Ingredient'}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="ingredient-img-frame mx-auto" style="${item.isCircular ? 'border-radius: 50%;' : 'border-radius: 0;'} box-shadow: 0 0 0 2px ${secondaryColor}, inset 0 2px 4px rgba(0,0,0,0.05);">
+                            <img src="${item.image || 'https://placehold.co/400x400?text=Ingredient'}" alt="${item.imageAlt || item.title}" style="width: 100%; height: 100%; ${item.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: cover;'}">
                         </div>
                         <h3 class="fw-bold fs-4 mb-2 text-dark">${item.title}</h3>
                         <p class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${item.description}</p>
@@ -552,12 +560,12 @@ ${seoBlock}
     </section>
     <section class="container-fluid py-5 bg-white">
         <div class="container mx-auto">
-            ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.guaranteeSubtitle}</p></div>` : ''}
+            ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.guaranteeSubtitle}</p></div>` : ''}
             <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
                 <div class="row align-items-center g-5">
                     <div class="col-lg-4 text-center">
-                        <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px;" />
-                        <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSubtitle || "Zero Risk • Complete Satisfaction Promise"}</p>
+                        <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
+                        <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSmallText || "Zero Risk • Complete Satisfaction Promise"}</p>
                     </div>
                     <div class="col-lg-8 text-center text-lg-start">
                         <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
@@ -579,7 +587,7 @@ ${seoBlock}
 
     <section class="container-fluid py-5" style="background-color: #f9f9f9;">
         <div class="container">
-            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.pricingSubtitle}</p></div>` : ''}
+            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.pricingSubtitle}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
             <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
@@ -592,7 +600,7 @@ ${seoBlock}
                             <div style="position: relative; background: #000; color: #fff; padding: 4px 8px; font-weight: 900; font-size: 11px; border: 1px solid #fff;">${plan.multiplier || 'X1'}</div>
                         </div>
                     </div>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="mx-auto" style="height: 160px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="mx-auto" style="height: 160px; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
                     <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
@@ -617,15 +625,15 @@ ${seoBlock}
     <section class="container py-5 bg-white">
         <div class="container py-lg-5">
             <div class="text-center mb-5">
-                <p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.testimonials.subtitle || ''}</p>
+                <p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.testimonials.subtitle || ''}</p>
             </div>
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="testimonial-card bg-white shadow-sm h-100 p-4 border rounded-0">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border-radius: 50%;">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}">
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
@@ -653,8 +661,8 @@ ${seoBlock}
 
     <section class="container-fluid py-5 bg-white">
         <div class="container">
-            ${data.faqSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="max-width: 700px;">${data.faqSubtitle}</p></div>` : ''}
-            <div class="container mx-auto" style="max-width: 800px;">
+            ${data.faqSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.faqSubtitle}</p></div>` : ''}
+            <div class="container mx-auto" style="width: 100%;">
                 <div class="accordion accordion-flush" id="faqAccordion">
                     ${(data.faq || []).map((item: any, i: number) => `
                     <div class="accordion-item mb-3 border rounded shadow-sm overflow-hidden">
@@ -673,7 +681,7 @@ ${seoBlock}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
-        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5  mx-auto  opacity-75" style="line-height: 1.6;" style="max-width: 1024px;">${data.footer?.companyInfo}</p><hr class="my-5 opacity-25" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6 opacity-75">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
+        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5  mx-auto  opacity-75" style="line-height: 1.6;" style="width: 100%;">${data.footer?.companyInfo}</p><hr class="my-5 opacity-25" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6 opacity-75">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
     </footer>
     
     <script>
@@ -707,6 +715,8 @@ h1, h2, h3, h4, h5, h6, .logo { font-family: 'Space Grotesk', sans-serif !import
 .accordion-button:not(.collapsed) { background: rgba(255,255,255,0.05) !important; color: ${secondaryColor} !important; }
 .accordion-button::after { filter: invert(1); }
 .accordion-item { background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important; }
+.text-white-50 { color: rgba(255,255,255,0.85) !important; }
+.opacity-75 { opacity: 0.9 !important; }
 .nav-link { transition: color 0.3s ease; }
 .nav-link:hover { color: ${secondaryColor} !important; }
 @media (max-width: 1200px) { .container { max-width: 95% !important; } }
@@ -743,7 +753,7 @@ ${seoBlock}
     <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05);">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 36px; width: auto;" alt="Logo" />` : ''}
+                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 36px; width: auto; ${data.hero.logoImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
                 <span class="fs-4 fw-bold logo gradient-text">${data.productName}</span>
             </a>
         <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
@@ -772,18 +782,18 @@ ${seoBlock}
                         ` : `<span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ Premium Support Formula</span>`}
                     </div>
                     <h1 class="fw-bold mb-4 gradient-text" style="font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; max-width: 550px; font-size: 0.95rem; white-space: pre-line;">${data.hero?.subtitle}</p>
+                    <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; width: 100%; font-size: 0.95rem; white-space: pre-line;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
                         <a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
                         ${(data.hero?.secondaryButtonText && data.hero.secondaryButtonText.trim() !== '') ? `<a href="${data.hero?.secondaryButtonHref || '#'}" class="modern-btn modern-btn-outline">${data.hero.secondaryButtonText}</a>` : ''}
                     </div>
                     <div class="d-flex flex-wrap gap-3 mt-5 justify-content-center justify-content-lg-start" style="opacity: 0.4;">
-                        ${(data.logos || []).filter((l: string) => l && l.trim() !== '').map((logo: string) => `<div style="width: 50px; height: 50px; filter: brightness(0) invert(1);"><img src="${logo}" class="img-fluid" /></div>`).join('')}
+                        ${(data.logos || []).map((logo: any) => `<div style="width: 50px; height: 50px; filter: brightness(0) invert(1);"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
                 <div class="col-12 col-lg-5 text-center">
                     <div class="p-4 rounded-4" style="background: linear-gradient(135deg, ${primaryColor}40, transparent);">
-                        <img src="${data.hero?.image}" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                        <img src="${data.hero?.image}" alt="${data.hero?.imageAlt || 'Product Modern'}" class="img-fluid mx-auto d-block" style="max-height: 450px; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                     </div>
                 </div>
             </div>
@@ -799,7 +809,7 @@ ${seoBlock}
                 ${data.ingredients.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="glass-card p-4 h-100 text-center">
-                        <div class="mb-4 mx-auto rounded-circle overflow-hidden border border-white/10" style="width: 120px; height: 120px;">
+                        <div class="mb-4 mx-auto overflow-hidden border border-white/10" style="width: 120px; height: 120px; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
                             <img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" />
                         </div>
                         <h4 class="fw-bold mb-2 text-white" style="font-size: 1.1rem;">${item.title}</h4>
@@ -820,7 +830,7 @@ ${seoBlock}
             <p class="text-center mb-5 text-white-50" style="font-size: 0.9rem;">Science-backed ingredients. Zero compromises.</p>
             <div class="row g-4 justify-content-center">
                 ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-sm-6 col-lg-3"><div class="glass-card p-4 h-100 text-center"><img src="${f.image}" class="img-fluid mx-auto mb-3" style="height: 80px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7;" /><h4 class="fw-bold mb-2 text-white" style="font-size: 1rem;">${f.title}</h4><p class="mb-0 text-white-50" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
+                <div class="col-12 col-sm-6 col-lg-3"><div class="glass-card p-4 h-100 text-center"><img src="${f.image}" alt="${f.imageAlt || f.title}" class="img-fluid mx-auto mb-3" style="height: 80px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><h4 class="fw-bold mb-2 text-white" style="font-size: 1rem;">${f.title}</h4><p class="mb-0 text-white-50" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
@@ -831,7 +841,7 @@ ${seoBlock}
         <div class="container">
             <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.about?.title || "The Formula"}</h2>
             <div class="row align-items-center g-5">
-                <div class="col-12 col-lg-5 text-center"><div class="glass-card p-4"><img src="${data.about?.image}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: contain;" /></div></div>
+                <div class="col-12 col-lg-5 text-center"><div class="glass-card p-4"><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Modern'}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div></div>
                 <div class="col-12 col-lg-7"><div class="text-white-50" style="line-height: 1.9; font-size: 0.95rem; white-space: pre-line;">${data.about?.description}</div></div>
             </div>
         </div>
@@ -857,7 +867,7 @@ ${seoBlock}
                 </div>
                 <div class="col-lg-6">
                     <div class="glass-card p-2">
-                        <img src="${data.research.image}" class="img-fluid rounded-3 w-100" style="max-height: 450px; object-fit: contain;" />
+                        <img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Modern'}" class="img-fluid rounded-3 w-100" style="max-height: 450px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                     </div>
                 </div>
             </div>
@@ -868,7 +878,7 @@ ${seoBlock}
     <section id="benefits" class="section-darker py-5">
         <div class="container">
             <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.benefits.title || "Benefits"}</h2>
-            <p class="text-center mb-5 mx-auto text-white-50" style="max-width: 700px; font-size: 0.9rem;">${data.benefits.description || ''}</p>
+            <p class="text-center mb-5 mx-auto text-white-50" style="width: 100%; font-size: 0.9rem;">${data.benefits.description || ''}</p>
             <div class="row g-4">
                 ${data.benefits.items.map((b: any) => `
                 <div class="col-12 col-md-6"><div class="glass-card p-4 h-100 d-flex align-items-start gap-3"><div class="flex-shrink-0 w-10 h-10 rounded-3 d-flex align-items-center justify-content-center" style="background: ${secondaryColor}15;"><i class="fa-solid fa-check" style="color: ${secondaryColor}; font-size: 0.8rem;"></i></div><div><h4 class="fw-bold mb-1 text-white" style="font-size: 1rem;">${b.title}</h4><p class="mb-0 text-white-50" style="font-size: 0.85rem; line-height: 1.6;">${b.description}</p></div></div></div>
@@ -882,15 +892,15 @@ ${seoBlock}
         <div class="container">
             <div class="text-center mb-5">
                 <h2 class="fw-bold gradient-text mb-2" style="font-size: 2rem;">${data.testimonials.title}</h2>
-                <p class="text-white-50 mx-auto" style="max-width: 700px;">${data.testimonials.subtitle || ''}</p>
+                <p class="text-white-50 mx-auto" style="width: 100%;">${data.testimonials.subtitle || ''}</p>
             </div>
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="glass-card p-4 h-100">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border-radius: 50%; border: 2px solid ${secondaryColor};">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" style="width: 100%; height: 100%; object-fit: cover;">
+                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border: 2px solid ${secondaryColor}; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}">
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 text-white fs-6">${item.name}</h4>
@@ -913,7 +923,7 @@ ${seoBlock}
     <section class="py-5" style="background: linear-gradient(135deg, ${primaryColor}30, #0a0a0a);">
         <div class="container">
             <div class="glass-card p-5"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3" style="max-width: 200px;" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSubtitle || "Zero Risk"}</p></div>
+                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Modern'}" class="img-fluid mb-3" style="max-width: 200px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSmallText || "Zero Risk"}</p></div>
                 <div class="col-lg-8"><h3 class="fw-bold mb-3 text-white" style="font-size: 1.6rem;">${data.guaranteeHeadline || "Satisfaction Guaranteed"}</h3><p class="text-white-50" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary mt-3">Claim Your Package <i class="fa-solid fa-arrow-right"></i></a></div>
             </div></div>
         </div>
@@ -927,7 +937,7 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4"><div class="glass-card p-4 h-100 text-center" style="${plan.isPrimary ? `border: 2px solid ${secondaryColor}; transform: scale(1.03);` : ''}">
                     ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: ${primaryColor}; font-size: 10px;">Best Value</span></div>` : ''}
                     <h4 class="fw-bold mb-2 text-uppercase text-white" style="font-size: 0.95rem; letter-spacing: 2px;">${plan.title}</h4>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                     <div class="fw-bold mb-3" style="color: ${secondaryColor}; font-size: 2rem;">${plan.price}</div>
                     <div class="mb-4">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-center gap-2 justify-content-center text-white-50" style="font-size: 0.85rem;"><i class="fa-solid fa-check-circle" style="color: ${secondaryColor}; font-size: 0.7rem;"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="modern-btn w-100 ${plan.isPrimary ? 'modern-btn-primary' : 'modern-btn-outline'}" style="justify-content: center;">${plan.buttonText}</a>
@@ -941,7 +951,7 @@ ${seoBlock}
 
     ${(data.sections?.faq !== false && data.faq?.length) ? `
     <section id="faq" class="section-dark py-5">
-        <div class="container" style="max-width: 800px;">
+        <div class="container" style="width: 100%;">
             <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.faqTitle || "FAQ"}</h2>
             <div class="accordion" id="faqAccordionModern">
                 ${data.faq.map((item: any, i: number) => `
@@ -965,7 +975,7 @@ ${seoBlock}
     <footer class="py-5 text-center" style="background: #050505; border-top: 1px solid rgba(255,255,255,0.05);">
         <div class="container">
             <h2 class="fw-bold gradient-text mb-3" style="font-size: 1.5rem;">${data.footerHeadline || "Questions?"}</h2>
-            <p class="mx-auto mb-4 text-white-50" style="max-width: 700px; font-size: 0.9rem; line-height: 1.7;">${data.footer?.companyInfo}</p>
+            <p class="mx-auto mb-4 text-white-50" style="width: 100%; font-size: 0.9rem; line-height: 1.7;">${data.footer?.companyInfo}</p>
             <div class="d-flex justify-content-center flex-wrap gap-4 mb-4">
                 ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-decoration-none text-white-50" style="font-size: 0.85rem;">${l.label}</a>`).join('')}
             </div>
@@ -989,6 +999,7 @@ h1, h2, h3, h4, .logo { font-family: 'IBM Plex Sans', sans-serif !important; }
 .clinical-btn-primary:hover { background: #0056b3; color: white; }
 .data-label { font-family: 'IBM Plex Sans', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.5rem; display: block; }
 .clinical-header { border-left: 4px solid ${secondaryColor}; padding-left: 1rem; }
+.text-muted { color: #475569 !important; }
 @media (max-width: 992px) {
     h1 { font-size: 2.5rem !important; }
 }
@@ -1016,7 +1027,7 @@ ${seoBlock}
     <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom py-3">
         <div class="container d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="index.html">
-                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="width: 40px; height: 40px; object-fit: contain;" />` : `<div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>`}
+                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="width: 40px; height: 40px; object-fit: contain; ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}" />` : `<div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>`}
                 <span class="fw-bold fs-5 logo" style="color: ${primaryColor}">${data.productName}</span>
             </a>
             
@@ -1046,13 +1057,13 @@ ${seoBlock}
                     <div class="p-4 border rounded bg-light mb-5"><p class="mb-0 text-muted" style="line-height: 1.6; font-size: 0.95rem;">${data.hero?.subtitle}</p></div>
                     <a href="${data.hero?.buttonHref}" class="clinical-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
                 </div>
-                <div class="col-12 col-lg-6 text-center"><div class="p-5 bg-light border rounded"><img src="${data.hero?.image}" class="img-fluid" style="max-height: 350px; object-fit: contain;" /></div></div>
+                <div class="col-12 col-lg-6 text-center"><div class="p-5 bg-light border rounded"><img src="${data.hero?.image}" alt="${data.hero?.imageAlt || 'Product Clinical'}" class="img-fluid" style="max-height: 350px; object-fit: ${data.hero.imageIsCircular ? 'cover' : 'contain'}; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div></div>
             </div>
             <div class="row mt-5 border-top pt-4">
                 <div class="col-12">
                     <span class="data-label text-center mb-4">REGULATORY / SAFETY COMPLIANCE</span>
                     <div class="d-flex justify-content-center flex-wrap gap-5 py-4">
-                        ${(data.logos || []).map((logo: string) => `<div style="width: 80px; opacity: 0.5;"><img src="${logo}" class="img-fluid grayscale" /></div>`).join('')}
+                        ${(data.logos || []).map((logo: any) => `<div style="width: 80px; opacity: 0.5;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid grayscale" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
             </div>
@@ -1066,7 +1077,7 @@ ${seoBlock}
             <h2 class="text-center fw-bold mb-5" style="color: ${primaryColor}">${data.featuresTitle || "Core Tolerances"}</h2>
             <div class="row g-4">
                 ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-md-6 col-lg-3"><div class="clinical-card p-4 h-100"><div class="mb-4 pb-3 border-bottom d-flex align-items-center justify-content-between"><h4 class="fw-semibold mb-0 text-dark" style="font-size: 1rem;">${f.title}</h4><img src="${f.image}" class="opacity-25 grayscale" style="height: 32px;" /></div><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
+                <div class="col-12 col-md-6 col-lg-3"><div class="clinical-card p-4 h-100"><div class="mb-4 pb-3 border-bottom d-flex align-items-center justify-content-between"><h4 class="fw-semibold mb-0 text-dark" style="font-size: 1rem;">${f.title}</h4><img src="${f.image}" class="opacity-25 grayscale" style="height: 32px; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
@@ -1074,12 +1085,12 @@ ${seoBlock}
 
     ${data.sections?.about ? `
     <section id="about" class="bg-white py-4 border-bottom">
-        <div class="container  mx-auto" style="max-width: 1100px;">
+        <div class="container  mx-auto" style="width: 100%;">
             <div class="clinical-header mb-4"><span class="data-label">PROTOCOL SUMMARY</span><h2 class="fw-bold mb-0" style="color: ${primaryColor}; font-size: 2.3rem;">${data.about?.title || "The Formula"}</h2></div>
             <div class="clearfix">
                 <div class="float-lg-start me-lg-5 mb-4 col-12 col-lg-5 px-0">
                     <div class="p-2 bg-light border rounded shadow-sm text-center">
-                        <img src="${data.about?.image}" class="img-fluid rounded border border-light mx-auto" style="max-height: 380px; object-fit: contain;" />
+                        <img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Clinical'}" class="img-fluid rounded border border-light mx-auto" style="max-height: 380px; object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                         <div class="mt-2 pb-1 text-center"><span class="data-label" style="font-size: 10px;">FIG 1.1: SYSTEMIC DISPERSION PROFILE</span></div>
                     </div>
                 </div>
@@ -1109,7 +1120,7 @@ ${seoBlock}
                     </div>
                 </div>
                 <div class="col-lg-6 text-center">
-                    <div class="clinical-card p-2 shadow-sm d-inline-block"><img src="${data.research.image}" class="img-fluid rounded" style="max-height: 400px; object-fit: contain;" /></div>
+                    <div class="clinical-card p-2 shadow-sm d-inline-block"><img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Clinical'}" class="img-fluid rounded" style="max-height: 400px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div>
                 </div>
             </div>
         </div>
@@ -1136,7 +1147,7 @@ ${seoBlock}
             <h2 class="fw-bold mb-5" style="color: ${primaryColor}">${data.ingredients?.title || "Active Constituents"}</h2>
             <div class="row g-3 justify-content-center">
                 ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 d-flex text-start overflow-hidden"><div class="w-25 bg-light d-flex align-items-center justify-content-center border-end p-2"><img src="${item.image || 'https://placehold.co/100x100?text=Ing'}" class="w-100 rounded-circle border border-white shadow-sm" /></div><div class="w-75 p-3 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-1 text-primary font-monospace" style="font-size: 0.85rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.5;">${item.description}</p></div></div></div>
+                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 d-flex text-start overflow-hidden"><div class="w-25 bg-light d-flex align-items-center justify-content-center border-end p-2"><img src="${item.image || 'https://placehold.co/100x100?text=Ing'}" class="border border-white shadow-sm" style="width: 100%; aspect-ratio: 1/1; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 8px;'} object-fit: cover;" /></div><div class="w-75 p-3 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-1 text-primary font-monospace" style="font-size: 0.85rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.5;">${item.description}</p></div></div></div>
                 `).join('')}
             </div>
         </div>
@@ -1151,8 +1162,8 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="clinical-card p-4 h-100 bg-white shadow-sm border">
                         <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
-                            <div class="w-12 h-12 rounded bg-light border d-flex align-items-center justify-content-center overflow-hidden">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" class="w-100 h-100" style="object-fit: cover;" />
+                            <div class="w-12 h-12 bg-light border d-flex align-items-center justify-content-center overflow-hidden" style="${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 4px;'}">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" class="w-100 h-100" style="object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
@@ -1169,16 +1180,34 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+    
+    <section class="py-5 bg-white border-bottom">
+        <div class="container py-lg-4">
+            <div class="p-5 bg-light border rounded shadow-sm">
+                <div class="row align-items-center g-5">
+                    <div class="col-lg-4 text-center">
+                        <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Clinical'}" class="img-fluid mb-3 mx-auto" style="max-width: 250px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
+                        <p class="data-label mb-0" style="color: ${secondaryColor}">${data.guaranteeSmallText || "Security Protocol"}</p>
+                    </div>
+                    <div class="col-lg-8">
+                        <h3 class="fw-bold mb-3" style="color: ${primaryColor}; font-size: 1.8rem;">${data.guaranteeHeadline || "60-Day Satisfaction Protocol"}</h3>
+                        <p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p>
+                        <a href="${data.hero?.buttonHref}" class="clinical-btn-primary mt-3 text-decoration-none">Order Now <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 
     <section class="py-5 bg-white" id="pricing">
         <div class="container py-lg-5">
             <div class="text-center mb-5"><span class="data-label">DISTRIBUTION TIERS</span><h2 class="fw-bold" style="color: ${primaryColor};">${data.pricingTitle || "Select Supply"}</h2></div>
-            <div class="row g-4 justify-content-center  mx-auto" style="max-width: 1000px;">
+            <div class="row g-4 justify-content-center  mx-auto" style="width: 100%;">
                 ${(data.pricing || []).map((plan: any) => `
                 <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}">
                     <div class="p-3 border-bottom ${plan.isPrimary ? 'bg-primary text-white' : 'bg-white text-dark'}"><h4 class="fw-bold mb-0 text-uppercase fs-6">${plan.title}</h4></div>
                     <div class="p-4 flex-grow-1 d-flex flex-column">
-                        <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto mb-4" style="height: 120px; object-fit: contain;" />
+                        <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto mb-4" style="height: 120px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                         <div class="fw-bold mb-4 font-monospace fs-2" style="color: ${primaryColor};">${plan.price}</div>
                         <div class="text-start border-start border-2 ps-3 mb-4 flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-check text-success me-2"></i>${f}</div>`).join('')}</div>
                         <a href="${plan.buttonHref}" class="clinical-btn-primary w-100 ${plan.isPrimary ? '' : 'bg-white text-dark border'}" style="justify-content: center;">${plan.buttonText}</a>
@@ -1192,7 +1221,7 @@ ${seoBlock}
 
     ${data.sections?.faq && data.faq?.length ? `
     <section id="faq" class="py-5 bg-white">
-        <div class="container py-lg-5  mx-auto" style="max-width: 800px;">
+        <div class="container py-lg-5  mx-auto" style="width: 100%;">
             <h2 class="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style="color: ${primaryColor};">${data.faqTitle || "Protocol FAQ"}</h2>
             <div class="accordion" id="faqAccordionClinical">
                 ${data.faq.map((item: any, i: number) => `
@@ -1215,7 +1244,7 @@ ${seoBlock}
 
     <footer class="bg-dark text-light py-5 font-monospace text-sm"><div class="container text-center">
         <h2 class="fw-bold mb-3 text-white fs-5">${data.footerHeadline || "End of Document"}</h2>
-        <p class="mb-4 text-secondary mx-auto" style="max-width: 600px;">${data.footer?.companyInfo}</p>
+        <p class="mb-4 text-secondary mx-auto" style="width: 100%;">${data.footer?.companyInfo}</p>
         <div class="d-flex justify-content-center gap-4 mb-4 border-top border-bottom border-secondary py-3">
             ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-light text-decoration-none">${l.label}</a>`).join('')}
         </div>
@@ -1247,6 +1276,7 @@ ${seoBlock}
         .organic-btn-primary:hover { background: ${secondaryColor}; color: #FAF6ED; }
         .organic-blob { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
         .leaf-shape { border-radius: 50% 0 50% 50%; }
+.text-muted { color: #4A3B2E !important; }
         ${customCss}
     </style>
 </head>
@@ -1254,8 +1284,8 @@ ${seoBlock}
     <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 121, 105, 0.1);">
         <div class="container">
             <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="index.html">
-                <div class="leaf-shape d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; background: ${primaryColor}; color: white;">
-                    <img src="${data.hero?.logoImage}" style="width: 30px; height: 30px; object-fit: contain; filter: brightness(0) invert(1);" />
+                <div class="leaf-shape d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; background: ${primaryColor}; color: white; ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}">
+                    <img src="${data.hero?.logoImage}" style="width: 30px; height: 30px; object-fit: contain; filter: brightness(0) invert(1); ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}" />
                 </div>
                 <span class="fs-4 fw-bold logo" style="color: ${primaryColor}">${data.productName}</span>
             </a>
@@ -1274,13 +1304,13 @@ ${seoBlock}
                     <span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">${data.hero.badgeText}</span>
                     ` : `<span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">Pure • Earth-Sourced • Balanced</span>`}
                     <h1 class="fw-bold mb-4" style="color: ${primaryColor}; font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; max-width: 500px; font-size: 1.05rem; white-space: pre-line;">${data.hero?.subtitle}</p>
+                    <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; width: 100%; font-size: 1.05rem; white-space: pre-line;">${data.hero?.subtitle}</p>
                     <a href="${data.hero?.buttonHref}" class="organic-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i></a>
                 </div>
                 <div class="col-12 col-lg-6 text-center position-relative">
                     <div class="position-absolute top-50 start-50 translate-middle organic-blob" style="width: 120%; height: 120%; background: #F0EBE1; z-index: 0;"></div>
                     <div class="position-relative z-1 d-inline-block p-4">
-                        <img src="${data.hero?.image || 'https://placehold.co/800x800?text=Hero+Image'}" class="img-fluid" style="max-height: 500px; object-fit: contain;" />
+                        <img src="${data.hero?.image || 'https://placehold.co/800x800?text=Hero+Image'}" alt="${data.hero?.imageAlt || 'Product Organic'}" class="img-fluid" style="max-height: 500px; object-fit: ${data.hero.imageIsCircular ? 'cover' : 'contain'}; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                     </div>
                 </div>
             </div>
@@ -1290,7 +1320,7 @@ ${seoBlock}
     <section class="py-4 border-top border-bottom" style="background: white; border-color: #E6D5C3 !important;">
         <div class="container">
             <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
-                ${(data.logos || []).map((logo: string) => `<div style="width: 70px;"><img src="${logo}" class="img-fluid" style="filter: opacity(0.7) sepia(0.5) hue-rotate(-30deg);" /></div>`).join('')}
+                ${(data.logos || []).map((logo: any) => `<div style="width: 70px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="filter: opacity(0.7) sepia(0.5) hue-rotate(-30deg); ${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
             </div>
         </div>
     </section>
@@ -1314,7 +1344,7 @@ ${seoBlock}
                 </div>
                 <div class="col-lg-6 text-center">
                     <div class="p-3 d-inline-block" style="background: #FAF6ED; border-radius: 3rem;">
-                        <img src="${data.research.image}" class="img-fluid" style="border-radius: 2.5rem; max-height: 420px; object-fit: contain;" />
+                        <img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Organic'}" class="img-fluid" style="max-height: 420px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 2.5rem;'}" />
                     </div>
                 </div>
             </div>
@@ -1331,7 +1361,7 @@ ${seoBlock}
             <p class="mb-5 font-serif fs-5" style="color: #6A5949;">Sourced sustainably, crafted carefully.</p>
             <div class="row g-4">
                 ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white"><div class="mx-auto mb-4 organic-blob overflow-hidden border border-4 border-light" style="width: 130px; height: 130px;"><img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" /></div><h4 class="fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 1.25rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${item.description}</p></div></div>
+                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white"><div class="mx-auto mb-4 overflow-hidden border border-4 border-light" style="width: 130px; height: 130px; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 20px;'}"><img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" /></div><h4 class="fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 1.25rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${item.description}</p></div></div>
                 `).join('')}
             </div>
         </div>
@@ -1341,7 +1371,7 @@ ${seoBlock}
     <section id="about" class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
             <div class="row align-items-center g-5">
-                <div class="col-lg-5"><div class="position-relative"><div class="position-absolute top-0 start-0 w-100 h-100 organic-blob" style="background: ${secondaryColor}; transform: translate(-5%, 5%); opacity: 0.1;"></div><img src="${data.about?.image}" class="img-fluid position-relative z-1 rounded-4 shadow-sm" /></div></div>
+                <div class="col-lg-5"><div class="position-relative"><div class="position-absolute top-0 start-0 w-100 h-100 organic-blob" style="background: ${secondaryColor}; transform: translate(-5%, 5%); opacity: 0.1;"></div><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Organic'}" class="img-fluid position-relative z-1 shadow-sm" style="object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 1.5rem;'}" /></div></div>
                 <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line; text-align: justify;">${data.about?.description}</div></div>
             </div>
         </div>
@@ -1368,7 +1398,7 @@ ${seoBlock}
                 <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}" style="${plan.isPrimary ? 'transform: scale(1.05); z-index: 10;' : ''}">
                     ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: white; font-size: 10px;">Best Choice</span></div>` : ''}
                     <h4 class="fw-bold mb-2 font-serif text-uppercase" style="color: ${primaryColor}">${plan.title}</h4>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: contain;" />
+                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                     <div class="fw-bold mb-3 font-serif fs-2" style="color: ${primaryColor}">${plan.price}</div>
                     <div class="mb-4 text-start flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-start gap-2" style="color: #6A5949; font-size: 0.9rem;"><i class="fa-solid fa-check mt-1" style="color: ${secondaryColor}"></i><span>${f}</span></div>`).join('')}</div>
                     <a href="${plan.buttonHref}" class="organic-btn-primary w-100" style="justify-content: center;">${plan.buttonText}</a>
@@ -1382,7 +1412,7 @@ ${seoBlock}
     <section class="py-5" style="background: #FAF6ED;">
         <div class="container py-lg-5">
             <div class="organic-card p-5 bg-white"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" class="img-fluid mb-3" style="max-width: 220px;" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSubtitle || "Nature's Promise"}</p></div>
+                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Organic'}" class="img-fluid mb-3" style="max-width: 220px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSmallText || "Nature's Promise"}</p></div>
                 <div class="col-lg-8"><h2 class="fw-bold mb-3 font-serif" style="color: ${primaryColor}">${data.guaranteeHeadline || "Pure Satisfaction Promise"}</h2><p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="organic-btn-primary mt-4">Order Now <i class="fa-solid fa-seedling"></i></a></div>
             </div></div>
         </div>
@@ -1399,8 +1429,8 @@ ${seoBlock}
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="organic-card p-4 h-100 bg-white text-start shadow-sm">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="leaf-shape overflow-hidden" style="width: 56px; height: 56px; border: 2px solid ${secondaryColor}30; border-radius: 50% 0 50% 0;">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" class="w-100 h-100" style="object-fit: cover;" />
+                            <div class="overflow-hidden" style="width: 56px; height: 56px; border: 2px solid ${secondaryColor}30; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 50% 0 50% 0;'}">
+                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" class="w-100 h-100" style="object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
                             </div>
                             <div>
                                 <h4 class="fw-bold mb-0 font-serif" style="color: ${primaryColor}">${item.name}</h4>
@@ -1421,7 +1451,7 @@ ${seoBlock}
 
     ${data.sections?.faq && data.faq?.length ? `
     <section id="faq" class="py-5" style="background: #F0EBE1;">
-        <div class="container py-lg-5" style="max-width: 800px;">
+        <div class="container py-lg-5" style="width: 100%;">
             <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.faqTitle || "Wisdom & Questions"}</h2>
             <div class="accordion" id="faqAccordionOrganic">
                 ${data.faq.map((item: any, i: number) => `
@@ -1446,7 +1476,7 @@ ${seoBlock}
         <div class="container">
             <i class="fa-solid fa-seedling fs-1 mb-4" style="color: ${secondaryColor}"></i>
             <h2 class="fw-bold mb-4 font-serif" style="font-size: 1.8rem;">${data.footerHeadline || "Back to Nature"}</h2>
-            <p class="mx-auto mb-5 opacity-75" style="max-width: 600px; line-height: 1.8;">${data.footer?.companyInfo}</p>
+            <p class="mx-auto mb-5 opacity-75" style="width: 100%; line-height: 1.8;">${data.footer?.companyInfo}</p>
             <div class="d-flex justify-content-center flex-wrap gap-4 mb-4 border-bottom border-top py-4" style="border-color: rgba(250, 246, 237, 0.2) !important;">
                 ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-light text-decoration-none font-serif italic fs-5">${l.label}</a>`).join('')}
             </div>
@@ -1606,12 +1636,23 @@ ${seoBlock}
     }
 
     for (const page of legalPages) {
+        const markdownStyles = `
+            <style>
+                .markdown-content h1, .markdown-content h2, .markdown-content h3 { margin-top: 1.5rem; margin-bottom: 1rem; font-weight: 700; color: #1a202c; }
+                .markdown-content p { margin-bottom: 1rem; }
+                .markdown-content ul, .markdown-content ol { margin-bottom: 1rem; padding-left: 1.5rem; }
+                .markdown-content li { margin-bottom: 0.5rem; }
+                .markdown-content strong { color: #1a202c; }
+                .markdown-content blockquote { border-left: 4px solid #e2e8f0; padding-left: 1rem; color: #718096; font-style: italic; margin: 1.5rem 0; }
+            </style>
+        `;
         const bodyContent = `
+            ${markdownStyles}
             <main class="container py-5" style="min-height: 70vh;">
                 <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
                     <h1 class="fw-bold mb-5">${page.title}</h1>
-                    <div class="text-secondary" style="line-height: 1.8; white-space: pre-line; font-size: 1.1rem; text-align: justify;">
-${page.content}
+                    <div class="text-secondary markdown-content" style="line-height: 1.8; font-size: 1.1rem; text-align: justify;">
+${marked.parse(page.content)}
                     </div>
                     <div class="mt-5 pt-4 border-top">
                         <a href="index.html" class="btn btn-outline-dark px-4 py-2 fw-bold uppercase" style="border-radius: 0; font-size: 12px; letter-spacing: 1px;">← Back to Home</a>

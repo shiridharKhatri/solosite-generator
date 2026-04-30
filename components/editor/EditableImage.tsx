@@ -5,6 +5,9 @@ import React, { useRef, useState } from 'react';
 interface EditableImageProps {
   src: string;
   onChange: (src: string) => void;
+  onAltChange?: (alt: string) => void;
+  isCircular?: boolean;
+  onToggleCircular?: () => void;
   onRemove?: () => void;
   className?: string;
   alt?: string;
@@ -14,6 +17,9 @@ interface EditableImageProps {
 export const EditableImage: React.FC<EditableImageProps> = ({
   src,
   onChange,
+  onAltChange,
+  isCircular = false,
+  onToggleCircular,
   onRemove,
   className = '',
   alt = 'Editable image',
@@ -21,9 +27,11 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isEditingAlt, setIsEditingAlt] = useState(false);
+  const [tempAlt, setTempAlt] = useState(alt);
 
   const handleClick = () => {
-    if (!isUploading) fileInputRef.current?.click();
+    if (!isUploading && !isEditingAlt) fileInputRef.current?.click();
   };
 
   const compressImage = (file: File): Promise<string> => {
@@ -49,7 +57,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           const ctx = canvas.getContext('2d');
           ctx?.drawImage(img, 0, 0, width, height);
 
-          // Use 0.6 quality for even better compression (still looks great)
           const webpBase64 = canvas.toDataURL('image/webp', 0.6);
           resolve(webpBase64);
         };
@@ -66,16 +73,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     setIsUploading(true);
 
     try {
-      // Always compress first to save space and prevent OOM
       const compressedBase64 = await compressImage(file);
-
-      // Try to upload to server (which will now just store this compressed base64 or save to disk)
-      // For now, we'll just use the compressed base64 directly to guarantee it works in production
       onChange(compressedBase64);
       setIsUploading(false);
-
-      // Optional: still call the API if you want server-side processing, 
-      // but the above line makes it work immediately and reliably.
     } catch (error) {
       console.error('Failed to process image', error);
       setIsUploading(false);
@@ -84,62 +84,120 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
   return (
     <div
-      className={`relative group cursor-pointer flex justify-center items-center ${className}`}
-      style={{ ...style, display: style?.display || 'flex', width: style?.width || (style?.maxHeight ? 'auto' : '100%'), height: style?.height }}
+      className={`relative group cursor-pointer flex justify-center items-center overflow-hidden transition-all duration-300 ${isCircular ? 'rounded-full aspect-square' : ''} ${className}`}
+      style={{
+        ...style,
+        display: style?.display || 'flex',
+        width: style?.width || (style?.maxHeight ? 'auto' : '100%'),
+        height: isCircular ? (style?.width || '100%') : style?.height
+      }}
     >
       <div onClick={handleClick} className="w-full h-full flex justify-center items-center">
         {src ? (
           <img
             src={src}
             alt={alt}
-            className="w-full h-full block"
+            className={`w-full h-full block ${isCircular ? 'object-cover' : 'object-contain'}`}
             onError={(e) => {
               (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Found';
             }}
             style={{
-              objectFit: style?.objectFit || 'contain',
-              maxHeight: style?.maxHeight || '70vh',
+              maxHeight: isCircular ? 'none' : (style?.maxHeight || '70vh'),
               minHeight: style?.minHeight || 'auto',
-              width: style?.width || '100%',
-              height: style?.height || 'auto',
-              margin: '0 auto'
+              width: '100%',
+              height: '100%',
+              margin: '0 auto',
+              borderRadius: isCircular ? '9999px' : '0'
             }}
           />
         ) : (
-          <div className="w-full h-full bg-zinc-100 border-2 border-dashed border-zinc-300 flex items-center justify-center p-4 min-h-[100px]">
+          <div className={`w-full h-full bg-zinc-100 border-2 border-dashed border-zinc-300 flex items-center justify-center p-4 min-h-[100px] ${isCircular ? 'rounded-full' : ''}`}>
             <span className="text-zinc-400 text-xs font-bold uppercase tracking-widest text-center">No Image<br /><small className="opacity-50">Click to add</small></span>
           </div>
         )}
       </div>
 
-      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none" style={{ borderRadius: 'inherit' }}>
-        <span className="text-white text-[10px] font-bold uppercase tracking-widest">Click to replace</span>
+      <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none ${isCircular ? 'rounded-full' : ''}`}>
+        <span className="text-white text-[10px] font-bold uppercase tracking-widest text-center px-2">Click to replace</span>
       </div>
 
       {isUploading && (
-        <div className="absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center z-40 transition-all">
+        <div className={`absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center z-40 transition-all ${isCircular ? 'rounded-full' : ''}`}>
           <i className="fa-solid fa-circle-notch animate-spin text-blue-600 text-xl mb-2"></i>
           <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">Uploading...</span>
         </div>
       )}
 
-      {(src || onRemove) && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            if (onRemove) {
-              onRemove();
-            } else {
-              onChange('');
-            }
-          }}
-          className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-none flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all z-50 shadow-lg border-none hover:bg-red-600 hover:scale-110"
-          title="Remove Image"
-        >
-          <i className="fa-solid fa-times text-[10px]"></i>
-        </button>
+      {(src || onRemove || onToggleCircular) && (
+        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-50">
+          {onToggleCircular && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleCircular();
+              }}
+              className={`w-6 h-6 flex items-center justify-center shadow-lg border-none hover:scale-110 transition-all ${isCircular ? 'bg-amber-500 text-white' : 'bg-white text-gray-900'}`}
+              title={isCircular ? "Make Square" : "Make Circular"}
+            >
+              <i className={`fa-solid ${isCircular ? 'fa-square' : 'fa-circle'} text-[10px]`}></i>
+            </button>
+          )}
+          {onAltChange && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsEditingAlt(!isEditingAlt);
+                setTempAlt(alt);
+              }}
+              className="w-6 h-6 bg-blue-600 text-white flex items-center justify-center shadow-lg border-none hover:bg-blue-700 hover:scale-110"
+              title="Edit Alt Tag"
+            >
+              <i className="fa-solid fa-tag text-[10px]"></i>
+            </button>
+          )}
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              if (onRemove) {
+                onRemove();
+              } else {
+                onChange('');
+              }
+            }}
+            className="w-6 h-6 bg-red-500 text-white flex items-center justify-center shadow-lg border-none hover:bg-red-600 hover:scale-110"
+            title="Remove Image"
+          >
+            <i className="fa-solid fa-times text-[10px]"></i>
+          </button>
+        </div>
       )}
 
+      {isEditingAlt && (
+        <div className={`absolute inset-0 bg-white/95 flex flex-col items-center justify-center p-4 z-[60] animate-in fade-in zoom-in duration-200 ${isCircular ? 'rounded-full' : ''}`}>
+          <label className="text-[10px] font-bold text-zinc-400 uppercase tracking-widest mb-2">Alt Tag</label>
+          <input
+            type="text"
+            className="w-full p-2 border border-zinc-200 text-xs focus:ring-1 focus:ring-blue-500 outline-none mb-3"
+            value={tempAlt}
+            onChange={(e) => setTempAlt(e.target.value)}
+            placeholder="Image description"
+            autoFocus
+            onClick={(e) => e.stopPropagation()}
+          />
+          <div className="flex gap-1 w-full">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onAltChange?.(tempAlt);
+                setIsEditingAlt(false);
+              }}
+              className="flex-1 py-1.5 bg-blue-600 text-white text-[9px] font-bold uppercase tracking-widest border-none"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
 
       <input
         type="file"

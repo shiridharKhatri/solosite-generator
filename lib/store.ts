@@ -12,15 +12,23 @@ export interface ProjectData {
     secondaryButtonHref?: string;
     secondaryIcon?: string;
     image: string;
+    imageAlt?: string;
     badgeText?: string;
     badgeImage?: string;
+    badgeImageAlt?: string;
     logoImage?: string;
+    logoImageAlt?: string;
+    imageIsCircular?: boolean;
+    badgeImageIsCircular?: boolean;
+    logoImageIsCircular?: boolean;
   };
-  logos: string[];
+  logos: { src: string; alt?: string; isCircular?: boolean }[];
   features: {
     title: string;
     description: string;
     image: string;
+    imageAlt?: string;
+    isCircular?: boolean;
     href?: string;
   }[];
   about: {
@@ -29,11 +37,13 @@ export interface ProjectData {
     description: string;
     stats: { label: string; value: string }[];
     image: string;
+    imageAlt?: string;
+    isCircular?: boolean;
   };
   ingredients: {
     title: string;
     subtitle: string;
-    items: { title: string; description: string; image: string; href?: string }[];
+    items: { title: string; description: string; image: string; imageAlt?: string; isCircular?: boolean; href?: string }[];
   };
   testimonials: {
     title: string;
@@ -44,6 +54,8 @@ export interface ProjectData {
       content: string;
       rating: number;
       image?: string;
+      imageAlt?: string;
+      isCircular?: boolean;
     }[];
   };
   benefits: {
@@ -64,6 +76,8 @@ export interface ProjectData {
     price: string;
     features: string[];
     image?: string;
+    imageAlt?: string;
+    isCircular?: boolean;
     isPrimary?: boolean;
     guaranteeBadge?: {
       text: string;
@@ -86,6 +100,8 @@ export interface ProjectData {
     companyInfo: string;
     links: { label: string; href: string }[];
     trustImage?: string;
+    trustImageAlt?: string;
+    trustImageIsCircular?: boolean;
   };
   navbar: {
     links: { label: string; href: string }[];
@@ -156,6 +172,8 @@ export interface ProjectData {
     subtitle: string;
     description: string;
     image: string;
+    imageAlt?: string;
+    isCircular?: boolean;
     stats: { label: string; value: string }[];
   };
   featuresTitle?: string;
@@ -166,6 +184,7 @@ export interface ProjectData {
   faqSubtitle?: string;
   guaranteeTitle?: string;
   guaranteeSubtitle?: string;
+  guaranteeSmallText?: string;
   footerHeadline?: string;
 
 
@@ -179,6 +198,8 @@ export interface ProjectData {
       content: string; // e.g. "purchased 6 bottles"
       timeAgo: string; // e.g. "5 minutes ago"
       image?: string;
+      imageAlt?: string;
+      isCircular?: boolean;
     }[];
   };
   sections?: {
@@ -198,7 +219,13 @@ export interface ProjectData {
     disclaimer: string;
   };
   orderLink?: string;
+  timer?: {
+    enabled: boolean;
+    minutes: number;
+    text: string;
+  };
 }
+
 
 interface EditorState {
   projectData: ProjectData | null;
@@ -242,6 +269,7 @@ interface EditorState {
   isDirty: boolean;
   setDirty: (dirty: boolean) => void;
   version: number;
+  updateTimer: (timer: Partial<ProjectData['timer']>) => void;
 }
 
 export const initialProjectData: ProjectData = {
@@ -256,36 +284,43 @@ export const initialProjectData: ProjectData = {
     secondaryButtonHref: "order.html",
     secondaryIcon: "fa-solid fa-arrow-right",
     image: "/image/index-img.webp",
+    imageAlt: "Glycopezil Product Bottle front view",
     badgeImage: "/image/supplement fats.webp",
+    badgeImageAlt: "Natural Supplement Facts Badge",
     badgeText: "Natural Blood Support",
-    logoImage: ""
+    logoImage: "",
+    logoImageAlt: "Glycopezil Logo"
   },
   logos: [
-    "/image/gmo.webp",
-    "/image/natural.webp",
-    "/image/gmp.webp",
-    "/image/fda.webp"
+    { src: "/image/gmo.webp", alt: "Non-GMO Certified" },
+    { src: "/image/natural.webp", alt: "100% Natural Ingredients" },
+    { src: "/image/gmp.webp", alt: "GMP Certified Facility" },
+    { src: "/image/fda.webp", alt: "FDA Registered Facility" }
   ],
   features: [
     {
       title: "100% Non-GMO Sourced",
       description: "Every component inside Glycopezil comes from verified non-GMO sources, ensuring a wholesome, unmodified, and trustworthy formula that prioritizes purity in every dose you take for blood sugar and metabolic harmony.",
-      image: "/image/gmo.webp"
+      image: "/image/gmo.webp",
+      imageAlt: "Non-GMO Icon"
     },
     {
       title: "Botanical-Origin Formula",
       description: "Harnessing the strength of plant-sourced compounds, Glycopezil assists in nurturing glucose harmony, efficient metabolic activity, and comprehensive daily vitality through a gentle, earth-derived approach.",
-      image: "/image/natural.webp"
+      image: "/image/natural.webp",
+      imageAlt: "Natural Formula Icon"
     },
     {
       title: "Rigorous GMP Standards",
       description: "Manufactured inside GMP-certified laboratories, Glycopezil passes through demanding quality inspections to guarantee integrity, cleanliness, and reliable strength in every single production cycle.",
-      image: "/image/gmp.webp"
+      image: "/image/gmp.webp",
+      imageAlt: "GMP Certified Icon"
     },
     {
       title: "Produced in FDA-Registered Labs",
       description: "Created within an FDA-registered production environment, Glycopezil follows established safety and manufacturing protocols for dietary supplements, delivering dependable quality that inspires genuine confidence.",
-      image: "/image/fda.webp"
+      image: "/image/fda.webp",
+      imageAlt: "FDA Registered Icon"
     }
   ],
   about: {
@@ -297,7 +332,8 @@ export const initialProjectData: ProjectData = {
       { label: "Reviews", value: "350+" },
       { label: "Satisfaction", value: "99%" }
     ],
-    image: "/image/banner-img.webp"
+    image: "/image/banner-img.webp",
+    imageAlt: "Formula Banner"
   },
   ingredients: {
     title: "Purposefully Chosen Natural Ingredients",
@@ -306,32 +342,38 @@ export const initialProjectData: ProjectData = {
       {
         title: "Schisandra: Whole-Body Balance Tonic",
         description: "Revered in traditional herbalism for centuries, Schisandra acts as a multi-tasking adaptogen that encourages healthy liver activity and fosters internal equilibrium.",
-        image: "/image/ingredient-schisandra.png"
+        image: "/image/ingredient-schisandra.png",
+        imageAlt: "Schisandra Ingredient"
       },
       {
         title: "Amla: Nutrient-Dense Rejuvenator",
         description: "Also called Indian gooseberry, Amla delivers exceptional antioxidants that fortify digestive processes and reinforce immune defenses.",
-        image: "/image/ingredient-amla.png"
+        image: "/image/ingredient-amla.png",
+        imageAlt: "Amla Ingredient"
       },
       {
         title: "Theobroma Cacao: Cardiovascular Energizer",
         description: "Brimmed with heart-friendly flavonoids, Cacao strengthens vascular health and bolsters smooth blood flow for daily vitality.",
-        image: "/image/ingredient-cacao.png"
+        image: "/image/ingredient-cacao.png",
+        imageAlt: "Cacao Ingredient"
       },
       {
         title: "Rhodiola: Adaptogenic Stamina Fuel",
         description: "A celebrated adaptogenic herb, Rhodiola empowers the body to navigate daily pressures and sustains balanced energy reserves.",
-        image: "/image/ingredient-rhodiola.png"
+        image: "/image/ingredient-rhodiola.png",
+        imageAlt: "Rhodiola Ingredient"
       },
       {
         title: "Maqui Berry: Free-Radical Fighter",
         description: "Sourced from pristine landscapes, Maqui Berry is loaded with potent anthocyanins that shield cells from oxidative damage.",
-        image: "/image/ingredient-maqui.png"
+        image: "/image/ingredient-maqui.png",
+        imageAlt: "Maqui Berry Ingredient"
       },
       {
         title: "Haematococcus: Superior Cellular Shield",
         description: "This microalga yields astaxanthin, guarding cellular structures against environmental wear and promoting graceful aging.",
-        image: "/image/ingredient-haematococcus.png"
+        image: "/image/ingredient-haematococcus.png",
+        imageAlt: "Haematococcus Ingredient"
       }
     ]
   },
@@ -344,21 +386,24 @@ export const initialProjectData: ProjectData = {
         role: "Verified Buyer",
         content: "I've tried so many different things for my blood sugar, but Glycopezil is the first one that actually made a noticeable difference in my daily energy levels. I feel much more stable throughout the day!",
         rating: 5,
-        image: "https://i.pravatar.cc/150?u=sarah"
+        image: "https://i.pravatar.cc/150?u=sarah",
+        imageAlt: "Sarah M. Profile"
       },
       {
         name: "David K.",
         role: "Verified Buyer",
         content: "The best part about Glycopezil is how easy it is to use. Just a few drops and I'm good to go. My cravings for sweets have significantly decreased since I started using it.",
         rating: 5,
-        image: "https://i.pravatar.cc/150?u=david"
+        image: "https://i.pravatar.cc/150?u=david",
+        imageAlt: "David K. Profile"
       },
       {
         name: "Elena R.",
         role: "Verified Buyer",
         content: "Highly recommend Glycopezil for anyone looking for natural support. It's gentle yet effective. I've noticed I don't get those afternoon energy crashes anymore.",
         rating: 4,
-        image: "https://i.pravatar.cc/150?u=elena"
+        image: "https://i.pravatar.cc/150?u=elena",
+        imageAlt: "Elena R. Profile"
       }
     ]
   },
@@ -423,6 +468,7 @@ export const initialProjectData: ProjectData = {
       price: "49",
       features: ["180 Day Supply", "Free Shipping", "Huge Savings Included"],
       image: "/image/bottle-snap.webp",
+      imageAlt: "Best Value 6 Bottles",
       isPrimary: true,
       buttonText: "Buy Now For $294",
       buttonHref: "order.html",
@@ -528,13 +574,15 @@ export const initialProjectData: ProjectData = {
       { label: "Disclaimer", href: "disclaimer.html" },
       { label: "Terms & Conditions", href: "terms-and-conditions.html" }
     ],
-    trustImage: "/image/money-back-guarantee-..webp"
+    trustImage: "/image/money-back-guarantee-..webp",
+    trustImageAlt: "60-Day Money Back Guarantee Badge"
   },
 
   footerHeadline: "Final Thoughts",
   research: {
     title: "The Science of Blood Support",
     subtitle: "Clinically-focused formulation for maximum metabolic impact.",
+    imageAlt: "Laboratory Research",
     description: "Glycopezil is built on a foundation of scientific research into botanical insulin-mimetics and glucose transporters. Our formula combines ancient wisdom with modern extraction techniques to deliver a product that doesn't just work, but excels in purity and bioavailability.",
     image: "/image/banner-img.webp",
     stats: [
@@ -557,6 +605,7 @@ export const initialProjectData: ProjectData = {
   faqSubtitle: "Find answers to frequently asked questions about our formula and how to use it.",
   guaranteeTitle: "Pure Ingredients & Thoroughly Verified",
   guaranteeSubtitle: "Your satisfaction is our priority. We stand behind our product with a 60-day money-back guarantee. Zero Risk",
+  guaranteeSmallText: "Zero Risk • Complete Satisfaction Promise",
   guaranteeHeadline: "Try Glycopezil Risk-Free For 60 Days",
   guaranteeDescription: "We are so confident in the metabolic power of Glycopezil that we back every single bottle with our ironclad 60-day money-back guarantee. If you are not absolutely wowed by the results you see in the mirror or how you feel each morning, simply contact our support team for a full, prompt refund of every penny—no questions asked.",
   seo: {
@@ -585,11 +634,11 @@ export const initialProjectData: ProjectData = {
     interval: 8000,
     displayTime: 5000,
     items: [
-      { name: "Anthony", location: "Ohio", content: "purchased 6 bottles", timeAgo: "5 minutes ago", image: "/image/bottle-snap.webp" },
-      { name: "Sarah", location: "California", content: "purchased 3 bottles", timeAgo: "12 minutes ago", image: "/image/bottle-snap.webp" },
-      { name: "Michael", location: "Texas", content: "purchased 1 bottle", timeAgo: "24 minutes ago", image: "/image/bottle-snap.webp" },
-      { name: "James", location: "Florida", content: "purchased 6 bottles", timeAgo: "45 minutes ago", image: "/image/bottle-snap.webp" },
-      { name: "Emily", location: "New York", content: "purchased 3 bottles", timeAgo: "1 hour ago", image: "/image/bottle-snap.webp" }
+      { name: "Anthony", location: "Ohio", content: "purchased 6 bottles", timeAgo: "5 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Anthony Purchase" },
+      { name: "Sarah", location: "California", content: "purchased 3 bottles", timeAgo: "12 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Sarah Purchase" },
+      { name: "Michael", location: "Texas", content: "purchased 1 bottle", timeAgo: "24 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Michael Purchase" },
+      { name: "James", location: "Florida", content: "purchased 6 bottles", timeAgo: "45 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "James Purchase" },
+      { name: "Emily", location: "New York", content: "purchased 3 bottles", timeAgo: "1 hour ago", image: "/image/bottle-snap.webp", imageAlt: "Emily Purchase" }
     ]
   },
   sections: {
@@ -608,7 +657,12 @@ export const initialProjectData: ProjectData = {
     termsAndConditions: "By accessing this website, we assume you accept these terms and conditions. Do not continue to use this site if you do not agree to take all of the terms and conditions stated on this page...",
     disclaimer: "The information provided on this website is for educational purposes only and is not intended as a substitute for professional medical advice..."
   },
-  orderLink: "https://glycopezil.com/gpz-lp-buy-aff/?aff_id=1343&subid=unika-solo"
+  orderLink: "https://glycopezil.com/gpz-lp-buy-aff/?aff_id=1343&subid=unika-solo",
+  timer: {
+    enabled: true,
+    minutes: 3,
+    text: "HURRY! OFFER ENDS IN:"
+  }
 };
 
 export const useStore = create<EditorState>((set) => ({
@@ -793,6 +847,11 @@ export const useStore = create<EditorState>((set) => ({
   })),
   updateProjectData: (data) => set((state) => ({
     projectData: state.projectData ? { ...state.projectData, ...data } : null,
+    isDirty: true,
+    version: state.version + 1
+  })),
+  updateTimer: (timer) => set((state) => ({
+    projectData: state.projectData ? { ...state.projectData, timer: { ...state.projectData.timer, ...timer } as any } : null,
     isDirty: true,
     version: state.version + 1
   })),
