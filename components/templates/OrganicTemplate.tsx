@@ -144,58 +144,104 @@ export const OrganicTemplate: React.FC = () => {
 
       <style dangerouslySetInnerHTML={{
         __html: `
-        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
-        .organic-template { font-family: 'Inter', sans-serif; }
-        .organic-template h1, .organic-template h2, .organic-template h3, .organic-template h4, .organic-template .logo, .organic-template .font-serif { font-family: 'Playfair Display', serif !important; }
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap');
         
-        .organic-card {
-          border: 1px solid #E6D5C3;
-          transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+        :root {
+          --org-primary: ${primary};
+          --org-secondary: ${secondary};
+          --org-bg: #F9F7F2;
+          --org-accent: #F1EDE4;
+          --org-text: #3D3A35;
+          --org-border: #E6D5C3;
         }
+
+        .organic-template { 
+          font-family: 'Outfit', sans-serif; 
+          color: var(--org-text);
+          background-color: var(--org-bg);
+          line-height: 1.6;
+          scroll-behavior: smooth;
+        }
+
+        .organic-template * {
+          transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .organic-template h1, 
+        .organic-template h2, 
+        .organic-template h3, 
+        .organic-template h4, 
+        .organic-template .logo, 
+        .organic-template .font-serif { 
+          font-family: 'Fraunces', serif !important; 
+          letter-spacing: -0.01em;
+          font-weight: 700;
+        }
+
+        .organic-card {
+          background: #ffffff;
+          border: 1px solid var(--org-border);
+          transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 0;
+        }
+
         .organic-card:hover {
-          transform: translateY(-8px);
-          box-shadow: 0 20px 40px -20px rgba(61,58,53,0.1);
-          border-color: ${primary};
+          transform: translateY(-12px) scale(1.02);
+          box-shadow: 0 40px 80px -15px rgba(61, 58, 53, 0.08);
+          border-color: var(--org-primary);
         }
 
         .organic-btn {
-          padding: 1rem 2.5rem;
-          font-weight: 600;
-          letter-spacing: 0.1em;
+          padding: 1.25rem 3rem;
+          font-weight: 700;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
-          font-size: 0.75rem;
-          transition: all 0.3s ease;
+          font-size: 0.7rem;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
           border: none;
-          text-decoration: none;
           display: inline-flex;
           align-items: center;
-          gap: 0.75rem;
+          gap: 1rem;
           cursor: pointer;
         }
-        .organic-btn-primary { background: ${primary}; color: #fff; }
-        .organic-btn-primary:hover { background: #142a25; transform: scale(1.02); color: white; }
-        .organic-btn-outline { background: transparent; border: 1px solid ${primary}; color: ${primary}; }
-        .organic-btn-outline:hover { background: ${primary}; color: #fff; }
 
-        .organic-blob { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
-        
+        .organic-btn-primary { background: var(--org-primary); color: #ffffff; }
+        .organic-btn-primary:hover { background: #0d1a17; transform: scale(1.03); color: white; }
+        .organic-btn-outline { background: transparent; border: 1.5px solid var(--org-primary); color: var(--org-primary); }
+        .organic-btn-outline:hover { background: var(--org-primary); color: #ffffff; }
+
+        .organic-blob { 
+          border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; 
+          animation: blobby 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        @keyframes blobby {
+          0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+          50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+          100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+
+        .section-reveal {
+          animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes reveal {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
         .purchase-proof {
-          position: fixed; bottom: 30px; left: 30px; background: #fff;
-          padding: 15px; border: 1px solid #E6D5C3; z-index: 9999;
-          transform: translateX(-150%); transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
-          display: flex; align-items: center; gap: 15px; min-width: 300px;
+          position: fixed; bottom: 40px; left: 40px; background: rgba(255, 255, 255, 0.98);
+          padding: 20px; border: 1px solid var(--org-border); z-index: 9999;
+          transform: translateX(-150%); transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex; align-items: center; gap: 20px; min-width: 340px;
+          backdrop-filter: blur(10px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
         }
         .purchase-proof.active { transform: translateX(0); }
 
-        .mobile-preview .organic-template .col-lg-5,
-        .mobile-preview .organic-template .col-lg-7,
-        .mobile-preview .organic-template .col-lg-4,
-        .mobile-preview .organic-template .col-md-6 {
-          width: 100% !important; flex: 0 0 100% !important; max-width: 100% !important;
-        }
         @media (max-width: 768px) {
-          .organic-template h1 { font-size: 2.2rem !important; }
-          .organic-template .navbar .d-lg-flex { display: none !important; }
+          .organic-template h1 { font-size: 2.2rem !important; line-height: 1.2 !important; }
+          .purchase-proof { left: 20px; bottom: 20px; min-width: calc(100% - 40px); }
         }
       `}} />
 
@@ -277,7 +323,7 @@ export const OrganicTemplate: React.FC = () => {
       </nav>
 
       {/* Hero - Elegant Serenity Layout */}
-      <section className="py-5 overflow-hidden">
+      <section className="py-5 overflow-hidden section-reveal">
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
@@ -302,14 +348,14 @@ export const OrganicTemplate: React.FC = () => {
               <div className="position-relative">
                 <div className="absolute inset-0 organic-blob bg-stone-100 rotate-12 -z-10 translate-x-4"></div>
                 <div className="p-4 organic-blob bg-white border border-[#E6D5C3]">
-                  <EditableImage 
-                  src={projectData.hero.image || '/image/index-img.webp'} 
-                  alt={projectData.hero.imageAlt}
-                  onChange={(val) => updateHero({ image: val })} 
-                  onAltChange={(val) => updateHero({ imageAlt: val })}
-                  className="img-fluid mx-auto d-block" 
-                  style={{ maxHeight: '450px', objectFit: 'contain' }} 
-                />
+                  <EditableImage
+                    src={projectData.hero.image || '/image/index-img.webp'}
+                    alt={projectData.hero.imageAlt}
+                    onChange={(val) => updateHero({ image: val })}
+                    onAltChange={(val) => updateHero({ imageAlt: val })}
+                    className="img-fluid mx-auto d-block"
+                    style={{ maxHeight: '450px', objectFit: 'contain' }}
+                  />
                 </div>
               </div>
             </div>
@@ -369,7 +415,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Ingredients Grid */}
       {projectData.sections?.ingredients && (
-        <section id="ingredients" className="py-5 group/section relative" style={{ backgroundColor: bgAccent }}>
+        <section id="ingredients" className="py-5 group/section relative section-reveal" style={{ backgroundColor: bgAccent }}>
           <SectionSettings sectionKey="ingredients" />
           <div className="container py-lg-5">
             <div className="text-center mb-4 w-100 mx-auto">
@@ -386,13 +432,13 @@ export const OrganicTemplate: React.FC = () => {
                   <div className="organic-card p-4 h-100 text-center relative bg-white">
                     <RemoveButton onClick={() => removeIngredient(i)} />
                     <div className="mx-auto mb-4 organic-blob overflow-hidden" style={{ width: '130px', height: '130px', border: `4px solid ${bgLight}` }}>
-                      <EditableImage 
-                        src={item.image || '/image/ingredient-schisandra.png'} 
+                      <EditableImage
+                        src={item.image || '/image/ingredient-schisandra.png'}
                         alt={item.imageAlt}
-                        onChange={(val) => updateIngredient(i, { image: val })} 
+                        onChange={(val) => updateIngredient(i, { image: val })}
                         onAltChange={(val) => updateIngredient(i, { imageAlt: val })}
-                        className="w-100 h-100" 
-                        style={{ objectFit: 'cover' }} 
+                        className="w-100 h-100"
+                        style={{ objectFit: 'cover' }}
                       />
                     </div>
                     <EditableText tagName="h4" className="fw-bold mb-2 font-serif" style={{ color: primary, fontSize: '1.25rem' }} value={item.title} onChange={(val) => updateIngredient(i, { title: val })} />
@@ -408,7 +454,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Core Philosophies (Features) */}
       {projectData.sections?.features && (
-        <section id="features" className="py-5 bg-white group/section relative">
+        <section id="features" className="py-5 bg-white group/section relative section-reveal">
           <SectionSettings sectionKey="features" />
           <div className="container py-lg-4">
             <div className="text-center mb-5">
@@ -419,12 +465,12 @@ export const OrganicTemplate: React.FC = () => {
               {projectData.features?.map((feature, i) => (
                 <div key={i} className="col-12 col-md-3 border-end border-bottom border-[#E6D5C3] p-5 text-center relative group/feat hover:bg-stone-50 transition-colors">
                   <RemoveButton onClick={() => removeFeature(i)} />
-                  <EditableImage 
-                    src={feature.image || '/image/gmo.webp'} 
+                  <EditableImage
+                    src={feature.image || '/image/gmo.webp'}
                     alt={feature.imageAlt}
-                    onChange={(val) => updateFeature(i, { image: val })} 
+                    onChange={(val) => updateFeature(i, { image: val })}
                     onAltChange={(val) => updateFeature(i, { imageAlt: val })}
-                    className="w-12 h-12 mx-auto mb-4 grayscale group-hover/feat:grayscale-0 transition-all" 
+                    className="w-12 h-12 mx-auto mb-4 grayscale group-hover/feat:grayscale-0 transition-all"
                   />
                   <EditableText tagName="h4" className="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest" value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
                   <EditableText tagName="p" className="mb-0 text-stone-700 text-xs" style={{ lineHeight: 1.8 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
@@ -440,7 +486,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Research */}
       {projectData.research && projectData.sections?.research !== false && (
-        <section id="research" className="py-5 bg-[#F9F7F2] group/section relative">
+        <section id="research" className="py-5 bg-[#F9F7F2] group/section relative section-reveal">
           <SectionSettings sectionKey="research" />
           <div className="container">
             <div className="row align-items-center g-5">
@@ -467,15 +513,18 @@ export const OrganicTemplate: React.FC = () => {
                 </div>
               </div>
               <div className="col-lg-6">
-                <div className="p-3 bg-white border border-[#E6D5C3] shadow-sm">
-                  <EditableImage 
-                    src={projectData.research?.image || '/image/banner-img.webp'} 
-                    alt={projectData.research?.imageAlt}
-                    onChange={(val) => updateResearch({ image: val })} 
-                    onAltChange={(val) => updateResearch({ imageAlt: val })}
-                    className="img-fluid" 
-                    style={{ maxHeight: '450px', width: 'auto', objectFit: 'contain' }} 
-                  />
+                <div className="position-relative">
+                  <div className="absolute inset-0 organic-blob bg-stone-100 -rotate-6 -z-10 translate-x-4"></div>
+                  <div className="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                    <EditableImage
+                      src={projectData.research?.image || '/image/banner-img.webp'}
+                      alt={projectData.research?.imageAlt}
+                      onChange={(val) => updateResearch({ image: val })}
+                      onAltChange={(val) => updateResearch({ imageAlt: val })}
+                      className="img-fluid mx-auto d-block"
+                      style={{ maxHeight: '450px', objectFit: 'contain' }}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
@@ -485,7 +534,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* About Section - Journal Style */}
       {projectData.sections?.about && (
-        <section id="about" className="py-5 bg-white group/section relative">
+        <section id="about" className="py-5 bg-white group/section relative section-reveal">
           <SectionSettings sectionKey="about" />
           <div className="container w-100 mx-auto">
             <div className="text-center mb-5">
@@ -495,13 +544,13 @@ export const OrganicTemplate: React.FC = () => {
             <div className="row g-5 align-items-center">
               <div className="col-lg-5 text-center">
                 <div className="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
-                  <EditableImage 
-                    src={projectData.about.image || '/image/banner-img.webp'} 
+                  <EditableImage
+                    src={projectData.about.image || '/image/banner-img.webp'}
                     alt={projectData.about.imageAlt}
-                    onChange={(val) => updateAbout({ image: val })} 
+                    onChange={(val) => updateAbout({ image: val })}
                     onAltChange={(val) => updateAbout({ imageAlt: val })}
-                    className="img-fluid grayscale hover:grayscale-0 transition-all duration-700" 
-                    style={{ maxHeight: '400px', objectFit: 'contain' }} 
+                    className="img-fluid grayscale hover:grayscale-0 transition-all duration-700"
+                    style={{ maxHeight: '400px', objectFit: 'contain' }}
                   />
                 </div>
               </div>
@@ -517,7 +566,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Benefits - List Format */}
       {projectData.sections?.benefits && (
-        <section id="benefits" className="py-5 bg-accent group/section relative" style={{ backgroundColor: bgAccent }}>
+        <section id="benefits" className="py-5 bg-accent group/section relative section-reveal" style={{ backgroundColor: bgAccent }}>
           <SectionSettings sectionKey="benefits" />
           <div className="container py-lg-4">
             <div className="row justify-content-center">
@@ -550,7 +599,7 @@ export const OrganicTemplate: React.FC = () => {
       )}
 
       {/* Pricing - Collection Gallery */}
-      <section className="py-5 bg-white" id="pricing">
+      <section className="py-5 bg-white section-reveal" id="pricing">
         <div className="container py-lg-5">
           <div className="text-center mb-5">
             <EditableText tagName="h2" className="fw-bold mb-2 font-serif" style={{ color: primary, fontSize: '2.8rem' }} value={projectData.pricingTitle || "Select Your Batch"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
@@ -585,13 +634,13 @@ export const OrganicTemplate: React.FC = () => {
                           />
                         </div>
                       </div>
-                      <EditableImage 
-                        src={plan.image || '/image/bottle-snap.webp'} 
+                      <EditableImage
+                        src={plan.image || '/image/bottle-snap.webp'}
                         alt={plan.imageAlt}
-                        onChange={(val) => updatePricing(i, { image: val })} 
+                        onChange={(val) => updatePricing(i, { image: val })}
                         onAltChange={(val) => updatePricing(i, { imageAlt: val })}
-                        className="img-fluid mx-auto grayscale hover:grayscale-0 transition-all duration-1000" 
-                        style={{ height: '150px', objectFit: 'contain' }} 
+                        className="img-fluid mx-auto grayscale hover:grayscale-0 transition-all duration-1000"
+                        style={{ height: '150px', objectFit: 'contain' }}
                       />
                     </div>
                     <EditableText tagName="div" className="fw-bold mb-4 font-serif text-3xl" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
@@ -625,7 +674,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* Testimonials - Narrative Style */}
       {projectData.sections?.testimonials && (
-        <section id="testimonials" className="py-5 bg-[#F9F7F2] group/section relative">
+        <section id="testimonials" className="py-5 bg-[#F9F7F2] group/section relative section-reveal">
           <SectionSettings sectionKey="testimonials" />
           <div className="container py-lg-4">
             <div className="text-center mb-5">
@@ -638,13 +687,13 @@ export const OrganicTemplate: React.FC = () => {
                   <div className="p-4 bg-white border border-[#E6D5C3] h-100 text-center flex flex-column align-items-center">
                     <RemoveButton onClick={() => removeTestimonial(i)} />
                     <div className="w-16 h-16 rounded-full overflow-hidden mb-3 border-2 border-stone-50">
-                        <EditableImage 
-                          src={item.image || "https://i.pravatar.cc/150"} 
-                          alt={item.imageAlt}
-                          onChange={(val) => updateTestimonials(i, { image: val })} 
-                          onAltChange={(val) => updateTestimonials(i, { imageAlt: val })}
-                          className="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" 
-                        />
+                      <EditableImage
+                        src={item.image || "https://i.pravatar.cc/150"}
+                        alt={item.imageAlt}
+                        onChange={(val) => updateTestimonials(i, { image: val })}
+                        onAltChange={(val) => updateTestimonials(i, { imageAlt: val })}
+                        className="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all"
+                      />
                     </div>
                     <EditableText tagName="h5" className="fw-bold mb-1 text-sm font-serif" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
                     <EditableText tagName="p" className="mb-3 text-[10px] text-stone-600 uppercase tracking-widest" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
@@ -666,13 +715,13 @@ export const OrganicTemplate: React.FC = () => {
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-lg-4 text-center">
-              <EditableImage 
-                src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'} 
+              <EditableImage
+                src={projectData.footer.trustImage || '/image/money-back-guarantee-..webp'}
                 alt={projectData.footer.trustImageAlt}
-                onChange={(val) => updateFooter({ trustImage: val })} 
+                onChange={(val) => updateFooter({ trustImage: val })}
                 onAltChange={(val) => updateFooter({ trustImageAlt: val })}
-                className="img-fluid mb-3 mx-auto" 
-                style={{ maxWidth: '220px' }} 
+                className="img-fluid mb-3 mx-auto"
+                style={{ maxWidth: '220px' }}
               />
             </div>
             <div className="col-lg-8">
@@ -686,7 +735,7 @@ export const OrganicTemplate: React.FC = () => {
 
       {/* FAQ - Accordion Style */}
       {projectData.sections?.faq && (
-        <section id="faq" className="py-5 bg-[#F9F7F2] group/section relative">
+        <section id="faq" className="py-5 bg-[#F9F7F2] group/section relative section-reveal">
           <SectionSettings sectionKey="faq" />
           <div className="container py-lg-4 w-100">
             <div className="text-center mb-5">
@@ -815,12 +864,12 @@ export const OrganicTemplate: React.FC = () => {
                         <div className="col-6"><input className="w-full text-xs p-2 bg-white border border-stone-100 outline-none" value={item.location} onChange={(e) => { const ni = [...projectData.socialProof!.items]; ni[i].location = e.target.value; updateSocialProof({ items: ni }); }} placeholder="Location" /></div>
                         <div className="col-12"><input className="w-full text-xs p-2 bg-white border border-stone-100 outline-none" value={item.content} onChange={(e) => { const ni = [...projectData.socialProof!.items]; ni[i].content = e.target.value; updateSocialProof({ items: ni }); }} placeholder="Notification Content" /></div>
                         <div className="col-12">
-                          <EditableImage 
-                            src={item.image || ''} 
+                          <EditableImage
+                            src={item.image || ''}
                             alt={item.imageAlt}
-                            onChange={(val) => { const ni = [...projectData.socialProof!.items]; ni[i].image = val; updateSocialProof({ items: ni }); }} 
+                            onChange={(val) => { const ni = [...projectData.socialProof!.items]; ni[i].image = val; updateSocialProof({ items: ni }); }}
                             onAltChange={(val) => { const ni = [...projectData.socialProof!.items]; ni[i].imageAlt = val; updateSocialProof({ items: ni }); }}
-                            className="w-full h-24 object-cover" 
+                            className="w-full h-24 object-cover"
                           />
                         </div>
                       </div>

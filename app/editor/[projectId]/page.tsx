@@ -11,13 +11,12 @@ import React, { useEffect, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useStore, initialProjectData } from '@/lib/store';
 import { GlycopezilTemplate } from '@/components/templates/GlycopezilTemplate';
-import { ModernTemplate } from '@/components/templates/ModernTemplate';
-import { ClinicalTemplate } from '@/components/templates/ClinicalTemplate';
 import { OrganicTemplate } from '@/components/templates/OrganicTemplate';
 import { generateProjectZip } from '@/lib/exporter';
 import { EditableImage } from '@/components/editor/EditableImage';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { ImageUploadField } from '@/components/editor/ImageUploadField';
+import { SEOChecker } from '@/components/editor/SEOChecker';
 
 const IconLayout = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
 const IconMonitor = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
@@ -52,6 +51,18 @@ export default function EditorPage() {
   const [jsonSyncStatus, setJsonSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
   const [jsonSyncError, setJsonSyncError] = useState('');
   const [isSyncing, startSyncTransition] = useTransition();
+
+  // Click outside to close dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (!target.closest('.dropdown-container') && activeDropdown) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeDropdown]);
 
   // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
   const sanitizeProjectData = React.useCallback((data: any) => {
@@ -333,15 +344,15 @@ export default function EditorPage() {
 
           <div className="h-8 w-px bg-gray-100 hidden xl:block"></div>
 
-          {/* Page Settings Dropdown */}
-          <div className="relative">
+          {/* Settings Group */}
+          <div className="relative dropdown-container">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'settings' ? null : 'settings')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'settings' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-none text-[11px] font-bold transition-all border ${activeDropdown === 'settings' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
             >
               <i className="fa-solid fa-cog"></i>
               Settings
-              <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'settings' ? 'rotate-180' : ''}`}></i>
+              <i className={`fa-solid fa-chevron-down text-[7px] transition-transform ${activeDropdown === 'settings' ? 'rotate-180' : ''}`}></i>
             </button>
             {activeDropdown === 'settings' && (
               <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-none shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
@@ -422,158 +433,136 @@ export default function EditorPage() {
           <div className="h-8 w-px bg-gray-100 hidden xl:block"></div>
 
           {/* Design & Appearance Group */}
-          <div className="flex items-center gap-3">
-            {/* Layout Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveDropdown(activeDropdown === 'layout' ? null : 'layout')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'layout' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
-              >
-                <i className="fa-solid fa-layer-group"></i>
-                Layout
-                <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'layout' ? 'rotate-180' : ''}`}></i>
-              </button>
-              {activeDropdown === 'layout' && (
-                <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-none shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
+          <div className="relative dropdown-container">
+            <button
+              onClick={() => setActiveDropdown(activeDropdown === 'layout' ? null : 'layout')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-none text-[11px] font-bold transition-all border ${activeDropdown === 'layout' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
+            >
+              <i className="fa-solid fa-palette"></i>
+              Design
+              <i className={`fa-solid fa-chevron-down text-[7px] transition-transform ${activeDropdown === 'layout' ? 'rotate-180' : ''}`}></i>
+            </button>
+            {activeDropdown === 'layout' && (
+              <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-none shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Layout Style</div>
+                <div className="grid grid-cols-2 gap-2 mb-6">
                   {[
-                    { id: 'default', name: 'Classic', desc: 'The original high-conversion template', color: '#2C0D67', secondary: '#fbbf24' },
-                    { id: 'modern', name: 'Modern', desc: 'Minimalist and spacious design', color: '#1e3932', secondary: '#f1f8f5' },
-                    { id: 'clinical', name: 'Clinical', desc: 'Professional medical-grade look', color: '#0a2540', secondary: '#0070f3' },
-                    { id: 'organic', name: 'Organic', desc: 'Natural tones and earthy aesthetics', color: '#4A3320', secondary: '#E6D5C3' }
+                    { id: 'default', name: 'Classic' },
+                    { id: 'organic', name: 'Organic' }
                   ].map((style) => (
                     <button
                       key={style.id}
-                      onClick={() => { updateLayoutStyle(style.id as any); updateTheme({ primary: style.color, secondary: style.secondary }); setActiveDropdown(null); }}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-none transition-all ${projectData.layoutStyle === style.id || (style.id === 'default' && !projectData.layoutStyle) ? 'bg-gray-50' : 'hover:bg-gray-50'}`}
+                      onClick={() => { updateLayoutStyle(style.id as any); setActiveDropdown(null); }}
+                      className={`px-3 py-2 text-[10px] font-bold border transition-all ${projectData.layoutStyle === style.id ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-500 border-transparent hover:bg-gray-100'}`}
                     >
-                      <div className="w-10 h-10 rounded-none flex items-center justify-center text-white shrink-0 shadow-inner" style={{ background: style.color }}>
-                        <div className="w-4 h-4 rounded-none" style={{ background: style.secondary }}></div>
-                      </div>
-                      <div className="text-left">
-                        <div className="text-xs font-bold text-gray-900">{style.name}</div>
-                        <div className="text-[10px] text-gray-500 leading-tight">{style.desc}</div>
-                      </div>
+                      {style.name}
                     </button>
                   ))}
                 </div>
-              )}
-            </div>
 
-            {/* Theme Dropdown */}
-            <div className="relative">
-              <button
-                onClick={() => setActiveDropdown(activeDropdown === 'theme' ? null : 'theme')}
-                className={`flex items-center gap-2 px-4 py-2 rounded-none text-xs font-bold transition-all border ${activeDropdown === 'theme' ? 'bg-black text-white border-black' : 'bg-gray-50 text-gray-600 border-transparent hover:bg-gray-100'}`}
-              >
-                <i className="fa-solid fa-palette"></i>
-                Theme
-                <i className={`fa-solid fa-chevron-down text-[8px] transition-transform ${activeDropdown === 'theme' ? 'rotate-180' : ''}`}></i>
-              </button>
-              {activeDropdown === 'theme' && (
-                <div className="absolute top-full left-0 mt-2 w-72 bg-white rounded-none shadow-2xl border border-gray-100 p-4 animate-in fade-in slide-in-from-top-2 duration-200 z-[10001]">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Color Presets</div>
-                  <div className="flex gap-3 mb-6">
-                    {[
-                      { p: '#2C0D67', s: '#fbbf24' },
-                      { p: '#0f172a', s: '#38bdf8' },
-                      { p: '#064e3b', s: '#34d399' },
-                      { p: '#7c3aed', s: '#f472b6' }
-                    ].map((c, i) => (
-                      <button
-                        key={i}
-                        onClick={() => updateTheme({ primary: c.p, secondary: c.s })}
-                        className="w-10 h-10 rounded-none cursor-pointer border-2 border-white hover:scale-110 transition-transform shadow-sm relative overflow-hidden shrink-0"
-                        style={{ backgroundColor: c.p }}
-                      >
-                        <div className="absolute top-0 right-0 w-1/2 h-full" style={{ backgroundColor: c.s }}></div>
-                      </button>
-                    ))}
-                  </div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 border-t pt-4">Color Presets</div>
+                <div className="flex gap-2 mb-6">
+                  {[
+                    { p: '#2C0D67', s: '#fbbf24' },
+                    { p: '#0f172a', s: '#38bdf8' },
+                    { p: '#064e3b', s: '#34d399' },
+                    { p: '#7c3aed', s: '#f472b6' }
+                  ].map((c, i) => (
+                    <button
+                      key={i}
+                      onClick={() => updateTheme({ primary: c.p, secondary: c.s })}
+                      className="w-8 h-8 rounded-none cursor-pointer border border-gray-200 hover:scale-110 transition-transform relative overflow-hidden"
+                      style={{ backgroundColor: c.p }}
+                    >
+                      <div className="absolute top-0 right-0 w-1/2 h-full" style={{ backgroundColor: c.s }}></div>
+                    </button>
+                  ))}
+                </div>
 
-                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3">Custom Branding</div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="text-[10px] font-bold text-gray-500">Primary</div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-none border border-gray-100">
-                        <div className="w-6 h-6 rounded-none border border-gray-200 overflow-hidden shrink-0">
-                          <input type="color" value={projectData.theme?.primary || '#2C0D67'} onChange={(e) => updateTheme({ primary: e.target.value })} className="w-full h-full scale-150 cursor-pointer" />
-                        </div>
-                        <span className="text-[10px] font-mono text-gray-600 uppercase">{projectData.theme?.primary}</span>
-                      </div>
+                <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-3 border-t pt-4">Custom Branding</div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <div className="text-[9px] font-bold text-gray-500">Primary</div>
+                    <div className="flex items-center gap-2 bg-gray-50 p-1.5 border border-gray-100">
+                      <input type="color" value={projectData.theme?.primary || '#2C0D67'} onChange={(e) => updateTheme({ primary: e.target.value })} className="w-4 h-4 cursor-pointer bg-transparent border-none" />
+                      <span className="text-[9px] font-mono text-gray-400 uppercase">{projectData.theme?.primary}</span>
                     </div>
-                    <div className="space-y-2">
-                      <div className="text-[10px] font-bold text-gray-500">Accent</div>
-                      <div className="flex items-center gap-2 bg-gray-50 p-2 rounded-none border border-gray-100">
-                        <div className="w-6 h-6 rounded-none border border-gray-200 overflow-hidden shrink-0">
-                          <input type="color" value={projectData.theme?.secondary || '#fbbf24'} onChange={(e) => updateTheme({ secondary: e.target.value })} className="w-full h-full scale-150 cursor-pointer" />
-                        </div>
-                        <span className="text-[10px] font-mono text-gray-600 uppercase">{projectData.theme?.secondary}</span>
-                      </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <div className="text-[9px] font-bold text-gray-500">Accent</div>
+                    <div className="flex items-center gap-2 bg-gray-50 p-1.5 border border-gray-100">
+                      <input type="color" value={projectData.theme?.secondary || '#fbbf24'} onChange={(e) => updateTheme({ secondary: e.target.value })} className="w-4 h-4 cursor-pointer bg-transparent border-none" />
+                      <span className="text-[9px] font-mono text-gray-400 uppercase">{projectData.theme?.secondary}</span>
                     </div>
                   </div>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
 
         {/* Right Side: Viewport & Export */}
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-1 bg-gray-100 p-1 rounded-none border border-gray-100">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-0.5 bg-gray-100 p-1 rounded-none border border-gray-100">
             <button
               onClick={() => setViewport('desktop')}
-              className={`w-9 h-9 flex items-center justify-center rounded-none transition-all ${viewport === 'desktop' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`w-7 h-7 flex items-center justify-center rounded-none transition-all ${viewport === 'desktop' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
               title="Desktop Preview"
             >
-              <i className="fa-solid fa-desktop text-sm"></i>
+              <i className="fa-solid fa-desktop text-[11px]"></i>
             </button>
             <button
               onClick={() => setViewport('mobile')}
-              className={`w-9 h-9 flex items-center justify-center rounded-none transition-all ${viewport === 'mobile' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
+              className={`w-7 h-7 flex items-center justify-center rounded-none transition-all ${viewport === 'mobile' ? 'bg-white text-black' : 'text-gray-400 hover:text-gray-600'}`}
               title="Mobile Preview"
             >
-              <i className="fa-solid fa-mobile-screen-button text-sm"></i>
+              <i className="fa-solid fa-mobile-screen-button text-[11px]"></i>
             </button>
           </div>
 
-          <div className="h-8 w-px bg-gray-100 mx-2"></div>
+          <div className="h-8 w-px bg-gray-100 mx-1"></div>
 
-          <div className="flex items-center gap-2">
+          <SEOChecker />
+
+          <div className="h-8 w-px bg-gray-100 mx-1"></div>
+
+          <div className="flex items-center gap-1.5">
             <button
               onClick={() => handleSave('draft')}
               disabled={isSaving}
-              className="px-4 py-2 bg-white border border-gray-200 text-black rounded-none font-bold text-xs hover:bg-gray-50 transition-all disabled:opacity-50"
+              className="px-3 py-1.5 bg-white border border-gray-200 text-black rounded-none font-bold text-[11px] hover:bg-gray-50 transition-all disabled:opacity-50"
             >
-              {isSaving ? 'Saving...' : 'Save Draft'}
+              {isSaving ? '...' : 'Save Draft'}
             </button>
             <button
               onClick={() => handleSave('published')}
               disabled={isSaving}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-none font-bold text-xs hover:bg-emerald-700 transition-all disabled:opacity-50"
+              className="px-3 py-1.5 bg-emerald-600 text-white rounded-none font-bold text-[11px] hover:bg-emerald-700 transition-all disabled:opacity-50"
             >
-              Publish
+              Save
             </button>
           </div>
 
-          <div className="h-8 w-px bg-gray-100 mx-2"></div>
+          <div className="h-8 w-px bg-gray-100 mx-1"></div>
 
           <button
             onClick={handleExport}
             disabled={isExporting}
-            className="group flex items-center gap-2 px-6 py-2.5 bg-black text-white rounded-none font-bold text-xs hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+            className="group flex items-center gap-1.5 px-4 py-2 bg-black text-white rounded-none font-bold text-[11px] hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
           >
             {isExporting ? (
               <i className="fa-solid fa-circle-notch animate-spin"></i>
             ) : (
-              <i className="fa-solid fa-file-export group-hover:translate-y-[-1px] transition-transform"></i>
+              <i className="fa-solid fa-file-export text-[10px]"></i>
             )}
-            <span>Export ZIP</span>
+            <span>Export</span>
           </button>
         </div>
       </header>
 
       <main className="flex-1 overflow-auto bg-gray-100 pt-20 px-8 pb-12 custom-scrollbar">
         <div
+          id="site-preview"
           className={`mx-auto bg-white rounded-md border border-gray-100 transition-all duration-500 ease-in-out relative ${viewport === 'mobile' ? 'max-w-[450px] mobile-preview shadow-2xl' : 'max-w-[1400px]'}`}
           style={{ height: 'fit-content', overflow: 'hidden' }}
         >
@@ -581,9 +570,6 @@ export default function EditorPage() {
         </div>
       </main>
 
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[10001] bg-black text-white px-6 py-2.5 rounded-none text-[10px] font-bold uppercase tracking-widest pointer-events-none opacity-80 backdrop-blur-sm">
-        Client-Side Mode • Edit and Export Anytime
-      </div>
       {/* Content Editor Modal */}
       {isContentModalOpen && (
         <div className="fixed inset-0 z-[20000] flex items-center justify-center p-4">
@@ -1277,9 +1263,8 @@ export default function EditorPage() {
 
                     {/* Status Toast */}
                     {jsonSyncStatus !== 'idle' && (
-                      <div className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-none animate-in fade-in slide-in-from-bottom-2 duration-200 ${
-                        jsonSyncStatus === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}>
+                      <div className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-none animate-in fade-in slide-in-from-bottom-2 duration-200 ${jsonSyncStatus === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                        }`}>
                         <i className={`fa-solid ${jsonSyncStatus === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}`}></i>
                         {jsonSyncStatus === 'success' ? (jsonSyncError || 'Content synced successfully!') : jsonSyncError}
                       </div>

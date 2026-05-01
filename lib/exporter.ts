@@ -730,578 +730,6 @@ ${seoBlock}
 </body>
 </html>`;
     }
-    else if (layoutStyle === 'modern') {
-        cssContent = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap');
-body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #e0e0e0; overflow-x: hidden; margin: 0; padding: 0; }
-h1, h2, h3, h4, h5, h6, .logo { font-family: 'Space Grotesk', sans-serif !important; }
-.glass-card { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 24px; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); transition: all 0.4s ease; }
-.gradient-text { background: linear-gradient(135deg, ${secondaryColor}, #fff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-.modern-btn { padding: 0.85rem 2.5rem; border-radius: 999px; font-weight: 700; font-size: 0.9rem; border: none; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; cursor: pointer; }
-.modern-btn-primary { background: ${secondaryColor}; color: ${primaryColor}; }
-.modern-btn-primary:hover { opacity: 0.85; transform: translateY(-2px); color: ${primaryColor}; }
-.modern-btn-outline { background: transparent; border: 2px solid rgba(255,255,255,0.2); color: #fff; }
-.modern-btn-outline:hover { border-color: ${secondaryColor}; color: ${secondaryColor}; }
-.section-dark { background: #0a0a0a; }
-.section-darker { background: #050505; }
-.section-accent { background: linear-gradient(135deg, ${primaryColor}, ${primaryColor}dd); }
-.accordion-button { background: transparent !important; color: white !important; box-shadow: none !important; }
-.accordion-button:not(.collapsed) { background: rgba(255,255,255,0.05) !important; color: ${secondaryColor} !important; }
-.accordion-button::after { filter: invert(1); }
-.accordion-item { background: transparent !important; border: 1px solid rgba(255,255,255,0.1) !important; }
-.text-white-50 { color: rgba(255,255,255,0.85) !important; }
-.opacity-75 { opacity: 0.9 !important; }
-.nav-link { transition: color 0.3s ease; }
-.nav-link:hover { color: ${secondaryColor} !important; }
-/* Rich Text Editor Support */
-.modern-template p { margin-bottom: 0; }
-.modern-template ul, .modern-template ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-.modern-template [style*="text-align: center"] { text-align: center !important; }
-.modern-template [style*="text-align: right"] { text-align: right !important; }
-.modern-template [style*="text-align: justify"] { text-align: justify !important; }
-@media (max-width: 1200px) { .container { max-width: 95% !important; } }
-@media (max-width: 992px) {
-    .modern-btn { padding: 0.75rem 2rem; font-size: 0.85rem; }
-    h1 { font-size: 2.8rem !important; }
-}
-@media (max-width: 768px) {
-    .section-dark, .section-darker { padding-top: 4rem !important; padding-bottom: 4rem !important; }
-    h1 { font-size: 2.2rem !important; }
-    h2 { font-size: 1.8rem !important; }
-    .modern-btn { width: 100%; justify-content: center; }
-    .glass-card { border-radius: 16px; padding: 1.5rem !important; }
-    .navbar { padding-top: 1rem !important; padding-bottom: 1rem !important; }
-    section[style*="min-height: 80vh"] { min-height: auto !important; padding-top: 5rem !important; }
-    div[style*="transform: scale(1.03)"] { transform: none !important; }
-}
-@media (max-width: 576px) {
-    h1 { font-size: 1.6rem !important; letter-spacing: -0.01em !important; }
-    .gradient-text { display: block; }
-}
-`;
-        htmlContent = `<!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-${seoBlock}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-    <header>
-    <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(10,10,10,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid rgba(255,255,255,0.05);">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 36px; width: auto; ${data.hero.logoImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
-                <span class="fs-4 fw-bold logo gradient-text">${data.productName}</span>
-            </a>
-        <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-            <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary py-2 px-3" style="font-size: 0.8rem; width: auto; min-width: auto; padding: 0.5rem 1rem;">Shop Now</a>
-            <button class="navbar-toggler border-0 shadow-none px-2 ms-1" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavModern">
-                <i class="fa-solid fa-bars fs-3 text-white"></i>
-            </button>
-        </div>
-        <div class="collapse navbar-collapse" id="navbarNavModern">
-            <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-lg-transparent rounded p-3 p-lg-0" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
-                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-white text-decoration-none w-100" style="font-size: 0.95rem;">${link.label}</a>`).join('')}
-                <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-none d-lg-inline-flex text-nowrap" style="width: auto; white-space: nowrap;">Shop Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
-            </div>
-        </div>
-    </div>
-</nav>
-</header>
-
-    <section class="section-dark py-5" style="min-height: 80vh; display: flex; align-items: center;">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-12 col-lg-7 text-center text-lg-start">
-                    <div class="mb-3">
-                        ${data.hero?.badgeText ? `
-                        <span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ ${data.hero.badgeText}</span>
-                        ` : `<span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ Premium Support Formula</span>`}
-                    </div>
-                    <h1 class="fw-bold mb-4 gradient-text" style="font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; width: 100%; font-size: 0.95rem;">${data.hero?.subtitle}</p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
-                        <a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
-                        ${(data.hero?.secondaryButtonText && data.hero.secondaryButtonText.trim() !== '') ? `<a href="${data.hero?.secondaryButtonHref || '#'}" class="modern-btn modern-btn-outline">${data.hero.secondaryButtonText}</a>` : ''}
-                    </div>
-                    <div class="d-flex flex-wrap gap-3 mt-5 justify-content-center justify-content-lg-start" style="opacity: 0.4;">
-                        ${(data.logos || []).map((logo: any) => `<div style="width: 50px; height: 50px; filter: brightness(0) invert(1);"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
-                    </div>
-                </div>
-                <div class="col-12 col-lg-5 text-center">
-                    <div class="p-4 rounded-4" style="background: linear-gradient(135deg, ${primaryColor}40, transparent);">
-                        <img src="${data.hero?.image}" alt="${data.hero?.imageAlt || 'Product Modern'}" class="img-fluid mx-auto d-block" style="max-height: 450px; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    ${data.ingredients?.items?.length ? `
-    <section id="ingredients" class="section-dark py-5">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.ingredients.title || "Natural Ingredients"}</h2>
-            <div class="row g-4 justify-content-center">
-                ${data.ingredients.items.map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="glass-card p-4 h-100 text-center">
-                        <div class="mb-4 mx-auto overflow-hidden border border-white/10" style="width: 120px; height: 120px; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
-                            <img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" />
-                        </div>
-                        <h4 class="fw-bold mb-2 text-white" style="font-size: 1.1rem;">${item.title}</h4>
-                        <p class="mb-0 text-white-50" style="font-size: 0.9rem; line-height: 1.6;">${item.description}</p>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-
-
-    ${(data.sections?.features !== false) ? `
-    <section id="features" class="section-darker py-5">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.featuresTitle || "Key Features"}</h2>
-            <p class="text-center mb-5 text-white-50" style="font-size: 0.9rem;">Science-backed ingredients. Zero compromises.</p>
-            <div class="row g-4 justify-content-center">
-                ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-sm-6 col-lg-3"><div class="glass-card p-4 h-100 text-center"><img src="${f.image}" alt="${f.imageAlt || f.title}" class="img-fluid mx-auto mb-3" style="height: 80px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><h4 class="fw-bold mb-2 text-white" style="font-size: 1rem;">${f.title}</h4><p class="mb-0 text-white-50" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${(data.sections?.about !== false) ? `
-    <section id="about" class="section-dark py-5">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.about?.title || "The Formula"}</h2>
-            <div class="row align-items-center g-5">
-                <div class="col-12 col-lg-5 text-center"><div class="glass-card p-4"><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Modern'}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div></div>
-                <div class="col-12 col-lg-7"><div class="text-white-50 modern-template" style="line-height: 1.9; font-size: 0.95rem;">${data.about?.description}</div></div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    <!-- Research -->
-    ${(data.sections?.research !== false && data.research) ? `
-    <section id="research" class="section-darker py-5 border-top border-white/5">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <h2 class="fw-bold fs-1 mb-4 gradient-text" style="font-size: 2.5rem;">${data.research.title}</h2>
-                    <p class="fs-5 text-white mb-4 opacity-75">${data.research.subtitle}</p>
-                    <div class="text-white-50 mb-5 modern-template" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
-                    <div class="row g-4">
-                        ${data.research.stats.map((stat: any) => `
-                        <div class="col-4">
-                            <div class="fw-bold fs-2" style="color: ${secondaryColor}">${stat.value}</div>
-                            <div class="text-white-50 small uppercase font-black tracking-widest" style="font-size: 10px;">${stat.label}</div>
-                        </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="glass-card p-2">
-                        <img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Modern'}" class="img-fluid rounded-3 w-100" style="max-height: 450px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${(data.sections?.benefits !== false && data.benefits?.items?.length) ? `
-    <section id="benefits" class="section-darker py-5">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-2 gradient-text" style="font-size: 2rem;">${data.benefits.title || "Benefits"}</h2>
-            <p class="text-center mb-5 mx-auto text-white-50" style="width: 100%; font-size: 0.9rem;">${data.benefits.description || ''}</p>
-            <div class="row g-4">
-                ${data.benefits.items.map((b: any) => `
-                <div class="col-12 col-md-6"><div class="glass-card p-4 h-100 d-flex align-items-start gap-3"><div class="flex-shrink-0 w-10 h-10 rounded-3 d-flex align-items-center justify-content-center" style="background: ${secondaryColor}15;"><i class="fa-solid fa-check" style="color: ${secondaryColor}; font-size: 0.8rem;"></i></div><div><h4 class="fw-bold mb-1 text-white" style="font-size: 1rem;">${b.title}</h4><p class="mb-0 text-white-50" style="font-size: 0.85rem; line-height: 1.6;">${b.description}</p></div></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${(data.sections?.testimonials !== false && data.testimonials) ? `
-    <section id="testimonials" class="section-dark py-5">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold gradient-text mb-2" style="font-size: 2rem;">${data.testimonials.title}</h2>
-                <p class="text-white-50 mx-auto" style="width: 100%;">${data.testimonials.subtitle || ''}</p>
-            </div>
-            <div class="row g-4 justify-content-center">
-                ${data.testimonials.items.map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="glass-card p-4 h-100">
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; border: 2px solid ${secondaryColor}; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}">
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-white fs-6">${item.name}</h4>
-                                <span class="text-white-50 small">${item.role || 'Verified Buyer'}</span>
-                            </div>
-                        </div>
-                        <div class="mb-3" style="color: ${secondaryColor};">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
-                        </div>
-                        <p class="text-white-50 italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content || ''}"</p>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-
-
-    <section class="py-5" style="background: linear-gradient(135deg, ${primaryColor}30, #0a0a0a);">
-        <div class="container">
-            <div class="glass-card p-5"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Modern'}" class="img-fluid mb-3" style="max-width: 200px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><p class="fw-semibold mb-0" style="color: ${secondaryColor}; font-size: 0.9rem;">${data.guaranteeSmallText || "Zero Risk"}</p></div>
-                <div class="col-lg-8"><h3 class="fw-bold mb-3 text-white" style="font-size: 1.6rem;">${data.guaranteeHeadline || "Satisfaction Guaranteed"}</h3><p class="text-white-50" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary mt-3">Claim Your Package <i class="fa-solid fa-arrow-right"></i></a></div>
-            </div></div>
-        </div>
-    </section>
-
-    <section class="section-darker py-5" id="pricing">
-        <div class="container">
-            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.pricingTitle || "Choose Your Plan"}</h2>
-            <div class="row g-4 justify-content-center">
-                ${(data.pricing || []).map((plan: any) => `
-                <div class="col-12 col-md-6 col-lg-4"><div class="glass-card p-4 h-100 text-center" style="${plan.isPrimary ? `border: 2px solid ${secondaryColor}; transform: scale(1.03);` : ''}">
-                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: ${primaryColor}; font-size: 10px;">Best Value</span></div>` : ''}
-                    <h4 class="fw-bold mb-2 text-uppercase text-white" style="font-size: 0.95rem; letter-spacing: 2px;">${plan.title}</h4>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                    <div class="fw-bold mb-3" style="color: ${secondaryColor}; font-size: 2rem;">${plan.price}</div>
-                    <div class="mb-4">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-center gap-2 justify-content-center text-white-50" style="font-size: 0.85rem;"><i class="fa-solid fa-check-circle" style="color: ${secondaryColor}; font-size: 0.7rem;"></i><span>${f}</span></div>`).join('')}</div>
-                    <a href="${plan.buttonHref}" class="modern-btn w-100 ${plan.isPrimary ? 'modern-btn-primary' : 'modern-btn-outline'}" style="justify-content: center;">${plan.buttonText}</a>
-                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
-                </div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-
-    ${(data.sections?.faq !== false && data.faq?.length) ? `
-    <section id="faq" class="section-dark py-5">
-        <div class="container" style="width: 100%;">
-            <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.faqTitle || "FAQ"}</h2>
-            <div class="accordion" id="faqAccordionModern">
-                ${data.faq.map((item: any, i: number) => `
-                <div class="accordion-item mb-3 glass-card border-0">
-                    <h2 class="accordion-header" id="heading${i}">
-                        <button class="accordion-button collapsed fw-bold p-4" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}" style="color: #fff; font-size: 0.95rem;">
-                            ${item.question}
-                        </button>
-                    </h2>
-                    <div id="collapse${i}" class="accordion-collapse collapse" data-bs-parent="#faqAccordionModern">
-                        <div class="accordion-body px-4 pb-4 pt-0 text-white-50" style="font-size: 0.9rem; line-height: 1.7;">
-                            ${item.answer}
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    <footer class="py-5 text-center" style="background: #050505; border-top: 1px solid rgba(255,255,255,0.05);">
-        <div class="container">
-            <h2 class="fw-bold gradient-text mb-3" style="font-size: 1.5rem;">${data.footerHeadline || "Questions?"}</h2>
-            <p class="mx-auto mb-4 text-white-50" style="width: 100%; font-size: 0.9rem; line-height: 1.7;">${data.footer?.companyInfo}</p>
-            <div class="d-flex justify-content-center flex-wrap gap-4 mb-4">
-                ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-decoration-none text-white-50" style="font-size: 0.85rem;">${l.label}</a>`).join('')}
-            </div>
-            <p class="text-white-50 opacity-25" style="font-size: 0.75rem;">© ${new Date().getFullYear()} ${data.productName}</p>
-        </div>
-    </footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    ${socialProofBlock}
-</body>
-</html>`;
-    }
-    else if (layoutStyle === 'clinical') {
-        cssContent = `
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap');
-body { font-family: 'Roboto', sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding: 0; }
-h1, h2, h3, h4, .logo { font-family: 'IBM Plex Sans', sans-serif !important; }
-.clinical-card { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); transition: transform 0.2s; }
-.clinical-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-.clinical-btn-primary { background: ${secondaryColor}; color: #ffffff; border: 1px solid ${secondaryColor}; border-radius: 6px; padding: 0.75rem 2rem; font-weight: 500; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; }
-.clinical-btn-primary:hover { background: #0056b3; color: white; }
-.data-label { font-family: 'IBM Plex Sans', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.5rem; display: block; }
-.clinical-header { border-left: 4px solid ${secondaryColor}; padding-left: 1rem; }
-.text-muted { color: #475569 !important; }
-/* Rich Text Editor Support */
-p { margin-bottom: 0; }
-ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-[style*="text-align: center"] { text-align: center !important; }
-[style*="text-align: right"] { text-align: right !important; }
-[style*="text-align: justify"] { text-align: justify !important; }
-@media (max-width: 992px) {
-    h1 { font-size: 2.5rem !important; }
-}
-@media (max-width: 768px) {
-    .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; }
-    h1 { font-size: 1.8rem !important; }
-    h2 { font-size: 1.5rem !important; }
-    .clinical-header { padding-left: 0.75rem; }
-    .clinical-card { padding: 1rem !important; }
-    .data-label { font-size: 0.65rem; }
-    .p-5.bg-light.border.rounded { padding: 2rem !important; }
-}
-`;
-        htmlContent = `<!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-${seoBlock}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css" />
-</head>
-<body>
-    <header>
-    <nav class="navbar navbar-expand-lg sticky-top bg-white border-bottom py-3">
-        <div class="container d-flex justify-content-between align-items-center">
-            <a class="navbar-brand d-flex align-items-center gap-3 text-decoration-none" href="index.html">
-                ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="width: 40px; height: 40px; object-fit: contain; ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}" />` : `<div style="width: 32px; height: 32px; background: #eff6ff; border: 1px solid #dbeafe; display: flex; align-items: center; justify-content: center; border-radius: 4px;"><i class="fa-solid fa-plus text-primary"></i></div>`}
-                <span class="fw-bold fs-5 logo" style="color: ${primaryColor}">${data.productName}</span>
-            </a>
-            
-            <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-3 text-decoration-none" style="background: ${secondaryColor} !important; border: none; font-size: 0.8rem;">Order Now</a>
-                <button class="navbar-toggler border-0 shadow-none px-1 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavClinical">
-                    <i class="fa-solid fa-bars fs-3 text-dark"></i>
-                </button>
-            </div>
-
-            <div class="collapse navbar-collapse" id="navbarNavClinical">
-                <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0">
-                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium text-secondary hover-dark text-sm p-0">${link.label}</a>`).join('')}
-                    <div class="h-6 w-px bg-light mx-2 d-none d-lg-block"></div>
-                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm d-none d-lg-inline-flex">Order Now</a>
-                </div>
-            </div>
-        </div>
-    </nav>
-
-    <section class="bg-white border-bottom py-5">
-        <div class="container py-lg-4">
-            <div class="row align-items-center g-5">
-                <div class="col-12 col-lg-6 text-center text-lg-start pe-lg-5">
-                    <span class="data-label text-primary mb-3">CLINICAL PROFILE • VERIFIED</span>
-                    <h1 class="fw-bold mb-4" style="color: ${primaryColor}; font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.02em;">${data.hero?.title}</h1>
-                    <div class="p-4 border rounded bg-light mb-5"><p class="mb-0 text-muted" style="line-height: 1.6; font-size: 0.95rem;">${data.hero?.subtitle}</p></div>
-                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
-                </div>
-                <div class="col-12 col-lg-6 text-center"><div class="p-5 bg-light border rounded"><img src="${data.hero?.image}" alt="${data.hero?.imageAlt || 'Product Clinical'}" class="img-fluid" style="max-height: 350px; object-fit: ${data.hero.imageIsCircular ? 'cover' : 'contain'}; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div></div>
-            </div>
-            <div class="row mt-5 border-top pt-4">
-                <div class="col-12">
-                    <span class="data-label text-center mb-4">REGULATORY / SAFETY COMPLIANCE</span>
-                    <div class="d-flex justify-content-center flex-wrap gap-5 py-4">
-                        ${(data.logos || []).map((logo: any) => `<div style="width: 80px; opacity: 0.5;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid grayscale" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    ${data.sections?.features ? `
-    <section id="features" class="py-5 bg-light border-bottom">
-        <div class="container py-lg-4">
-            <span class="data-label text-center mb-2 d-block">EFFICACY METRICS</span>
-            <h2 class="text-center fw-bold mb-5" style="color: ${primaryColor}">${data.featuresTitle || "Core Tolerances"}</h2>
-            <div class="row g-4">
-                ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-md-6 col-lg-3"><div class="clinical-card p-4 h-100"><div class="mb-4 pb-3 border-bottom d-flex align-items-center justify-content-between"><h4 class="fw-semibold mb-0 text-dark" style="font-size: 1rem;">${f.title}</h4><img src="${f.image}" class="opacity-25 grayscale" style="height: 32px; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${f.description}</p></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${data.sections?.about ? `
-    <section id="about" class="bg-white py-4 border-bottom">
-        <div class="container  mx-auto" style="width: 100%;">
-            <div class="clinical-header mb-4"><span class="data-label">PROTOCOL SUMMARY</span><h2 class="fw-bold mb-0" style="color: ${primaryColor}; font-size: 2.3rem;">${data.about?.title || "The Formula"}</h2></div>
-            <div class="clearfix">
-                <div class="float-lg-start me-lg-5 mb-4 col-12 col-lg-5 px-0">
-                    <div class="p-2 bg-light border rounded shadow-sm text-center">
-                        <img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Clinical'}" class="img-fluid rounded border border-light mx-auto" style="max-height: 380px; object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                        <div class="mt-2 pb-1 text-center"><span class="data-label" style="font-size: 10px;">FIG 1.1: SYSTEMIC DISPERSION PROFILE</span></div>
-                    </div>
-                </div>
-                <div class="protocol-text">
-                    <div class="p-3 bg-light border-start border-2 border-secondary mb-3 d-flex gap-3 align-items-center"><i class="fa-solid fa-circle-info text-muted"></i><p class="mb-0 text-muted uppercase tracking-tight" style="font-size: 11px; font-family: monospace;">Clinical Note: Data suggests 60-day adherence for optimal metabolic synchronization.</p></div>
-                    <div class="text-muted" style="line-height: 1.7; font-size: 1.05rem; text-align: justify; font-family: serif;">${data.about?.description}</div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${data.sections?.research && data.research ? `
-    <section id="research" class="py-5 bg-light border-bottom">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <div class="clinical-header mb-4"><span class="data-label">R&D ANALYSIS</span><h2 class="fw-bold mb-0">${data.research.title}</h2></div>
-                    <p class="fs-5 text-muted mb-4">${data.research.subtitle}</p>
-                    <p class="text-muted mb-5">${data.research.description}</p>
-                    <div class="row g-4">
-                        ${data.research.stats.map((stat: any) => `
-                        <div class="col-4">
-                            <div class="fw-bold fs-2 text-primary">${stat.value}</div>
-                            <div class="data-label">${stat.label}</div>
-                        </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <div class="clinical-card p-2 shadow-sm d-inline-block"><img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Clinical'}" class="img-fluid rounded" style="max-height: 400px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-
-
-    ${data.sections?.benefits ? `
-    <section id="benefits" class="py-5 bg-light border-bottom">
-        <div class="container">
-            <div class="text-center mb-5"><span class="data-label">THERAPEUTIC EFFECTS</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.benefits.title || "Clinical Benefits"}</h2></div>
-            <div class="row g-4 justify-content-center">
-                ${(data.benefits?.items || []).map((b: any) => `
-                <div class="col-12 col-lg-10"><div class="clinical-card p-4 d-flex align-items-start gap-3"><i class="fa-solid fa-check-circle text-success mt-1"></i><div><h4 class="fw-bold mb-1 text-dark" style="font-size: 1rem;">${b.title}</h4><p class="mb-0 text-muted" style="font-size: 0.85rem; line-height: 1.6;">${b.description}</p></div></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${data.sections?.ingredients ? `
-    <section id="ingredients" class="py-5 bg-white border-bottom">
-        <div class="container text-center">
-            <span class="data-label">COMPOUND ANALYSIS</span>
-            <h2 class="fw-bold mb-5" style="color: ${primaryColor}">${data.ingredients?.title || "Active Constituents"}</h2>
-            <div class="row g-3 justify-content-center">
-                ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 d-flex text-start overflow-hidden"><div class="w-25 bg-light d-flex align-items-center justify-content-center border-end p-2"><img src="${item.image || 'https://placehold.co/100x100?text=Ing'}" class="border border-white shadow-sm" style="width: 100%; aspect-ratio: 1/1; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 8px;'} object-fit: cover;" /></div><div class="w-75 p-3 d-flex flex-column justify-content-center"><h4 class="fw-bold mb-1 text-primary font-monospace" style="font-size: 0.85rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.75rem; line-height: 1.5;">${item.description}</p></div></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${data.sections?.testimonials && data.testimonials ? `
-    <section id="testimonials" class="py-5 bg-light border-bottom">
-        <div class="container">
-            <div class="text-center mb-5"><span class="data-label">PATIENT FEEDBACK</span><h2 class="fw-bold" style="color: ${primaryColor}">${data.testimonials.title}</h2></div>
-            <div class="row g-4 justify-content-center">
-                ${data.testimonials.items.map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="clinical-card p-4 h-100 bg-white shadow-sm border">
-                        <div class="d-flex align-items-center gap-3 mb-3 pb-3 border-bottom">
-                            <div class="w-12 h-12 bg-light border d-flex align-items-center justify-content-center overflow-hidden" style="${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 4px;'}">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" class="w-100 h-100" style="object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
-                                <span class="data-label mb-0" style="font-size: 10px;">${item.role || 'Verified'}</span>
-                            </div>
-                        </div>
-                        <div class="mb-2 text-warning" style="font-size: 12px;">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
-                        </div>
-                        <p class="mb-0 text-muted italic" style="font-size: 0.85rem; line-height: 1.6;">"${item.content || ''}"</p>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-    
-    <section class="py-5 bg-white border-bottom">
-        <div class="container py-lg-4">
-            <div class="p-5 bg-light border rounded shadow-sm">
-                <div class="row align-items-center g-5">
-                    <div class="col-lg-4 text-center">
-                        <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Clinical'}" class="img-fluid mb-3 mx-auto" style="max-width: 250px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
-                        <p class="data-label mb-0" style="color: ${secondaryColor}">${data.guaranteeSmallText || "Security Protocol"}</p>
-                    </div>
-                    <div class="col-lg-8">
-                        <h3 class="fw-bold mb-3" style="color: ${primaryColor}; font-size: 1.8rem;">${data.guaranteeHeadline || "60-Day Satisfaction Protocol"}</h3>
-                        <p class="text-muted" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p>
-                        <a href="${data.hero?.buttonHref}" class="clinical-btn-primary mt-3 text-decoration-none">Order Now <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section class="py-5 bg-white" id="pricing">
-        <div class="container py-lg-5">
-            <div class="text-center mb-5"><span class="data-label">DISTRIBUTION TIERS</span><h2 class="fw-bold" style="color: ${primaryColor};">${data.pricingTitle || "Select Supply"}</h2></div>
-            <div class="row g-4 justify-content-center  mx-auto" style="width: 100%;">
-                ${(data.pricing || []).map((plan: any) => `
-                <div class="col-lg-4 col-md-6"><div class="clinical-card p-0 h-100 text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}">
-                    <div class="p-3 border-bottom ${plan.isPrimary ? 'bg-primary text-white' : 'bg-white text-dark'}"><h4 class="fw-bold mb-0 text-uppercase fs-6">${plan.title}</h4></div>
-                    <div class="p-4 flex-grow-1 d-flex flex-column">
-                        <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto mb-4" style="height: 120px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                        <div class="fw-bold mb-4 font-monospace fs-2" style="color: ${primaryColor};">${plan.price}</div>
-                        <div class="text-start border-start border-2 ps-3 mb-4 flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 text-muted" style="font-size: 0.85rem;"><i class="fa-solid fa-check text-success me-2"></i>${f}</div>`).join('')}</div>
-                        <a href="${plan.buttonHref}" class="clinical-btn-primary w-100 ${plan.isPrimary ? '' : 'bg-white text-dark border'}" style="justify-content: center;">${plan.buttonText}</a>
-                        <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
-                    </div>
-                </div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>
-
-    ${data.sections?.faq && data.faq?.length ? `
-    <section id="faq" class="py-5 bg-white">
-        <div class="container py-lg-5  mx-auto" style="width: 100%;">
-            <h2 class="text-center fw-bold mb-5 clinical-header d-inline-block mx-auto border-0 px-0" style="color: ${primaryColor};">${data.faqTitle || "Protocol FAQ"}</h2>
-            <div class="accordion" id="faqAccordionClinical">
-                ${data.faq.map((item: any, i: number) => `
-                <div class="accordion-item mb-3 border rounded shadow-sm">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed fw-semibold p-4" type="button" data-bs-toggle="collapse" data-bs-target="#c_collapse${i}" style="color: ${primaryColor};">
-                            ${item.question}
-                        </button>
-                    </h2>
-                    <div id="c_collapse${i}" class="accordion-collapse collapse" data-bs-parent="#faqAccordionClinical">
-                        <div class="accordion-body px-4 pb-4 pt-0 text-secondary" style="font-size: 0.95rem; line-height: 1.7;">
-                            ${item.answer}
-                        </div>
-                    </div>
-                </div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    <footer class="bg-dark text-light py-5 font-monospace text-sm"><div class="container text-center">
-        <h2 class="fw-bold mb-3 text-white fs-5">${data.footerHeadline || "End of Document"}</h2>
-        <p class="mb-4 text-secondary mx-auto" style="width: 100%;">${data.footer?.companyInfo}</p>
-        <div class="d-flex justify-content-center gap-4 mb-4 border-top border-bottom border-secondary py-3">
-            ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-light text-decoration-none">${l.label}</a>`).join('')}
-        </div>
-        <p class="text-secondary small">© ${new Date().getFullYear()} ${data.productName}. DOC_REV_A.</p>
-    </div></footer>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
-    ${socialProofBlock}
-</body>
-</html>`;
-    }
     else if (layoutStyle === 'organic') {
         htmlContent = `<!DOCTYPE html>
 <html lang="en-US">
@@ -1313,224 +741,480 @@ ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Nunito:wght@300;400;600;700&display=swap');
-        body { font-family: 'Nunito', sans-serif; background-color: #FAF6ED; color: ${primaryColor}; margin: 0; padding: 0; }
-        h1, h2, h3, h4, .logo { font-family: 'Lora', serif !important; }
-        .organic-card { background: #ffffff; border-radius: 30px 30px 30px 0; box-shadow: 10px 10px 30px rgba(74, 51, 32, 0.05); transition: all 0.3s ease; border: 1px solid rgba(138, 121, 105, 0.1); }
-        .organic-card:hover { transform: translateY(-5px); border-radius: 30px; }
-        .organic-btn-primary { background: ${primaryColor}; color: #FAF6ED; border-radius: 30px; padding: 0.8rem 2.2rem; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: none; }
-        .organic-btn-primary:hover { background: ${secondaryColor}; color: #FAF6ED; }
-        .organic-blob { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
-        .leaf-shape { border-radius: 50% 0 50% 50%; }
-.text-muted { color: #4A3B2E !important; }
-        ${customCss}
+        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+          --org-primary: ${primaryColor};
+          --org-secondary: ${secondaryColor};
+          --org-bg: #F9F7F2;
+          --org-accent: #F1EDE4;
+          --org-text: #3D3A35;
+          --org-border: #E6D5C3;
+        }
+
+        body { 
+          font-family: 'Outfit', sans-serif; 
+          color: var(--org-text);
+          background-color: var(--org-bg);
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+          scroll-behavior: smooth;
+        }
+
+        * {
+          transition: border-color 0.3s ease, background-color 0.3s ease, transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        h1, h2, h3, h4, .logo, .font-serif { 
+          font-family: 'Fraunces', serif !important; 
+          letter-spacing: -0.01em;
+          color: var(--org-text);
+          font-weight: 700;
+        }
+
+        .organic-card {
+          background: #ffffff;
+          border: 1px solid var(--org-border);
+          transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+          border-radius: 0;
+        }
+
+        .organic-card:hover {
+          transform: translateY(-12px) scale(1.02);
+          box-shadow: 0 40px 80px -15px rgba(61, 58, 53, 0.08);
+          border-color: var(--org-primary);
+        }
+
+        .organic-btn {
+          padding: 1.25rem 3rem;
+          font-weight: 700;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          font-size: 0.7rem;
+          transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+          border: none;
+          display: inline-flex;
+          align-items: center;
+          gap: 1rem;
+          cursor: pointer;
+          text-decoration: none;
+        }
+
+        .organic-btn-primary { background: var(--org-primary); color: #ffffff; }
+        .organic-btn-primary:hover { background: #0d1a17; transform: scale(1.03); color: white; }
+        .organic-btn-outline { background: transparent; border: 1.5px solid var(--org-primary); color: var(--org-primary); }
+        .organic-btn-outline:hover { background: var(--org-primary); color: #ffffff; }
+
+        .organic-blob { 
+          border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; 
+          animation: blobby 20s infinite alternate cubic-bezier(0.45, 0, 0.55, 1);
+        }
+
+        @keyframes blobby {
+          0% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+          50% { border-radius: 30% 60% 70% 40% / 50% 60% 30% 60%; }
+          100% { border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%; }
+        }
+
+        .section-reveal {
+          animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        @keyframes reveal {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+
+        .navbar {
+          background: rgba(249, 247, 242, 0.95);
+          backdrop-filter: blur(10px);
+          border-bottom: 1px solid var(--org-border);
+        }
+
+        .nav-link {
+          color: var(--org-text) !important;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          text-transform: uppercase;
+          font-size: 0.75rem;
+          transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+          color: var(--org-primary) !important;
+          opacity: 0.7;
+        }
+
+        .purchase-proof {
+          position: fixed; bottom: 40px; left: 40px; background: rgba(255, 255, 255, 0.98);
+          padding: 20px; border: 1px solid var(--org-border); z-index: 9999;
+          transform: translateX(-150%); transition: transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+          display: flex; align-items: center; gap: 20px; min-width: 340px;
+          backdrop-filter: blur(10px); box-shadow: 0 20px 40px -10px rgba(0,0,0,0.05);
+        }
+        .purchase-proof.active { transform: translateX(0); }
+
+        /* Utility classes to mirror Tailwind */
+        .text-stone-600 { color: #57534e; }
+        .text-stone-700 { color: #44403c; }
+        .text-stone-800 { color: #292524; }
+        .bg-stone-50 { background-color: #fafaf9; }
+        .bg-stone-100 { background-color: #f5f5f4; }
+        .tracking-widest { letter-spacing: 0.1em; }
+        .tracking-tighter { letter-spacing: -0.05em; }
+        .italic { font-style: italic; }
+        .small { font-size: 0.875rem; }
+        .opacity-75 { opacity: 0.75; }
+        .opacity-50 { opacity: 0.5; }
+        .no-underline { text-decoration: none; }
+        .font-mono { font-family: monospace; }
+
+        @media (max-width: 768px) {
+          h1 { font-size: 2.2rem !important; line-height: 1.2 !important; }
+          .organic-btn { padding: 1rem 2rem; width: 100%; justify-content: center; }
+          .purchase-proof { left: 20px; bottom: 20px; min-width: calc(100% - 40px); }
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg sticky-top py-3" style="background: rgba(250, 246, 237, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(138, 121, 105, 0.1);">
-        <div class="container">
-            <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="index.html">
-                <div class="leaf-shape d-flex align-items-center justify-content-center shadow-sm" style="width: 45px; height: 45px; background: ${primaryColor}; color: white; ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}">
-                    <img src="${data.hero?.logoImage}" style="width: 30px; height: 30px; object-fit: contain; filter: brightness(0) invert(1); ${data.hero.logoImageIsCircular ? 'border-radius: 50%;' : ''}" />
+    <nav class="navbar navbar-expand-lg sticky-top py-4">
+        <div class="container px-3 d-flex justify-content-between align-items-center">
+            <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="#">
+                <div style="width: 45px; height: 45px; flex-shrink: 0;">
+                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" class="w-100 h-100 object-contain grayscale hover:grayscale-0 transition-all" style="object-fit: contain;" alt="Logo" />` : ''}
                 </div>
-                <span class="fs-4 fw-bold logo" style="color: ${primaryColor}">${data.productName}</span>
+                <span class="fs-3 fw-bold logo" style="color: var(--org-primary);">${data.productName}</span>
             </a>
-            <div class="d-none d-lg-flex align-items-center gap-5">
-                ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">${link.label}</a>`).join('')}
-                <a href="${data.hero?.buttonHref}" class="organic-btn-primary shadow-sm">Order Now</a>
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <i class="fa-solid fa-bars fs-3 text-dark"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto align-items-center gap-5 mt-4 mt-lg-0">
+                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-stone-700 hover:text-green-900 text-xs uppercase tracking-widest no-underline">${link.label}</a>`).join('')}
+                    <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary py-2 px-4">Shop Collection</a>
+                </div>
             </div>
         </div>
     </nav>
 
-    <section class="py-5 overflow-hidden" style="background: #FAF6ED;">
-        <div class="container pt-lg-5 pb-lg-3">
-            <div class="row align-items-center flex-column-reverse flex-lg-row g-5">
-                <div class="col-12 col-lg-6 text-center text-lg-start position-relative">
-                    ${data.hero?.badgeText ? `
-                    <span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">${data.hero.badgeText}</span>
-                    ` : `<span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">Pure • Earth-Sourced • Balanced</span>`}
-                    <h1 class="fw-bold mb-4" style="color: ${primaryColor}; font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; width: 100%; font-size: 1.05rem;">${data.hero?.subtitle}</p>
-                    <a href="${data.hero?.buttonHref}" class="organic-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i></a>
+    <!-- Hero Section -->
+    <section class="py-5 overflow-hidden section-reveal">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-[0.4em] mb-4 d-block">Hand-Crafted • Botanical • Pure</span>
+                    <h1 class="display-3 fw-bold mb-4" style="line-height: 1.1;">${data.hero?.title}</h1>
+                    <p class="fs-5 text-stone-700 mb-5 italic font-serif w-100" style="line-height: 1.8;">${data.hero?.subtitle}</p>
+                    <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
+                        <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
+                            <span>${data.hero?.buttonText}</span>
+                            <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i>
+                        </a>
+                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span></a>` : ''}
+                    </div>
                 </div>
-                <div class="col-12 col-lg-6 text-center position-relative">
-                    <div class="position-absolute top-50 start-50 translate-middle organic-blob" style="width: 120%; height: 120%; background: #F0EBE1; z-index: 0;"></div>
-                    <div class="position-relative z-1 d-inline-block p-4">
-                        <img src="${data.hero?.image || 'https://placehold.co/800x800?text=Hero+Image'}" alt="${data.hero?.imageAlt || 'Product Organic'}" class="img-fluid" style="max-height: 500px; object-fit: ${data.hero.imageIsCircular ? 'cover' : 'contain'}; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
+                <div class="col-12 col-lg-5">
+                    <div class="position-relative">
+                        <div class="position-absolute organic-blob bg-stone-100 rotate-12" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(12deg) translateX(20px);"></div>
+                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                            <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <section class="py-4 border-top border-bottom" style="background: white; border-color: #E6D5C3 !important;">
+    <!-- Logos & Timer -->
+    <section class="py-4 border-top border-bottom" style="background-color: white;">
         <div class="container">
             <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
-                ${(data.logos || []).map((logo: any) => `<div style="width: 70px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="filter: opacity(0.7) sepia(0.5) hue-rotate(-30deg); ${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
+                ${(data.logos || []).map((logo: any) => `
+                <div style="width: 80px;">
+                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" />
+                </div>`).join('')}
             </div>
+
+            ${data.timer?.enabled ? `
+            <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
+                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white px-4 py-3 w-100 shadow-lg" style="max-width: 500px; border-radius: 12px; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
+                    <div class="d-flex flex-column align-items-start">
+                        <div class="text-[14px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 14px; font-weight: 800;">LIMITED TIME OFFER</div>
+                        <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
+                    </div>
+                    <div class="bg-white text-black px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="background-color: white; color: black; border-radius: 8px; min-width: 80px;">
+                        <div class="fs-4 fw-bold tabular-nums tracking-tighter" id="timer-display" style="font-size: 20px; font-weight: 800;">00:00</div>
+                    </div>
+                </div>
+            </div>
+            <style>
+                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
+            </style>
+            <script>
+                (function() {
+                    let time = ${data.timer.minutes || 15} * 60;
+                    const display = document.getElementById('timer-display');
+                    function update() {
+                        const m = Math.floor(time / 60);
+                        const s = time % 60;
+                        display.innerText = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+                        if (time > 0) { time--; setTimeout(update, 1000); }
+                    }
+                    update();
+                })();
+            </script>` : ''}
         </div>
     </section>
 
-    ${data.sections?.research && data.research ? `
-    <section id="research" class="py-5 bg-white border-top border-bottom" style="border-color: #FAF6ED !important;">
+    <!-- Ingredients -->
+    ${data.sections?.ingredients !== false ? `
+    <section id="ingredients" class="py-5 section-reveal" style="background-color: var(--org-accent);">
+        <div class="container py-lg-5 text-center">
+            <i class="fa-solid fa-leaf mb-3 text-2xl" style="color: var(--org-secondary);"></i>
+            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2.5rem;">${data.ingredients?.title || 'From the Earth'}</h2>
+            ${data.ingredients?.subtitle ? `<p class="text-[#4A3B2E] font-serif text-lg mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p>` : ''}
+            
+            <div class="row g-4 mt-4">
+                ${(data.ingredients?.items || []).map((item: any) => `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="organic-card p-4 h-100 text-center bg-white">
+                        <div class="mx-auto mb-4 organic-blob overflow-hidden" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
+                            <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" />
+                        </div>
+                        <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${item.title}</h4>
+                        <p class="mb-0 text-[#4A3B2E] small">${item.description}</p>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
+    <!-- Features -->
+    ${data.sections?.features !== false ? `
+    <section id="features" class="py-5 bg-white section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-2" style="color: var(--org-primary); font-size: 2.2rem;">${data.featuresTitle || 'Our Philosophy'}</h2>
+                <div class="w-12 h-0.5 bg-green-800 mx-auto mt-3" style="width: 50px; height: 2px; background: #1e3932;"></div>
+            </div>
+            <div class="row g-0 border border-[#E6D5C3]">
+                ${(data.features || []).map((f: any) => `
+                <div class="col-12 col-md-3 border-end border-bottom border-[#E6D5C3] p-5 text-center transition-colors hover:bg-stone-50">
+                    <img src="${f.image}" alt="${f.title}" class="w-12 h-12 mx-auto mb-4" style="width: 48px; height: 48px;" />
+                    <h4 class="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest">${f.title}</h4>
+                    <p class="mb-0 text-stone-700 text-xs">${f.description}</p>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
+    <!-- Research -->
+    ${data.research && data.sections?.research !== false ? `
+    <section id="research" class="py-5 bg-[#F9F7F2] section-reveal">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
-                    <h2 class="fw-bold fs-1 mb-4" style="color: #2D4A22; font-size: 2.5rem;">${data.research.title}</h2>
-                    <p class="fs-5 text-success mb-4 opacity-75 fw-bold italic">${data.research.subtitle}</p>
-                    <div class="text-muted mb-5" style="line-height: 1.9; font-size: 1.05rem;">${data.research.description}</div>
-                    <div class="row g-4 border-top pt-4">
-                        ${data.research.stats.map((stat: any) => `
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-3 d-block">Scientific Verification</span>
+                    <h2 class="fw-bold mb-4 font-serif" style="color: var(--org-primary); font-size: 2.5rem;">${data.research.title}</h2>
+                    <p class="fs-5 text-stone-700 mb-4 italic">${data.research.subtitle}</p>
+                    <div class="text-stone-700 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
+                    <div class="row g-4 pt-4 border-top border-[#E6D5C3]">
+                        ${(data.research.stats || []).map((stat: any) => `
                         <div class="col-4">
-                            <div class="fw-bold fs-1" style="color: #2D4A22;">${stat.value}</div>
-                            <div class="text-muted small uppercase fw-bold">${stat.label}</div>
+                            <div class="fw-bold fs-3 text-stone-800">${stat.value}</div>
+                            <div class="text-stone-600 small uppercase tracking-tighter" style="font-size: 10px;">${stat.label}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="position-relative">
+                        <div class="position-absolute organic-blob bg-stone-100 -rotate-6" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(-6deg) translateX(20px);"></div>
+                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                            <img src="${data.research.image}" alt="Research Data" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
                         </div>
-                        `).join('')}
-                    </div>
-                </div>
-                <div class="col-lg-6 text-center">
-                    <div class="p-3 d-inline-block" style="background: #FAF6ED; border-radius: 3rem;">
-                        <img src="${data.research.image}" alt="${data.research.imageAlt || 'Research Organic'}" class="img-fluid" style="max-height: 420px; object-fit: ${data.research.isCircular ? 'cover' : 'contain'}; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 2.5rem;'}" />
                     </div>
                 </div>
             </div>
         </div>
     </section>` : ''}
 
-
-
-    ${data.sections?.ingredients ? `
-    <section id="ingredients" class="py-5" style="background: #F0EBE1;">
-        <div class="container py-lg-5 text-center">
-            <i class="fa-solid fa-leaf mb-3 fs-2" style="color: ${secondaryColor}"></i>
-            <h2 class="fw-bold mb-3" style="color: ${primaryColor}; font-size: 2.5rem;">${data.ingredients?.title || "From the Earth"}</h2>
-            <p class="mb-5 font-serif fs-5" style="color: #6A5949;">Sourced sustainably, crafted carefully.</p>
-            <div class="row g-4">
-                ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white"><div class="mx-auto mb-4 overflow-hidden border border-4 border-light" style="width: 130px; height: 130px; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 20px;'}"><img src="${item.image}" class="w-100 h-100" style="object-fit: cover;" /></div><h4 class="fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 1.25rem;">${item.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${item.description}</p></div></div>
-                `).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${(data.sections?.about !== false) ? `
-    <section id="about" class="py-5" style="background: #FAF6ED;">
-        <div class="container py-lg-5">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-5"><div class="position-relative"><div class="position-absolute top-0 start-0 w-100 h-100 organic-blob" style="background: ${secondaryColor}; transform: translate(-5%, 5%); opacity: 0.1;"></div><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Organic'}" class="img-fluid position-relative z-1 shadow-sm" style="object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 1.5rem;'}" /></div></div>
-                <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; text-align: justify;">${data.about?.description}</div></div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${(data.sections?.features !== false) ? `
-    <section id="features" class="py-5" style="background: #F0EBE1;">
+    <!-- About Section -->
+    ${data.sections?.about !== false && data.about ? `
+    <section id="about" class="py-5 bg-white section-reveal">
         <div class="container">
-            <h2 class="text-center fw-bold mb-2 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.featuresTitle || "Nature's Bounty"}</h2>
-            <div class="row g-4">
-                ${(data.benefits?.items || []).map((b: any) => `
-                <div class="col-12 col-md-6"><div class="organic-card p-4 h-100 d-flex align-items-start gap-3 bg-white"><i class="fa-solid fa-circle-check fs-4 mt-1" style="color: ${secondaryColor}"></i><div class="text-start"><h4 class="fw-bold mb-1 font-serif" style="color: ${primaryColor}">${b.title}</h4><p class="mb-0 text-muted" style="font-size: 0.95rem; line-height: 1.6;">${b.description}</p></div></div></div>
-                `).join('')}
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-4" style="color: var(--org-primary);">${data.about.title || 'The Botanical Journal'}</h2>
+            </div>
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5 text-center">
+                    <div class="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
+                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" />
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="ps-lg-4 border-start border-4 border-success border-opacity-25" style="border-left: 4px solid rgba(25, 135, 84, 0.25) !important;">
+                        <div class="text-stone-600 font-serif" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about.description}</div>
+                    </div>
+                </div>
             </div>
         </div>
     </section>` : ''}
 
-    ${(data.sections?.pricing !== false) ? `
-    <section id="pricing" class="py-5" style="background: #F0EBE1;">
+    <!-- Benefits -->
+    ${data.sections?.benefits !== false && data.benefits ? `
+    <section id="benefits" class="py-5 bg-accent section-reveal" style="background-color: var(--org-accent);">
+        <div class="container py-lg-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="bg-white p-5 border border-[#E6D5C3]">
+                        <div class="text-center mb-5">
+                            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2rem;">${data.benefits.title || 'Holistic Rewards'}</h2>
+                            <p class="text-stone-700 italic mx-auto font-serif" style="max-width: 600px;">${data.benefits.description}</p>
+                        </div>
+                        <div class="row g-4">
+                            ${(data.benefits.items || []).map((b: any) => `
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-4 p-3 hover:bg-stone-50 transition-colors">
+                                    <div class="text-success pt-1"><i class="fa-solid fa-leaf text-xs"></i></div>
+                                    <div>
+                                        <h4 class="fw-bold mb-1 text-sm uppercase tracking-wider">${b.title}</h4>
+                                        <p class="mb-0 text-stone-700 text-xs">${b.description}</p>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : ''}
+
+    <!-- Pricing -->
+    ${data.sections?.pricing !== false ? `
+    <section id="pricing" class="py-5 bg-white section-reveal">
         <div class="container py-lg-5">
-            <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.pricingTitle || "Select Your Pack"}</h2>
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 2.8rem;">${data.pricingTitle || 'Select Your Batch'}</h2>
+                <div class="w-16 h-px bg-stone-200 mx-auto mt-4" style="width: 64px; height: 1px; background: #e7e5e4;"></div>
+            </div>
             <div class="row g-4 justify-content-center">
                 ${(data.pricing || []).map((plan: any) => `
-                <div class="col-lg-4 col-md-6"><div class="organic-card p-4 h-100 bg-white text-center d-flex flex-column ${plan.isPrimary ? 'border-primary shadow' : ''}" style="${plan.isPrimary ? 'transform: scale(1.05); z-index: 10;' : ''}">
-                    ${plan.isPrimary ? `<div class="mb-3"><span class="px-3 py-1 rounded-md text-uppercase fw-bold" style="background: ${secondaryColor}; color: white; font-size: 10px;">Best Choice</span></div>` : ''}
-                    <h4 class="fw-bold mb-2 font-serif text-uppercase" style="color: ${primaryColor}">${plan.title}</h4>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="img-fluid mx-auto my-3" style="height: 140px; object-fit: ${plan.isCircular ? 'cover' : 'contain'}; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                    <div class="fw-bold mb-3 font-serif fs-2" style="color: ${primaryColor}">${plan.price}</div>
-                    <div class="mb-4 text-start flex-grow-1">${plan.features.map((f: string) => `<div class="mb-2 d-flex align-items-start gap-2" style="color: #6A5949; font-size: 0.9rem;"><i class="fa-solid fa-check mt-1" style="color: ${secondaryColor}"></i><span>${f}</span></div>`).join('')}</div>
-                    <a href="${plan.buttonHref}" class="organic-btn-primary w-100" style="justify-content: center;">${plan.buttonText}</a>
-                    <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
-                </div></div>
-                `).join('')}
+                <div class="col-12 col-md-4">
+                    <div class="organic-card h-100 d-flex flex-column bg-white ${plan.isPrimary ? 'border-success' : ''}" style="${plan.isPrimary ? 'border-color: #1e3932 !important; border-width: 2px !important;' : ''}">
+                        ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
+                        <div class="p-5 flex-grow-1 text-center">
+                            <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
+                            <div class="relative mb-5 position-relative">
+                                ${plan.multiplier ? `
+                                <div class="position-absolute top-0 end-0 translate-middle-y me-n2 mt-n2 z-index-10">
+                                    <div class="bg-dark text-white px-3 py-1.5 font-serif italic text-xs shadow-sm" style="background-color: #1e3932;">${plan.multiplier}</div>
+                                </div>` : ''}
+                                <img src="${plan.image}" alt="${plan.title}" class="img-fluid mx-auto grayscale hover:grayscale-0 transition-all duration-1000" style="height: 150px; object-fit: contain;" />
+                            </div>
+                            <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
+                            <div class="mb-5 text-start ps-4 border-start border-stone-100">
+                                ${plan.features.map((f: string) => `
+                                <div class="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
+                                    <i class="fa-solid fa-check text-success"></i>
+                                    <span>${f}</span>
+                                </div>`).join('')}
+                            </div>
+                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}">${plan.buttonText}</a>
+                            ${plan.guaranteeBadge ? `
+                            <div class="mt-4 d-flex align-items-center justify-content-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
+                                <i class="${plan.guaranteeBadge.icon || 'fa-solid fa-shield-halved'}"></i>
+                                <span>${plan.guaranteeBadge.text}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                </div>`).join('')}
             </div>
         </div>
     </section>` : ''}
 
-    <section class="py-5" style="background: #FAF6ED;">
-        <div class="container py-lg-5">
-            <div class="organic-card p-5 bg-white"><div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center"><img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Organic'}" class="img-fluid mb-3" style="max-width: 220px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><p class="font-serif italic mb-0" style="color: ${secondaryColor}">${data.guaranteeSmallText || "Nature's Promise"}</p></div>
-                <div class="col-lg-8"><h2 class="fw-bold mb-3 font-serif" style="color: ${primaryColor}">${data.guaranteeHeadline || "Pure Satisfaction Promise"}</h2><p class="text-muted" style="line-height: 1.8; font-size: 1.05rem;">${data.guaranteeDescription || defaultGuaranteeDescription}</p><a href="${data.hero?.buttonHref}" class="organic-btn-primary mt-4">Order Now <i class="fa-solid fa-seedling"></i></a></div>
-            </div></div>
+    <!-- Testimonials -->
+    ${data.sections?.testimonials !== false && data.testimonials ? `
+    <section id="testimonials" class="py-5 bg-[#F9F7F2] section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">The Community Voice</span>
+                <h2 class="fw-bold font-serif mb-4" style="color: var(--org-primary); font-size: 2.5rem;">${data.testimonials.title || 'Community Stories'}</h2>
+            </div>
+            <div class="row g-4">
+                ${(data.testimonials.items || []).map((t: any) => `
+                <div class="col-md-4">
+                    <div class="p-4 bg-white border border-[#E6D5C3] h-100 text-center d-flex flex-column align-items-center">
+                        <div class="w-16 h-16 rounded-circle overflow-hidden mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
+                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
+                        </div>
+                        <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>
+                        <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
+                        <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
+                            ${[...Array(5)].map(() => `<i class="fa-solid fa-star"></i>`).join('')}
+                        </div>
+                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : ''}
+
+    <!-- Satisfaction Promise -->
+    <section class="py-5 bg-white border-top border-[#E6D5C3]">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-4 text-center">
+                    <img src="${data.footer?.trustImage || 'https://via.placeholder.com/220x100?text=Guarantee'}" alt="Guarantee" class="img-fluid mb-3 mx-auto" style="max-width: 220px;" />
+                </div>
+                <div class="col-lg-8">
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">Our Pure Promise</span>
+                    <h3 class="fw-bold mb-3 font-serif" style="color: var(--org-primary); font-size: 2rem;">${data.guaranteeHeadline || '60-Day Botanical Promise'}</h3>
+                    <p class="text-stone-700" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || `Your path to wellness is protected. Every bottle of ${data.productName} is covered by our 60-day satisfaction protocol. If you don't feel the difference, we will honor a full refund.`}</p>
+                </div>
+            </div>
         </div>
     </section>
 
-    ${data.sections?.testimonials && data.testimonials ? `
-    <section id="testimonials" class="py-5" style="background: #FAF6ED;">
-        <div class="container py-lg-5 text-center">
-            <i class="fa-solid fa-heart mb-3 fs-3" style="color: ${secondaryColor}"></i>
-            <h2 class="fw-bold mb-3 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.testimonials.title}</h2>
-            <p class="mb-5 font-serif fs-5 italic" style="color: #6A5949;">Real stories from our community.</p>
-            <div class="row g-4 justify-content-center">
-                ${data.testimonials.items.map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="organic-card p-4 h-100 bg-white text-start shadow-sm">
-                        <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="overflow-hidden" style="width: 56px; height: 56px; border: 2px solid ${secondaryColor}30; ${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 50% 0 50% 0;'}">
-                                <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" class="w-100 h-100" style="object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" />
-                            </div>
-                            <div>
-                                <h4 class="fw-bold mb-0 font-serif" style="color: ${primaryColor}">${item.name}</h4>
-                                <span class="small italic" style="color: #8A7969">${item.role || 'Verified'}</span>
-                            </div>
-                        </div>
-                        <div class="mb-3" style="color: ${secondaryColor}">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}" style="font-size: 14px;"></i>`).join('')}
-                        </div>
-                        <p class="mb-0 italic" style="color: #6A5949; line-height: 1.7; font-size: 0.95rem;">"${item.content || ''}"</p>
-                    </div>
-                </div>
-                `).join('')}
+    <!-- FAQ -->
+    ${data.sections?.faq !== false && data.faq ? `
+    <section id="faq" class="py-5 bg-[#F9F7F2] section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold font-serif mb-3" style="color: var(--org-primary); font-size: 2.3rem;">${data.faqTitle || 'Inquiries & Insights'}</h2>
             </div>
-        </div>
-    </section>` : ''}
-
-
-    ${data.sections?.faq && data.faq?.length ? `
-    <section id="faq" class="py-5" style="background: #F0EBE1;">
-        <div class="container py-lg-5" style="width: 100%;">
-            <h2 class="text-center fw-bold mb-5 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.faqTitle || "Wisdom & Questions"}</h2>
-            <div class="accordion" id="faqAccordionOrganic">
+            <div class="mx-auto" style="max-width: 800px;">
                 ${data.faq.map((item: any, i: number) => `
-                <div class="accordion-item mb-3 border-0 bg-transparent">
-                    <h2 class="accordion-header">
-                        <button class="accordion-button collapsed fw-bold p-4 bg-white shadow-sm font-serif" type="button" data-bs-toggle="collapse" data-bs-target="#o_collapse${i}" style="color: ${primaryColor}; font-size: 1.1rem; border-radius: 0;">
-                            ${item.question}
-                        </button>
-                    </h2>
-                    <div id="o_collapse${i}" class="accordion-collapse collapse bg-white" data-bs-parent="#faqAccordionOrganic">
-                        <div class="accordion-body px-4 pb-4 pt-0" style="color: #6A5949; font-size: 1rem; line-height: 1.7;">
-                            ${item.answer}
-                        </div>
+                <div class="bg-white border border-[#E6D5C3] mb-3">
+                    <div class="p-4 cursor-pointer d-flex justify-content-between align-items-center" onclick="const ans = document.getElementById('faq-ans-${i}'); const icon = document.getElementById('faq-icon-${i}'); ans.classList.toggle('d-none'); icon.classList.toggle('rotate-45');">
+                        <span class="fw-bold text-stone-800 text-sm font-serif">${item.question}</span>
+                        <i id="faq-icon-${i}" class="fa-solid fa-plus text-[10px] text-stone-300 transition-transform"></i>
                     </div>
-                </div>
-                `).join('')}
+                    <div id="faq-ans-${i}" class="px-4 pb-4 d-none">
+                        <p class="mb-0 text-stone-700 text-xs" style="line-height: 1.8;">${item.answer}</p>
+                    </div>
+                </div>`).join('')}
             </div>
         </div>
+        <style>
+            .rotate-45 { transform: rotate(45deg); }
+        </style>
     </section>` : ''}
 
-    <footer class="py-5 text-center" style="background: ${primaryColor}; color: #FAF6ED;">
+    <!-- Footer -->
+    <footer class="py-5 text-center" style="background-color: #1e3932; color: rgba(249, 247, 242, 0.6); font-family: 'Playfair Display', serif;">
         <div class="container">
-            <i class="fa-solid fa-seedling fs-1 mb-4" style="color: ${secondaryColor}"></i>
-            <h2 class="fw-bold mb-4 font-serif" style="font-size: 1.8rem;">${data.footerHeadline || "Back to Nature"}</h2>
-            <p class="mx-auto mb-5 opacity-75" style="width: 100%; line-height: 1.8;">${data.footer?.companyInfo}</p>
-            <div class="d-flex justify-content-center flex-wrap gap-4 mb-4 border-bottom border-top py-4" style="border-color: rgba(250, 246, 237, 0.2) !important;">
-                ${(data.footer?.links || []).map((l: any) => `<a href="${l.href}" class="text-light text-decoration-none font-serif italic fs-5">${l.label}</a>`).join('')}
+            <h2 class="fw-bold mb-2 text-white" style="font-size: 1.4rem;">${data.footerHeadline || 'Botanical Wisdom'}</h2>
+            <p class="mx-auto mb-4 text-xs italic" style="max-width: 600px;">${data.footer?.companyInfo}</p>
+            <div class="d-flex justify-content-center flex-wrap gap-5 my-5 border-top border-bottom border-white border-opacity-10 py-4">
+                ${(data.footer?.links || []).map((link: any) => `<a href="${link.href}" class="text-white text-decoration-none text-[10px] uppercase tracking-widest hover:opacity-75 transition-opacity">${link.label}</a>`).join('')}
             </div>
-            <p class="opacity-50 small">© ${new Date().getFullYear()} ${data.productName}. Cultivated with care.</p>
+            <p class="text-[9px] uppercase tracking-widest">© ${new Date().getFullYear()} ${data.productName}. Heritage Botanical.</p>
         </div>
     </footer>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     ${socialProofBlock}
 </body>
 </html>`;

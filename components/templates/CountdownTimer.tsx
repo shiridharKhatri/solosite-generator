@@ -42,17 +42,17 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
         <i className="fa-solid fa-xmark text-[10px]"></i>
       </button>
 
-      <div className="flex flex-col items-start gap-1">
-        <div className="text-[16px] font-black uppercase leading-tight tracking-wide">
+      <div className="flex flex-col items-start gap-0.5">
+        <div className="text-[14px] font-black uppercase leading-tight tracking-wider font-serif">
           LIMITED TIME OFFER
         </div>
-        <div className="text-[13px] font-medium opacity-90 italic">
-          Hurry, Stock Running Low!
+        <div className="text-[11px] font-medium opacity-90 italic">
+          {text || 'Hurry, Stock Running Low!'}
         </div>
       </div>
 
-      <div className="bg-white text-black rounded-lg px-3 py-2 min-w-[90px] flex items-center justify-center shadow-inner">
-        <div className="text-[24px] font-black tabular-nums tracking-tighter">
+      <div className="bg-white text-black rounded-lg px-3 py-1.5 min-w-[85px] flex items-center justify-center shadow-inner">
+        <div className="text-[22px] font-black tabular-nums tracking-tighter">
           {formatTime(timeLeft)}
         </div>
       </div>
