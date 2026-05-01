@@ -904,9 +904,9 @@ ${seoBlock}
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
-                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-[0.4em] mb-4 d-block">Hand-Crafted • Botanical • Pure</span>
-                    <h1 class="display-3 fw-bold mb-4" style="line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="fs-5 text-stone-700 mb-5 italic font-serif w-100" style="line-height: 1.8;">${data.hero?.subtitle}</p>
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-[0.4em] mb-3 d-block">Hand-Crafted • Botanical • Pure</span>
+                    <h1 class="display-3 fw-bold mb-3" style="line-height: 1.05;">${data.hero?.title}</h1>
+                    <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
                         <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
                             <span>${data.hero?.buttonText}</span>
