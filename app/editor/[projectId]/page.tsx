@@ -16,6 +16,7 @@ import { ClinicalTemplate } from '@/components/templates/ClinicalTemplate';
 import { OrganicTemplate } from '@/components/templates/OrganicTemplate';
 import { generateProjectZip } from '@/lib/exporter';
 import { EditableImage } from '@/components/editor/EditableImage';
+import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { ImageUploadField } from '@/components/editor/ImageUploadField';
 
 const IconLayout = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
@@ -662,8 +663,12 @@ export default function EditorPage() {
                       <input type="text" value={projectData.hero.title} onChange={(e) => updateHero({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Subtitle</label>
-                      <textarea rows={3} value={projectData.hero.subtitle} onChange={(e) => updateHero({ subtitle: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                      <RichTextEditor
+                        value={projectData.hero.subtitle}
+                        onChange={(val) => updateHero({ subtitle: val })}
+                        className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[80px] text-sm"
+                        tagName="div"
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-1.5">
@@ -804,12 +809,11 @@ export default function EditorPage() {
                           </div>
 
                           <div className="space-y-1.5">
-                            <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Testimonial Content</label>
-                            <textarea
+                            <RichTextEditor
                               value={item.content}
-                              onChange={(e) => updateTestimonials(i, { content: e.target.value })}
-                              rows={3}
-                              className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm resize-none"
+                              onChange={(val) => updateTestimonials(i, { content: val })}
+                              className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[80px] text-sm"
+                              tagName="div"
                             />
                           </div>
                         </div>
@@ -851,8 +855,12 @@ export default function EditorPage() {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Description</label>
-                          <textarea rows={2} value={feature.description} onChange={(e) => updateFeature(idx, { description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                          <RichTextEditor
+                            value={feature.description}
+                            onChange={(val) => updateFeature(idx, { description: val })}
+                            className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[60px] text-sm"
+                            tagName="div"
+                          />
                         </div>
                       </div>
                     ))}
@@ -873,8 +881,12 @@ export default function EditorPage() {
                       <input type="text" value={projectData.about.title} onChange={(e) => updateAbout({ title: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
                     </div>
                     <div className="space-y-1.5">
-                      <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Main Description</label>
-                      <textarea rows={6} value={projectData.about.description} onChange={(e) => updateAbout({ description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                      <RichTextEditor
+                        value={projectData.about.description}
+                        onChange={(val) => updateAbout({ description: val })}
+                        className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[150px] text-sm"
+                        tagName="div"
+                      />
                     </div>
                     <ImageUploadField
                       label="About Image"
@@ -905,7 +917,12 @@ export default function EditorPage() {
                     </div>
                     <div className="space-y-1.5">
                       <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Detailed Description</label>
-                      <textarea rows={4} value={projectData.research.description} onChange={(e) => updateResearch({ description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 text-sm" />
+                      <RichTextEditor
+                        value={projectData.research.description}
+                        onChange={(val) => updateResearch({ description: val })}
+                        className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[120px] text-sm"
+                        tagName="div"
+                      />
                     </div>
                     <div className="grid grid-cols-3 gap-3 pt-4">
                       {projectData.research.stats.map((stat, idx) => (
@@ -965,8 +982,12 @@ export default function EditorPage() {
                           />
                         </div>
                         <div className="space-y-1.5">
-                          <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Description</label>
-                          <textarea rows={2} value={item.description} onChange={(e) => updateIngredient(idx, { description: e.target.value })} className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none transition-all font-bold text-gray-900 text-sm" />
+                          <RichTextEditor
+                            value={item.description}
+                            onChange={(val) => updateIngredient(idx, { description: val })}
+                            className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[60px] text-sm"
+                            tagName="div"
+                          />
                         </div>
                       </div>
                     ))}
@@ -1500,17 +1521,12 @@ export default function EditorPage() {
                       <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <textarea
-                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
-                      value={projectData.legalPages?.privacyPolicy}
-                      onChange={(e) => updateLegalPage('privacyPolicy', e.target.value)}
-                      onPaste={(e) => handleLegalPaste(e, 'privacyPolicy')}
-                      placeholder="Enter your Privacy Policy content here..."
-                    />
-                    <div
-                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
-                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.privacyPolicy || '') }}
+                  <div className="border border-gray-200">
+                    <RichTextEditor
+                      value={projectData.legalPages?.privacyPolicy || ''}
+                      onChange={(val) => updateLegalPage('privacyPolicy', val)}
+                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
+                      tagName="div"
                     />
                   </div>
                 </div>
@@ -1529,17 +1545,12 @@ export default function EditorPage() {
                       <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <textarea
-                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
-                      value={projectData.legalPages?.termsAndConditions}
-                      onChange={(e) => updateLegalPage('termsAndConditions', e.target.value)}
-                      onPaste={(e) => handleLegalPaste(e, 'termsAndConditions')}
-                      placeholder="Enter your Terms & Conditions here..."
-                    />
-                    <div
-                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
-                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.termsAndConditions || '') }}
+                  <div className="border border-gray-200">
+                    <RichTextEditor
+                      value={projectData.legalPages?.termsAndConditions || ''}
+                      onChange={(val) => updateLegalPage('termsAndConditions', val)}
+                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
+                      tagName="div"
                     />
                   </div>
                 </div>
@@ -1551,17 +1562,12 @@ export default function EditorPage() {
                       <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
                     </div>
                   </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <textarea
-                      className="w-full p-4 border border-gray-200 text-sm h-64 focus:ring-2 focus:ring-blue-500 outline-none transition-all leading-relaxed custom-scrollbar font-mono"
-                      value={projectData.legalPages?.disclaimer}
-                      onChange={(e) => updateLegalPage('disclaimer', e.target.value)}
-                      onPaste={(e) => handleLegalPaste(e, 'disclaimer')}
-                      placeholder="Enter medical/legal disclaimers here..."
-                    />
-                    <div
-                      className="w-full p-4 border border-gray-100 bg-gray-50/50 text-sm h-64 overflow-y-auto markdown-preview"
-                      dangerouslySetInnerHTML={{ __html: marked.parse(projectData.legalPages?.disclaimer || '') }}
+                  <div className="border border-gray-200">
+                    <RichTextEditor
+                      value={projectData.legalPages?.disclaimer || ''}
+                      onChange={(val) => updateLegalPage('disclaimer', val)}
+                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
+                      tagName="div"
                     />
                   </div>
                 </div>

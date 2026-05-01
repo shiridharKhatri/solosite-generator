@@ -84,13 +84,8 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
   return (
     <div
-      className={`relative group cursor-pointer flex justify-center items-center overflow-hidden transition-all duration-300 ${isCircular ? 'rounded-full aspect-square' : ''} ${className}`}
-      style={{
-        ...style,
-        display: style?.display || 'flex',
-        width: style?.width || (style?.maxHeight ? 'auto' : '100%'),
-        height: isCircular ? (style?.width || '100%') : style?.height
-      }}
+      className={`relative group cursor-pointer flex justify-center items-center overflow-hidden transition-all duration-300 z-10 ${isCircular ? 'rounded-full aspect-square' : ''} ${className}`}
+      style={style}
     >
       <div onClick={handleClick} className="w-full h-full flex justify-center items-center">
         {src ? (
@@ -102,11 +97,10 @@ export const EditableImage: React.FC<EditableImageProps> = ({
               (e.target as HTMLImageElement).src = 'https://placehold.co/600x400?text=Image+Not+Found';
             }}
             style={{
-              maxHeight: isCircular ? 'none' : (style?.maxHeight || '70vh'),
-              minHeight: style?.minHeight || 'auto',
+              maxHeight: isCircular ? 'none' : (style?.maxHeight || '100%'),
               width: '100%',
               height: '100%',
-              margin: '0 auto',
+              objectFit: (style?.objectFit as any) || (isCircular ? 'cover' : 'contain'),
               borderRadius: isCircular ? '9999px' : '0'
             }}
           />
@@ -117,58 +111,57 @@ export const EditableImage: React.FC<EditableImageProps> = ({
         )}
       </div>
 
-      <div className={`absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none ${isCircular ? 'rounded-full' : ''}`}>
-        <span className="text-white text-[10px] font-bold uppercase tracking-widest text-center px-2">Click to replace</span>
+      <div className={`absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none z-50 ${isCircular ? 'rounded-full' : ''}`}>
+        {(src || onRemove || onToggleCircular) && (
+          <div className="flex gap-2 pointer-events-auto">
+            {onToggleCircular && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onToggleCircular();
+                }}
+                className={`w-7 h-7 rounded-full flex items-center justify-center shadow-lg border-none hover:scale-110 transition-all ${isCircular ? 'bg-amber-500 text-white' : 'bg-white text-gray-900'}`}
+                title={isCircular ? "Make Square" : "Make Circular"}
+              >
+                <i className={`fa-solid ${isCircular ? 'fa-square' : 'fa-circle'} text-[10px]`}></i>
+              </button>
+            )}
+            {onAltChange && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsEditingAlt(!isEditingAlt);
+                  setTempAlt(alt);
+                }}
+                className="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center shadow-lg border-none hover:bg-blue-700 hover:scale-110 transition-all"
+                title="Edit Alt Tag"
+              >
+                <i className="fa-solid fa-tag text-[10px]"></i>
+              </button>
+            )}
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onRemove) {
+                  onRemove();
+                } else {
+                  onChange('');
+                }
+              }}
+              className="w-7 h-7 rounded-full bg-red-500 text-white flex items-center justify-center shadow-lg border-none hover:bg-red-600 hover:scale-110 transition-all"
+              title="Remove Image"
+            >
+              <i className="fa-solid fa-times text-[10px]"></i>
+            </button>
+          </div>
+        )}
+        <span className="text-white/90 text-[9px] font-bold uppercase tracking-widest text-center px-2 hidden sm:block">Click to replace</span>
       </div>
 
       {isUploading && (
         <div className={`absolute inset-0 bg-white/60 backdrop-blur-[2px] flex flex-col items-center justify-center z-40 transition-all ${isCircular ? 'rounded-full' : ''}`}>
           <i className="fa-solid fa-circle-notch animate-spin text-blue-600 text-xl mb-2"></i>
           <span className="text-[10px] font-black text-blue-600 uppercase tracking-tighter">Uploading...</span>
-        </div>
-      )}
-
-      {(src || onRemove || onToggleCircular) && (
-        <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-all z-50">
-          {onToggleCircular && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onToggleCircular();
-              }}
-              className={`w-6 h-6 flex items-center justify-center shadow-lg border-none hover:scale-110 transition-all ${isCircular ? 'bg-amber-500 text-white' : 'bg-white text-gray-900'}`}
-              title={isCircular ? "Make Square" : "Make Circular"}
-            >
-              <i className={`fa-solid ${isCircular ? 'fa-square' : 'fa-circle'} text-[10px]`}></i>
-            </button>
-          )}
-          {onAltChange && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setIsEditingAlt(!isEditingAlt);
-                setTempAlt(alt);
-              }}
-              className="w-6 h-6 bg-blue-600 text-white flex items-center justify-center shadow-lg border-none hover:bg-blue-700 hover:scale-110"
-              title="Edit Alt Tag"
-            >
-              <i className="fa-solid fa-tag text-[10px]"></i>
-            </button>
-          )}
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              if (onRemove) {
-                onRemove();
-              } else {
-                onChange('');
-              }
-            }}
-            className="w-6 h-6 bg-red-500 text-white flex items-center justify-center shadow-lg border-none hover:bg-red-600 hover:scale-110"
-            title="Remove Image"
-          >
-            <i className="fa-solid fa-times text-[10px]"></i>
-          </button>
         </div>
       )}
 

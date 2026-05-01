@@ -34,25 +34,25 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
   };
 
   return (
-    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-2xl px-8 py-4 w-full max-w-5xl shadow-2xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
+    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-xl px-5 py-3 w-full max-w-lg shadow-xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
       <button
         onClick={(e) => { e.stopPropagation(); onUpdate({ enabled: false }); }}
-        className="absolute -top-2 -right-2 bg-gray-800 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/timer:opacity-100 transition-all z-20 hover:bg-red-500 border-none shadow-lg"
+        className="absolute -top-2 -right-2 bg-gray-800 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/timer:opacity-100 transition-all z-20 hover:bg-red-500 border-none shadow-lg"
       >
-        <i className="fa-solid fa-xmark text-xs"></i>
+        <i className="fa-solid fa-xmark text-[10px]"></i>
       </button>
 
       <div className="flex flex-col items-start gap-1">
-        <div className="text-[18px] font-black uppercase leading-tight tracking-wide">
+        <div className="text-[16px] font-black uppercase leading-tight tracking-wide">
           LIMITED TIME OFFER
         </div>
-        <div className="text-[14px] font-medium opacity-90 italic">
+        <div className="text-[13px] font-medium opacity-90 italic">
           Hurry, Stock Running Low!
         </div>
       </div>
 
-      <div className="bg-white text-black rounded-xl px-4 py-2 min-w-[100px] flex items-center justify-center shadow-inner">
-        <div className="text-[28px] font-black tabular-nums tracking-tighter">
+      <div className="bg-white text-black rounded-lg px-3 py-2 min-w-[90px] flex items-center justify-center shadow-inner">
+        <div className="text-[24px] font-black tabular-nums tracking-tighter">
           {formatTime(timeLeft)}
         </div>
       </div>

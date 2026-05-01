@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { RichTextEditor } from './RichTextEditor';
 
 interface EditableTextProps {
   value: string;
@@ -15,38 +16,15 @@ export const EditableText: React.FC<EditableTextProps> = ({
   onChange,
   className = '',
   style,
-  tagName: Tag = 'p',
+  tagName = 'p',
 }) => {
-  const elementRef = React.useRef<HTMLElement>(null);
-  const [isFocused, setIsFocused] = React.useState(false);
-
-  // Update the element's text if the prop changes externally (and we're not focused)
-  React.useEffect(() => {
-    if (elementRef.current && !isFocused && elementRef.current.innerText !== value) {
-      elementRef.current.innerText = value;
-    }
-  }, [value, isFocused]);
-
   return (
-    <Tag
-      ref={elementRef as any}
-      contentEditable
-      suppressContentEditableWarning
-      onFocus={() => setIsFocused(true)}
-      onBlur={(e) => {
-        setIsFocused(false);
-        onChange(e.currentTarget.innerText);
-      }}
-      onInput={(e) => {
-        // We still call onChange for auto-save, but we don't let React 
-        // re-render the children of this Tag while we're typing.
-        onChange(e.currentTarget.innerText);
-      }}
-      className={`focus:outline-none focus:ring-2 focus:ring-green-500 rounded px-1 transition-all ${className}`}
+    <RichTextEditor
+      value={value}
+      onChange={onChange}
+      className={className}
       style={style}
-    >
-      {/* We set initial value here, but useEffect handles updates */}
-      {React.useMemo(() => value, [])} 
-    </Tag>
+      tagName={tagName}
+    />
   );
 };

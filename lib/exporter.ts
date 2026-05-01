@@ -349,12 +349,19 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
 .btn-custom-pill { background-color: ${secondaryColor}; color: black; font-weight: 700; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.05); padding: 0.75rem 2rem; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; }
 .btn-custom-pill:hover { opacity: 0.9; transform: translateY(-2px); color: black; }
 .about-description { text-align: justify; }
-.text-muted { color: #444 !important; }
+.text-muted, .text-muted * { color: #444 !important; }
 @media (max-width: 992px) { 
     .title-scale { font-size: 1.6rem !important; } 
     .about-description { text-align: center !important; }
 }
 @media (max-width: 768px) { .bgbadge { max-width: 100%; } .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; } }
+/* Rich Text Editor Support */
+p { margin-bottom: 0; }
+ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+[style*="text-align: center"] { text-align: center !important; }
+[style*="text-align: right"] { text-align: right !important; }
+[style*="text-align: justify"] { text-align: justify !important; }
+
 `;
         htmlContent = `<!DOCTYPE html>
 <html lang="en-US">
@@ -390,7 +397,7 @@ ${seoBlock}
                     <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
                 </a>
                 <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">${data.hero?.buttonText || 'Order Now'}</a>
+                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">Order Now</a>
                     <button class="navbar-toggler border-0 shadow-none px-1 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                         <i class="fa-solid fa-bars fs-3 text-dark"></i>
                     </button>
@@ -399,7 +406,7 @@ ${seoBlock}
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
                         ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
-                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; white-space: nowrap;">${data.hero?.buttonText || 'Order Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; white-space: nowrap;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
                     </div>
                 </div>
             </div>
@@ -416,13 +423,40 @@ ${seoBlock}
                             <img src="${data.hero?.badgeImage || ''}" alt="${data.hero?.badgeImageAlt || 'Supplement Facts'}" class="img-fluid" style="${data.hero.badgeImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
                         </div>
                     </div>
+                    ${data.timer?.enabled ? `
+                    <div class="my-3 d-flex justify-content-center w-100 px-3">
+                        <div class="d-flex align-items-center justify-content-between text-white rounded-4 px-4 py-3 w-100 shadow-lg" style="background-color: #cc1d1d; max-width: 500px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                <div class="fw-black text-uppercase lh-1" style="font-size: 16px; letter-spacing: 0.025em; font-family: sans-serif;">LIMITED TIME OFFER</div>
+                                <div class="fw-medium fst-italic opacity-75" style="font-size: 13px; font-family: sans-serif;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
+                            </div>
+                            <div class="bg-white text-dark rounded-3 px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="min-width: 90px;">
+                                <div id="countdown-timer-display" class="fw-black tabular-nums" style="font-size: 24px; letter-spacing: -0.05em; font-family: sans-serif;">
+                                    ${String(data.timer.minutes || 10).padStart(2, '0')}:00
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .85; } }</style>
+                    <script>
+                        (function() {
+                            var t = ${(data.timer.minutes || 10) * 60};
+                            var el = document.getElementById('countdown-timer-display');
+                            setInterval(function() {
+                                t = t <= 1 ? ${(data.timer.minutes || 10) * 60} : t - 1;
+                                var m = Math.floor(t / 60), s = t % 60;
+                                el.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+                            }, 1000);
+                        })();
+                    </script>
+                    ` : ''}
                     <div class="d-flex justify-content-center flex-wrap gap-2 mt-4 pt-2">
                         ${(data.logos || []).map((logo: any) => `<div style="width: 65px; height: 65px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
                 <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start pt-3 pt-lg-4">
                     <h1 class="fw-bold mb-3" style="font-size: clamp(1.5rem, 4vw, 2.75rem); line-height: 1.15;">${data.hero?.title}</h1>
-                    <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; width: 100%; white-space: pre-line; text-align: justify;">${data.hero?.subtitle}</p>
+                    <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; width: 100%; text-align: justify;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
                         <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none" style="min-width: 200px; background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
                         <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; min-width: 200px; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
@@ -470,7 +504,7 @@ ${seoBlock}
                         <div class="mt-2" style="font-size: 9px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2em; border-top: 1px solid #eee; pt-2;">Editorial: Clinical Formula Composition</div>
                     </div>
                 </div>
-                <div class="fs-5 text-muted about-description" style="line-height: 1.7; white-space: pre-line; text-align: justify; color: #444 !important;">${data.about?.description}</div>
+                <div class="fs-5 text-muted about-description" style="line-height: 1.7; text-align: justify; color: #444 !important;">${data.about?.description}</div>
             </div>
         </div>
     </section>` : ''}
@@ -719,6 +753,12 @@ h1, h2, h3, h4, h5, h6, .logo { font-family: 'Space Grotesk', sans-serif !import
 .opacity-75 { opacity: 0.9 !important; }
 .nav-link { transition: color 0.3s ease; }
 .nav-link:hover { color: ${secondaryColor} !important; }
+/* Rich Text Editor Support */
+.modern-template p { margin-bottom: 0; }
+.modern-template ul, .modern-template ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+.modern-template [style*="text-align: center"] { text-align: center !important; }
+.modern-template [style*="text-align: right"] { text-align: right !important; }
+.modern-template [style*="text-align: justify"] { text-align: justify !important; }
 @media (max-width: 1200px) { .container { max-width: 95% !important; } }
 @media (max-width: 992px) {
     .modern-btn { padding: 0.75rem 2rem; font-size: 0.85rem; }
@@ -765,7 +805,7 @@ ${seoBlock}
         <div class="collapse navbar-collapse" id="navbarNavModern">
             <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center bg-lg-transparent rounded p-3 p-lg-0" style="background: rgba(255,255,255,0.05); backdrop-filter: blur(10px);">
                 ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-white text-decoration-none w-100" style="font-size: 0.95rem;">${link.label}</a>`).join('')}
-                <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-none d-lg-inline-flex text-nowrap" style="width: auto; white-space: nowrap;">${data.hero?.buttonText || 'Shop Now'} <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                <a href="${data.hero?.buttonHref || '#'}" class="modern-btn modern-btn-primary d-none d-lg-inline-flex text-nowrap" style="width: auto; white-space: nowrap;">Shop Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
             </div>
         </div>
     </div>
@@ -782,7 +822,7 @@ ${seoBlock}
                         ` : `<span class="px-4 py-1.5 rounded-md text-uppercase tracking-widest fw-bold" style="background: ${secondaryColor}20; color: ${secondaryColor}; border: 1px solid ${secondaryColor}40; font-size: 11px;">✦ Premium Support Formula</span>`}
                     </div>
                     <h1 class="fw-bold mb-4 gradient-text" style="font-size: clamp(2rem, 5vw, 3.5rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; width: 100%; font-size: 0.95rem; white-space: pre-line;">${data.hero?.subtitle}</p>
+                    <p class="mb-5 mx-auto mx-lg-0 text-white-50" style="line-height: 1.8; width: 100%; font-size: 0.95rem;">${data.hero?.subtitle}</p>
                     <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
                         <a href="${data.hero?.buttonHref}" class="modern-btn modern-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
                         ${(data.hero?.secondaryButtonText && data.hero.secondaryButtonText.trim() !== '') ? `<a href="${data.hero?.secondaryButtonHref || '#'}" class="modern-btn modern-btn-outline">${data.hero.secondaryButtonText}</a>` : ''}
@@ -842,7 +882,7 @@ ${seoBlock}
             <h2 class="text-center fw-bold mb-5 gradient-text" style="font-size: 2rem;">${data.about?.title || "The Formula"}</h2>
             <div class="row align-items-center g-5">
                 <div class="col-12 col-lg-5 text-center"><div class="glass-card p-4"><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Modern'}" class="img-fluid rounded-3" style="max-height: 400px; object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" /></div></div>
-                <div class="col-12 col-lg-7"><div class="text-white-50" style="line-height: 1.9; font-size: 0.95rem; white-space: pre-line;">${data.about?.description}</div></div>
+                <div class="col-12 col-lg-7"><div class="text-white-50 modern-template" style="line-height: 1.9; font-size: 0.95rem;">${data.about?.description}</div></div>
             </div>
         </div>
     </section>` : ''}
@@ -855,7 +895,7 @@ ${seoBlock}
                 <div class="col-lg-6">
                     <h2 class="fw-bold fs-1 mb-4 gradient-text" style="font-size: 2.5rem;">${data.research.title}</h2>
                     <p class="fs-5 text-white mb-4 opacity-75">${data.research.subtitle}</p>
-                    <div class="text-white-50 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
+                    <div class="text-white-50 mb-5 modern-template" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
                     <div class="row g-4">
                         ${data.research.stats.map((stat: any) => `
                         <div class="col-4">
@@ -1000,6 +1040,12 @@ h1, h2, h3, h4, .logo { font-family: 'IBM Plex Sans', sans-serif !important; }
 .data-label { font-family: 'IBM Plex Sans', monospace; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.5rem; display: block; }
 .clinical-header { border-left: 4px solid ${secondaryColor}; padding-left: 1rem; }
 .text-muted { color: #475569 !important; }
+/* Rich Text Editor Support */
+p { margin-bottom: 0; }
+ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+[style*="text-align: center"] { text-align: center !important; }
+[style*="text-align: right"] { text-align: right !important; }
+[style*="text-align: justify"] { text-align: justify !important; }
 @media (max-width: 992px) {
     h1 { font-size: 2.5rem !important; }
 }
@@ -1042,7 +1088,7 @@ ${seoBlock}
                 <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0">
                     ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium text-secondary hover-dark text-sm p-0">${link.label}</a>`).join('')}
                     <div class="h-6 w-px bg-light mx-2 d-none d-lg-block"></div>
-                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm d-none d-lg-inline-flex">${data.hero?.buttonText}</a>
+                    <a href="${data.hero?.buttonHref}" class="clinical-btn-primary py-2 px-4 text-sm rounded-0 shadow-sm d-none d-lg-inline-flex">Order Now</a>
                 </div>
             </div>
         </div>
@@ -1096,7 +1142,7 @@ ${seoBlock}
                 </div>
                 <div class="protocol-text">
                     <div class="p-3 bg-light border-start border-2 border-secondary mb-3 d-flex gap-3 align-items-center"><i class="fa-solid fa-circle-info text-muted"></i><p class="mb-0 text-muted uppercase tracking-tight" style="font-size: 11px; font-family: monospace;">Clinical Note: Data suggests 60-day adherence for optimal metabolic synchronization.</p></div>
-                    <div class="text-muted" style="line-height: 1.7; font-size: 1.05rem; white-space: pre-line; text-align: justify; font-family: serif;">${data.about?.description}</div>
+                    <div class="text-muted" style="line-height: 1.7; font-size: 1.05rem; text-align: justify; font-family: serif;">${data.about?.description}</div>
                 </div>
             </div>
         </div>
@@ -1291,7 +1337,7 @@ ${seoBlock}
             </a>
             <div class="d-none d-lg-flex align-items-center gap-5">
                 ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-bold p-0 text-decoration-none font-serif italic" style="color: ${secondaryColor}; font-size: 1rem;">${link.label}</a>`).join('')}
-                <a href="${data.hero?.buttonHref}" class="organic-btn-primary shadow-sm">${data.hero?.buttonText}</a>
+                <a href="${data.hero?.buttonHref}" class="organic-btn-primary shadow-sm">Order Now</a>
             </div>
         </div>
     </nav>
@@ -1304,7 +1350,7 @@ ${seoBlock}
                     <span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">${data.hero.badgeText}</span>
                     ` : `<span class="font-serif italic mb-3 d-block fs-5" style="color: ${secondaryColor}">Pure • Earth-Sourced • Balanced</span>`}
                     <h1 class="fw-bold mb-4" style="color: ${primaryColor}; font-size: clamp(2.2rem, 5vw, 3.8rem); line-height: 1.1;">${data.hero?.title}</h1>
-                    <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; width: 100%; font-size: 1.05rem; white-space: pre-line;">${data.hero?.subtitle}</p>
+                    <p class="mb-5 mx-auto mx-lg-0" style="color: #6A5949; line-height: 1.8; width: 100%; font-size: 1.05rem;">${data.hero?.subtitle}</p>
                     <a href="${data.hero?.buttonHref}" class="organic-btn-primary">${data.hero?.buttonText} <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i></a>
                 </div>
                 <div class="col-12 col-lg-6 text-center position-relative">
@@ -1372,7 +1418,7 @@ ${seoBlock}
         <div class="container py-lg-5">
             <div class="row align-items-center g-5">
                 <div class="col-lg-5"><div class="position-relative"><div class="position-absolute top-0 start-0 w-100 h-100 organic-blob" style="background: ${secondaryColor}; transform: translate(-5%, 5%); opacity: 0.1;"></div><img src="${data.about?.image}" alt="${data.about?.imageAlt || 'About Product Organic'}" class="img-fluid position-relative z-1 shadow-sm" style="object-fit: ${data.about.isCircular ? 'cover' : 'contain'}; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 1.5rem;'}" /></div></div>
-                <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line; text-align: justify;">${data.about?.description}</div></div>
+                <div class="col-lg-7 ps-lg-5"><h2 class="fw-bold mb-4 font-serif" style="color: ${primaryColor}; font-size: 2.5rem;">${data.about?.title || "Our Roots"}</h2><div class="text-muted" style="line-height: 1.9; font-size: 1.1rem; text-align: justify;">${data.about?.description}</div></div>
             </div>
         </div>
     </section>` : ''}
@@ -1503,7 +1549,7 @@ ${seoBlock}
     if (data.features) data.features.forEach((f: any) => { if (f.image) imageSources.add(f.image); });
     if (data.ingredients?.items) data.ingredients.items.forEach((i: any) => { if (i.image) imageSources.add(i.image); });
     if (data.pricing) data.pricing.forEach((p: any) => { if (p.image) imageSources.add(p.image); });
-    if (data.logos) data.logos.forEach((l: string) => { if (l) imageSources.add(l); });
+    if (data.logos) data.logos.forEach((l: any) => { if (l?.src) imageSources.add(l.src); else if (typeof l === 'string') imageSources.add(l); });
     if (data.footer?.trustImage) imageSources.add(data.footer.trustImage);
     if (data.testimonials?.items) data.testimonials.items.forEach((t: any) => { if (t.image) imageSources.add(t.image); });
 
@@ -1652,7 +1698,7 @@ ${seoBlock}
                 <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
                     <h1 class="fw-bold mb-5">${page.title}</h1>
                     <div class="text-secondary markdown-content" style="line-height: 1.8; font-size: 1.1rem; text-align: justify;">
-${marked.parse(page.content)}
+${page.content}
                     </div>
                     <div class="mt-5 pt-4 border-top">
                         <a href="index.html" class="btn btn-outline-dark px-4 py-2 fw-bold uppercase" style="border-radius: 0; font-size: 12px; letter-spacing: 1px;">← Back to Home</a>

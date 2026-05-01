@@ -697,7 +697,7 @@ export const GlycopezilTemplate: React.FC = () => {
               )}
               <div className="clearfix">
                 {/* Image Section - Floated Right for Newspaper Style */}
-                <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
+                <div className="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center relative z-[100000]">
                   <div className="relative inline-block p-3 bg-white rounded-none shadow-md border border-gray-100 transition-transform hover:scale-[1.01] duration-300 w-full">
                     <EditableImage
                       src={projectData.about.image || '/image/banner-img.webp'}
