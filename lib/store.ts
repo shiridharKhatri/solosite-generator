@@ -13,13 +13,9 @@ export interface ProjectData {
     secondaryIcon?: string;
     image: string;
     imageAlt?: string;
-    badgeText?: string;
-    badgeImage?: string;
-    badgeImageAlt?: string;
     logoImage?: string;
     logoImageAlt?: string;
     imageIsCircular?: boolean;
-    badgeImageIsCircular?: boolean;
     logoImageIsCircular?: boolean;
   };
   logos: { src: string; alt?: string; isCircular?: boolean }[];
@@ -285,9 +281,6 @@ export const initialProjectData: ProjectData = {
     secondaryIcon: "fa-solid fa-arrow-right",
     image: "/image/index-img.webp",
     imageAlt: "Glycopezil Product Bottle front view",
-    badgeImage: "/image/supplement fats.webp",
-    badgeImageAlt: "Natural Supplement Facts Badge",
-    badgeText: "Natural Blood Support",
     logoImage: "",
     logoImageAlt: "Glycopezil Logo"
   },

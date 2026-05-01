@@ -27,8 +27,8 @@ export async function generateProjectZip(data: any) {
                 zIndex = 100;
                 filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.12))';
             } else {
-                const x = side * (pairIndex * 44) - 50; 
-                const y = -50; 
+                const x = side * (pairIndex * 44) - 50;
+                const y = -50;
                 const scale = 0.95;
                 transform = `translate(${x}%, ${y}%) scale(${scale})`;
                 zIndex = 50 - pairIndex;
@@ -46,7 +46,13 @@ export async function generateProjectZip(data: any) {
     const cssFolder = zip.folder("css");
 
     // Sitemap & Robots
-    const baseUrl = data.seo?.canonicalUrl || 'https://example.com';
+    let baseUrl = data.seo?.canonicalUrl || 'https://example.com';
+
+    // Prevent localhost from leaking into production exports
+    if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+        baseUrl = 'https://example.com';
+    }
+
     const legalPageLinks = [
         'privacy-policy.html',
         'disclaimer.html',
@@ -62,7 +68,29 @@ export async function generateProjectZip(data: any) {
 ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5</priority></url>`).join('\n')}
 </urlset>`;
     zip.file("sitemap.xml", sitemap);
-    zip.file("robots.txt", `User-agent: *\nAllow: /\nSitemap: ${baseUrl}/sitemap.xml`);
+
+    // DYNAMIC SITEMAP (PHP) - Auto-detects domain for Hostinger/PHP hosts
+    const sitemapPhp = `<?php
+header('Content-Type: application/xml; charset=utf-8');
+$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
+$host = $_SERVER['HTTP_HOST'];
+$domain = $protocol . "://" . $host;
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc><?php echo $domain; ?>/index.html</loc><priority>1.0</priority></url>
+${legalPageLinks.map(link => `  <url><loc><?php echo $domain; ?>/${link}</loc><priority>0.5</priority></url>`).join('\n')}
+</urlset>`;
+    zip.file("sitemap.php", sitemapPhp);
+
+    zip.file("robots.txt", `User-agent: *
+Allow: /
+
+# Auto-detecting Sitemap (Works on PHP/Hostinger)
+Sitemap: /sitemap.php
+
+# Fallback Sitemap
+Sitemap: ${baseUrl}/sitemap.xml`);
 
     // Order Page (order.html) - Professional high-trust redirect
     const orderLink = data.orderLink || 'https://example.com';
@@ -166,6 +194,19 @@ ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5<
     </style>
     <script>
       (function() {
+        // Smart Domain Detection
+        const currentOrigin = window.location.origin;
+        if (currentOrigin && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical && (canonical.href.includes('example.com') || !canonical.href)) {
+                canonical.href = currentOrigin + window.location.pathname;
+            }
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl && (ogUrl.content.includes('example.com') || !ogUrl.content)) {
+                ogUrl.content = currentOrigin + window.location.pathname;
+            }
+        }
+
         const items = ${JSON.stringify(data.socialProof?.items || [])};
         if (!items.length) return;
         let index = 0;
@@ -195,7 +236,23 @@ ${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5<
         }, 3000);
       })();
     </script>
-    ` : '';
+    ` : `
+    <script>
+      (function() {
+        const currentOrigin = window.location.origin;
+        if (currentOrigin && !currentOrigin.includes('localhost') && !currentOrigin.includes('127.0.0.1')) {
+            const canonical = document.querySelector('link[rel="canonical"]');
+            if (canonical && (canonical.href.includes('example.com') || !canonical.href)) {
+                canonical.href = currentOrigin + window.location.pathname;
+            }
+            const ogUrl = document.querySelector('meta[property="og:url"]');
+            if (ogUrl && (ogUrl.content.includes('example.com') || !ogUrl.content)) {
+                ogUrl.content = currentOrigin + window.location.pathname;
+            }
+        }
+      })();
+    </script>
+    `;
 
     const scrollToTopBlock = `
     <!-- Scroll To Top -->
@@ -380,7 +437,8 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
 .logo { color: ${secondaryColor}; text-decoration: none; font-weight: 800; }
 .bgbadge { background-color: white; border: 0.5px solid ${primaryColor}; border-radius: 20px; color: rgb(5, 0, 0); width: 100%; max-width: 312px; min-height: 380px; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 1.5rem; margin: 0 auto; }
 .ing { border-radius: 12px; }
-.btn-custom-pill { background-color: ${secondaryColor}; color: black; font-weight: 700; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.05); padding: 0.75rem 2rem; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none; }
+.btn-custom-pill { background-color: ${secondaryColor}; color: black; font-weight: 700; border-radius: 9999px; border: 1px solid rgba(0,0,0,0.05); padding: 0.75rem 2.5rem; transition: all 0.3s ease; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; text-decoration: none; white-space: normal; text-align: center; min-width: max-content; text-transform: uppercase; letter-spacing: 0.05em; font-size: 0.85rem; }
+@media (max-width: 576px) { section .btn-custom-pill { min-width: 100%; } }
 .btn-custom-pill:hover { opacity: 0.9; transform: translateY(-2px); color: black; }
 .about-description { text-align: justify; }
 .text-muted, .text-muted * { color: #444 !important; }
@@ -404,7 +462,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="css/style.css" />
     <style>
       .sectioncolor { background-color: ${primaryColor}; color: white; }
@@ -431,8 +489,8 @@ ${seoBlock}
                     <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
                 </a>
                 <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif;">Order Now</a>
-                    <button class="navbar-toggler border-0 shadow-none px-1 ms-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Order Now</a>
+                    <button class="navbar-toggler border-0 shadow-none px-2 ms-2 flex-shrink-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fa-solid fa-bars fs-3 text-dark"></i>
                     </button>
                 </div>
@@ -440,7 +498,7 @@ ${seoBlock}
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
                         ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
-                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important; padding: 0.6rem 1.5rem; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; white-space: nowrap;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
                     </div>
                 </div>
             </div>
@@ -453,9 +511,6 @@ ${seoBlock}
                 <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0">
                     <div class="position-relative d-inline-block mb-3">
                         <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="img-fluid mx-auto d-block" style="max-height: 50vh; ${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
-                        <div class="position-absolute top-0 end-0" style="width: 80px; transform: translate(25%, -25%);">
-                            <img src="${data.hero?.badgeImage || ''}" alt="${data.hero?.badgeImageAlt || 'Supplement Facts'}" class="img-fluid" style="${data.hero.badgeImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
-                        </div>
                     </div>
                     ${data.timer?.enabled ? `
                     <div class="my-3 d-flex justify-content-center w-100 px-3">
@@ -491,9 +546,9 @@ ${seoBlock}
                 <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start pt-3 pt-lg-4">
                     <h1 class="fw-bold mb-3" style="font-size: clamp(1.5rem, 4vw, 2.75rem); line-height: 1.15;">${data.hero?.title}</h1>
                     <p class="fs-6 mt-2 fw-medium text-dark opacity-75 mx-auto mx-lg-0" style="line-height: 1.7; width: 100%; text-align: justify;">${data.hero?.subtitle}</p>
-                    <div class="d-flex flex-wrap gap-3 justify-content-center justify-content-lg-start mt-4">
-                        <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none" style="min-width: 200px; background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
-                        <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; min-width: 200px; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
+                    <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center mt-4">
+                        <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
+                        <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
                     </div>
                 </div>
             </div>
@@ -773,7 +828,7 @@ ${seoBlock}
     <title>${data.productName}</title>
     ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap');
         
@@ -898,6 +953,10 @@ ${seoBlock}
         .bg-stone-100 { background-color: #f5f5f4; }
         .tracking-widest { letter-spacing: 0.1em; }
         .tracking-tighter { letter-spacing: -0.05em; }
+        .organic-btn { padding: 1rem 2.5rem; font-weight: 700; letter-spacing: 0.15em; text-transform: uppercase; font-size: 0.7rem; transition: all 0.4s ease; border: none; display: inline-flex; align-items: center; justify-content: center; gap: 0.75rem; cursor: pointer; text-decoration: none; border-radius: 9999px; white-space: normal; text-align: center; min-width: max-content; }
+@media (max-width: 576px) { section .organic-btn { min-width: 100%; } }
+        .organic-btn-primary { background: var(--org-primary); color: #ffffff; }
+        .organic-btn-outline { background: transparent; border: 1.5px solid var(--org-primary); color: var(--org-primary); }
         .italic { font-style: italic; }
         .small { font-size: 0.875rem; }
         .opacity-75 { opacity: 0.75; }
@@ -921,7 +980,7 @@ ${seoBlock}
                 </div>
                 <span class="fs-3 fw-bold logo" style="color: var(--org-primary);">${data.productName}</span>
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler border-0 shadow-none px-2" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <i class="fa-solid fa-bars fs-3 text-dark"></i>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -940,7 +999,7 @@ ${seoBlock}
                 <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
                     <h1 class="display-3 fw-bold mb-3" style="line-height: 0.9;">${data.hero?.title}</h1>
                     <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${data.hero?.subtitle}</p>
-                    <div class="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
+                    <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center">
                         <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
                             <span>${data.hero?.buttonText}</span>
                             <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i>

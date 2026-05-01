@@ -638,16 +638,11 @@ export default function EditorPage() {
                         />
                       </div>
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 gap-3">
                       <ImageUploadField
                         label="Hero Image"
                         value={projectData.hero.image}
                         onChange={(url) => updateHero({ image: url })}
-                      />
-                      <ImageUploadField
-                        label="Badge Image"
-                        value={projectData.hero.badgeImage || ''}
-                        onChange={(url) => updateHero({ badgeImage: url })}
                       />
                     </div>
                     <div className="space-y-1.5">
@@ -1415,7 +1410,16 @@ export default function EditorPage() {
                 <div className="space-y-3 animate-in fade-in slide-in-from-right-4 duration-300">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Canonical URL</label>
+                      <div className="flex justify-between items-center mb-1">
+                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide">Canonical URL</label>
+                        <button
+                          onClick={() => updateSEO({ canonicalUrl: window.location.origin })}
+                          className="text-[9px] font-black text-blue-600 hover:text-blue-700 flex items-center gap-1"
+                        >
+                          <i className="fa-solid fa-wand-magic-sparkles"></i>
+                          Detect Domain
+                        </button>
+                      </div>
                       <input type="text" placeholder="https://example.com" value={projectData.seo?.canonicalUrl || ''} onChange={(e) => updateSEO({ canonicalUrl: e.target.value })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none" />
                     </div>
                     <div>

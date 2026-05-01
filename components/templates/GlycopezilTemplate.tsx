@@ -49,7 +49,7 @@ const Linkable = ({ children, link, onLinkChange, className = "" }: { children: 
   return (
     <div
       onContextMenu={handleRightClick}
-      className={`relative group/link ${className}`}
+      className={`relative group/link inline-flex items-center ${className}`}
     >
       {children}
       {showSettings && (
@@ -115,9 +115,9 @@ const getBottleStyle = (idx: number, total: number) => {
   const pairIndex = Math.floor(bgIdx / 2) + 1;
 
   // Slightly wider horizontal alignment for a cleaner, less attached look
-  const x = side * (pairIndex * 44) - 50; 
-  const y = -50; 
-  const rotate = 0; 
+  const x = side * (pairIndex * 44) - 50;
+  const y = -50;
+  const rotate = 0;
   const scale = 0.95;
   const zIndex = 50 - pairIndex;
 
@@ -240,7 +240,7 @@ export const GlycopezilTemplate: React.FC = () => {
     <div className="glycopezil-template relative overflow-x-hidden bg-white">
       {/* Bootstrap & Icons */}
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -442,18 +442,25 @@ export const GlycopezilTemplate: React.FC = () => {
             font-weight: 700;
             border-radius: 9999px;
             border: none;
-            padding: 0.75rem 2rem;
+            padding: 0.75rem 2.5rem;
             border: 1px solid rgba(0,0,0,0.05);
             transition: all 0.3s ease;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.5rem;
-            text-transform: capitalize;
+            gap: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
             text-decoration: none;
             white-space: normal;
-            word-break: break-word;
-            max-width: 100%;
+            text-align: center;
+            min-width: max-content;
+            font-size: 0.85rem;
+        }
+        @media (max-width: 576px) {
+            section .btn-custom-pill {
+                min-width: 100%;
+            }
         }
         .btn-custom-pill:hover {
             opacity: 0.9;
@@ -533,14 +540,14 @@ export const GlycopezilTemplate: React.FC = () => {
                 </button>
               </Linkable>
             </div>
-            <div className="d-flex align-items-center gap-2 d-lg-none">
+            <div className="d-flex align-items-center gap-2 d-lg-none ms-auto">
               <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
-                <button className="btn-custom-pill py-2 px-3 fs-6 text-nowrap" style={{ minWidth: 'auto', width: 'auto', whiteSpace: 'nowrap' }}>
+                <button className="btn-custom-pill py-2 px-3 fs-6 text-nowrap" style={{ minWidth: 'auto', width: 'auto', maxWidth: '140px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                   <EditableText tagName="span" value={projectData.hero.buttonText} onChange={() => { }} />
                 </button>
               </Linkable>
-              {/* Mobile Toggler */}
-              <button className="border-none bg-transparent p-2 text-[#FF922B]" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+              {/* Mobile Toggler - Fixed visibility and priority */}
+              <button className="border-none bg-transparent p-2 text-dark flex-shrink-0" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ zIndex: 50 }}>
                 <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} fs-2`}></i>
               </button>
             </div>
@@ -660,7 +667,7 @@ export const GlycopezilTemplate: React.FC = () => {
               />
 
               <div className="mt-4">
-                <div className="flex flex-wrap gap-3 justify-center justify-content-lg-start">
+                <div className="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center">
                   <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
                     <div className="btn-custom-pill px-5 py-2.5 fs-6">
                       <EditableText tagName="span" value={projectData.hero.buttonText} onChange={(val) => updateHero({ buttonText: val })} />

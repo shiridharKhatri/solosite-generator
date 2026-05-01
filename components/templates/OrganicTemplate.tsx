@@ -70,7 +70,7 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
     <div onContextMenu={(e) => {
       if (onContextMenu) { onContextMenu(e); }
       else { e.preventDefault(); setPos({ x: e.clientX, y: e.clientY }); setShowSettings(true); }
-    }} className={`relative group/link ${className}`}>
+    }} className={`relative group/link inline-flex items-center ${className}`}>
       {children}
       {showSettings && (<><div className="fixed inset-0 z-[99998]" onClick={() => setShowSettings(false)} /><LinkSettings link={link} onChange={onLinkChange} onClose={() => setShowSettings(false)} x={pos.x} y={pos.y} /></>)}
       <button onClick={(e) => { e.preventDefault(); e.stopPropagation(); setPos({ x: e.clientX, y: e.clientY }); setShowSettings(true); }} className="absolute -top-3 left-1/2 -translate-x-1/2 opacity-0 group-hover/link:opacity-100 transition-all bg-green-800 text-white px-2 py-1 rounded-none shadow-xl z-50 flex items-center gap-1 border-none hover:bg-green-900 hover:scale-105" title="Edit Link Settings">
@@ -92,9 +92,9 @@ const getBottleStyle = (idx: number, total: number) => {
   const pairIndex = Math.floor(bgIdx / 2) + 1;
 
   // Slightly wider horizontal alignment for a cleaner, less attached look
-  const x = side * (pairIndex * 44) - 50; 
-  const y = -50; 
-  const rotate = 0; 
+  const x = side * (pairIndex * 44) - 50;
+  const y = -50;
+  const rotate = 0;
   const scale = 0.95;
   const zIndex = 50 - pairIndex;
 
@@ -213,7 +213,7 @@ export const OrganicTemplate: React.FC = () => {
   return (
     <div className="organic-template relative bg-[#F9F7F2] text-[#3D3A35]">
       <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" />
-      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.1/css/all.min.css" />
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
       <style dangerouslySetInnerHTML={{
         __html: `
@@ -371,17 +371,14 @@ export const OrganicTemplate: React.FC = () => {
               </button>
             </Linkable>
           </div>
-          <div className="d-flex align-items-center gap-3 d-lg-none">
+          <div className="d-flex align-items-center gap-2 d-lg-none ms-auto">
             <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
               <button className="organic-btn organic-btn-primary py-2 px-3 text-nowrap" style={{ fontSize: '0.65rem', width: 'auto' }}>
                 <EditableText tagName="span" value="Shop Now" onChange={() => { }} />
               </button>
             </Linkable>
-            <button className="border-none bg-transparent p-1" onClick={() => setIsMenuOpen(!isMenuOpen)}>
-              <div className="d-flex flex-column gap-1.5">
-                <div style={{ width: '22px', height: '1px', background: primary }}></div>
-                <div style={{ width: '22px', height: '1px', background: primary }}></div>
-              </div>
+            <button className="border-none bg-transparent p-2 text-dark flex-shrink-0" onClick={() => setIsMenuOpen(!isMenuOpen)} style={{ zIndex: 50 }}>
+              <i className={`fa-solid ${isMenuOpen ? 'fa-xmark' : 'fa-bars'} fs-2`}></i>
             </button>
           </div>
         </div>
@@ -402,7 +399,7 @@ export const OrganicTemplate: React.FC = () => {
             <div className="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
               <EditableText tagName="h1" value={projectData.hero.title} onChange={(val) => updateHero({ title: val })} className="display-3 fw-bold mb-3" style={{ color: primary, lineHeight: 0.9 }} />
               <EditableText tagName="p" value={projectData.hero.subtitle} onChange={(val) => updateHero({ subtitle: val })} className="fs-6 text-stone-700 mb-4 italic font-serif w-100" style={{ lineHeight: 1.6 }} />
-              <div className="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
+              <div className="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center">
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
                   <button className="organic-btn organic-btn-primary">
                     <EditableText tagName="span" value={projectData.hero.buttonText} onChange={(val) => updateHero({ buttonText: val })} />
@@ -708,7 +705,7 @@ export const OrganicTemplate: React.FC = () => {
                       </div>
                       <BottleStack
                         src={plan.image || '/image/bottle-snap.webp'}
-                        alt={plan.imageAlt}
+                        alt={plan.imageAlt || ""}
                         multiplier={plan.multiplier || "X1"}
                         onChange={(val) => updatePricing(i, { image: val })}
                         onAltChange={(val) => updatePricing(i, { imageAlt: val })}
