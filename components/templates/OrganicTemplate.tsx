@@ -327,8 +327,7 @@ export const OrganicTemplate: React.FC = () => {
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
-              <span className="text-[10px] fw-bold text-stone-600 uppercase tracking-[0.4em] mb-3 d-block">Hand-Crafted • Botanical • Pure</span>
-              <EditableText tagName="h1" value={projectData.hero.title} onChange={(val) => updateHero({ title: val })} className="display-3 fw-bold mb-3" style={{ color: primary, lineHeight: 1.05 }} />
+              <EditableText tagName="h1" value={projectData.hero.title} onChange={(val) => updateHero({ title: val })} className="display-3 fw-bold mb-3" style={{ color: primary, lineHeight: 0.9 }} />
               <EditableText tagName="p" value={projectData.hero.subtitle} onChange={(val) => updateHero({ subtitle: val })} className="fs-6 text-stone-700 mb-4 italic font-serif w-100" style={{ lineHeight: 1.6 }} />
               <div className="d-flex flex-wrap gap-4 justify-content-center justify-content-lg-start">
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
