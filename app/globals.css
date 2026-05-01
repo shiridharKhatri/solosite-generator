@@ -74,4 +74,18 @@ h1, h2, h3, h4, .font-headline {
 
 .mobile-preview .d-flex.d-lg-none { display: flex !important; }
 .mobile-preview .d-lg-none:not(.d-flex) { display: block !important; }
-
+/* RichTextEditor (Tiptap) Styles */
+.is-inline-editor .tiptap { display: inline; width: auto; height: auto; }
+.is-inline-editor .tiptap p { display: inline; margin: 0; }
+.is-block-editor .tiptap p { margin-bottom: 1rem; }
+.is-block-editor .tiptap p:last-child { margin-bottom: 0; }
+.tiptap ul, .tiptap ol { padding-left: 1.2rem; margin: 0.5rem 0; }
+.tiptap a { color: inherit; text-decoration: underline; }
+/* Tiptap placeholder */
+.tiptap p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: #adb5bd;
+  pointer-events: none;
+  height: 0;
+}

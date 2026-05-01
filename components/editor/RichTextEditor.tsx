@@ -137,15 +137,7 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
       className={`relative group/editor ${isInline ? 'is-inline-editor' : 'is-block-editor'}`}
       style={{ zIndex: (editor?.isFocused || showSizeDropdown) ? 99999 : undefined }}
     >
-      <style dangerouslySetInnerHTML={{
-        __html: `
-        .is-inline-editor .tiptap { display: inline; width: auto; height: auto; }
-        .is-inline-editor .tiptap p { display: inline; margin: 0; }
-        .is-block-editor .tiptap p { margin-bottom: 1rem; }
-        .is-block-editor .tiptap p:last-child { margin-bottom: 0; }
-        .tiptap ul, .tiptap ol { padding-left: 1.2rem; margin: 0.5rem 0; }
-        .tiptap a { color: inherit; text-decoration: underline; }
-      `}} />
+
       {editor && (
         <BubbleMenu editor={editor} updateDelay={0}>
           <div className="flex items-center gap-0.5 bg-[#1a1b26] border border-white/20 p-1 shadow-2xl rounded-lg animate-in fade-in zoom-in-95 duration-200 backdrop-blur-md font-sans text-xs font-normal normal-case tracking-normal leading-normal text-left" style={{ zIndex: 999999 }}>

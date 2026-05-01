@@ -247,7 +247,14 @@ export default function EditorPage() {
     }
   }, [projectData]);
 
-  if (!projectData) return <div>Loading...</div>;
+  if (!projectData) return (
+    <div className="fixed inset-0 bg-white flex items-center justify-center">
+      <div className="flex flex-col items-center gap-3">
+        <i className="fa-solid fa-cube text-4xl text-blue-600 animate-bounce"></i>
+        <span className="text-xs font-black uppercase tracking-widest text-slate-400">Loading project...</span>
+      </div>
+    </div>
+  );
 
   const activeTemplate = React.useMemo(() => {
     switch (projectData?.layoutStyle) {
@@ -1530,7 +1537,7 @@ export default function EditorPage() {
                     />
                   </div>
                 </div>
-                <style jsx global>{`
+                <style>{`
                   .markdown-preview h1, .markdown-preview h2, .markdown-preview h3 { font-weight: 800; margin: 1.5rem 0 0.5rem; color: #111; }
                   .markdown-preview p { margin-bottom: 1rem; line-height: 1.6; }
                   .markdown-preview ul, .markdown-preview ol { padding-left: 1.5rem; margin-bottom: 1rem; }
