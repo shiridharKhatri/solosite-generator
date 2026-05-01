@@ -82,6 +82,79 @@ const Linkable = ({ children, link, onLinkChange, className = "", onContextMenu 
   );
 };
 
+const getBottleStyle = (idx: number, total: number) => {
+  const isMain = idx === total - 1;
+  // Main bottle is prominent, centered, and slightly larger
+  if (isMain) return { transform: 'translate(-50%, -50%) scale(1.15)', zIndex: 100 };
+
+  const bgIdx = total - 2 - idx;
+  const side = bgIdx % 2 === 0 ? -1 : 1;
+  const pairIndex = Math.floor(bgIdx / 2) + 1;
+
+  // Slightly wider horizontal alignment for a cleaner, less attached look
+  const x = side * (pairIndex * 44) - 50; 
+  const y = -50; 
+  const rotate = 0; 
+  const scale = 0.95;
+  const zIndex = 50 - pairIndex;
+
+  return {
+    transform: `translate(${x}%, ${y}%) rotate(${rotate}deg) scale(${scale})`,
+    zIndex,
+    filter: `drop-shadow(0 15px 30px rgba(0,0,0,0.12))`
+  };
+};
+
+const BottleStack = ({ src, alt, multiplier, onChange, onAltChange }: {
+  src: string;
+  alt: string;
+  multiplier: string;
+  onChange: (val: string) => void;
+  onAltChange: (val: string) => void;
+}) => {
+  const count = parseInt(multiplier.replace(/[^0-9]/g, '')) || 1;
+  const safeCount = Math.min(Math.max(count, 1), 10);
+  const indices = Array.from({ length: safeCount }, (_, i) => i);
+
+  return (
+    <div className="relative h-[200px] w-full overflow-visible perspective-[1200px]">
+      {indices.map((idx) => {
+        const isMain = idx === indices.length - 1;
+        const style = getBottleStyle(idx, indices.length);
+
+        if (isMain) {
+          return (
+            <div key={idx} className="absolute left-1/2 top-1/2 w-full flex items-center justify-center transition-all duration-700 cubic-bezier(0.34, 1.56, 0.64, 1)" style={{ transform: style.transform, zIndex: style.zIndex }}>
+              <EditableImage
+                src={src}
+                alt={alt}
+                onChange={onChange}
+                onAltChange={onAltChange}
+                className="img-fluid mx-auto transition-all duration-1000"
+                style={{ height: '180px', objectFit: 'contain' }}
+              />
+            </div>
+          );
+        }
+
+        return (
+          <img
+            key={idx}
+            src={src}
+            alt={alt}
+            className="absolute left-1/2 top-1/2 h-[180px] object-contain transition-all duration-1000 cubic-bezier(0.34, 1.56, 0.64, 1) pointer-events-none"
+            style={{
+              transform: style.transform,
+              zIndex: style.zIndex,
+              filter: style.filter
+            }}
+          />
+        );
+      })}
+    </div>
+  );
+};
+
 export const OrganicTemplate: React.FC = () => {
   const {
     projectData, updateHero, updateAbout, updateFeature, addFeature, removeFeature,
@@ -633,13 +706,12 @@ export const OrganicTemplate: React.FC = () => {
                           />
                         </div>
                       </div>
-                      <EditableImage
+                      <BottleStack
                         src={plan.image || '/image/bottle-snap.webp'}
                         alt={plan.imageAlt}
+                        multiplier={plan.multiplier || "X1"}
                         onChange={(val) => updatePricing(i, { image: val })}
                         onAltChange={(val) => updatePricing(i, { imageAlt: val })}
-                        className="img-fluid mx-auto grayscale hover:grayscale-0 transition-all duration-1000"
-                        style={{ height: '150px', objectFit: 'contain' }}
                       />
                     </div>
                     <EditableText tagName="div" className="fw-bold mb-4 font-serif text-3xl" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />

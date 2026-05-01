@@ -7,6 +7,40 @@ marked.setOptions({
 });
 
 export async function generateProjectZip(data: any) {
+    // Helper to render the multi-bottle stack in static exports
+    const renderBottleStack = (multiplier: string, image: string, title: string, height: string = '160px') => {
+        const total = parseInt(multiplier.replace(/[^0-9]/g, '')) || 1;
+        if (total <= 1) {
+            return `<img src="${image}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain;" />`;
+        }
+
+        const bottles = Array.from({ length: Math.min(total, 10) });
+        const stackHtml = bottles.map((_, idx) => {
+            const isMain = idx === bottles.length - 1;
+            const bgIdx = bottles.length - 2 - idx;
+            const side = bgIdx % 2 === 0 ? -1 : 1;
+            const pairIndex = Math.floor(bgIdx / 2) + 1;
+
+            let transform, zIndex, filter;
+            if (isMain) {
+                transform = 'translate(-50%, -50%) scale(1.15)';
+                zIndex = 100;
+                filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.12))';
+            } else {
+                const x = side * (pairIndex * 44) - 50; 
+                const y = -50; 
+                const scale = 0.95;
+                transform = `translate(${x}%, ${y}%) scale(${scale})`;
+                zIndex = 50 - pairIndex;
+                filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.08))';
+            }
+
+            return `<img src="${image}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
+        }).join('');
+
+        return `<div style="position: relative; height: ${height}; width: 100%; margin-bottom: 20px;">${stackHtml}</div>`;
+    };
+
     const zip = new JSZip();
     const imagesFolder = zip.folder("images");
     const cssFolder = zip.folder("css");
@@ -627,14 +661,14 @@ ${seoBlock}
             <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-md fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase">${plan.title}</h3>
-                <div class="position-relative mx-auto mb-3" style="width: 160px;">
-                    <div class="position-absolute top-0 end-0" style="z-index: 2; transform: translate(10%, -10%);">
+                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 160px;">
+                    <div class="position-absolute top-0 end-0" style="z-index: 150; transform: translate(10%, -10%);">
                         <div style="position: relative;">
                             <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); transform: translate(3px, 3px);"></div>
                             <div style="position: relative; background: #000; color: #fff; padding: 4px 8px; font-weight: 900; font-size: 11px; border: 1px solid #fff;">${plan.multiplier || 'X1'}</div>
                         </div>
                     </div>
-                    <img src="${plan.image || 'https://placehold.co/400x400?text=Product'}" alt="${plan.imageAlt || plan.title}" class="mx-auto" style="height: 160px; ${plan.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
+                    ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '160px')}
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
                     <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
@@ -1105,12 +1139,12 @@ ${seoBlock}
                         ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
                         <div class="p-5 flex-grow-1 text-center">
                             <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
-                            <div class="relative mb-5 position-relative">
+                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 150px;">
                                 ${plan.multiplier ? `
-                                <div class="position-absolute top-0 end-0 translate-middle-y me-n2 mt-n2 z-index-10">
+                                <div class="position-absolute top-0 end-0 translate-middle-y me-n2 mt-n2" style="z-index: 150;">
                                     <div class="bg-dark text-white px-3 py-1.5 font-serif italic text-xs shadow-sm" style="background-color: #1e3932;">${plan.multiplier}</div>
                                 </div>` : ''}
-                                <img src="${plan.image}" alt="${plan.title}" class="img-fluid mx-auto grayscale hover:grayscale-0 transition-all duration-1000" style="height: 150px; object-fit: contain;" />
+                                ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '150px')}
                             </div>
                             <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
                             <div class="mb-5 text-start ps-4 border-start border-stone-100">

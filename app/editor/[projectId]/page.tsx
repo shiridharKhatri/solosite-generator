@@ -272,10 +272,6 @@ export default function EditorPage() {
 
   const activeTemplate = React.useMemo(() => {
     switch (projectData?.layoutStyle) {
-      case 'modern':
-        return <ModernTemplate />;
-      case 'clinical':
-        return <ClinicalTemplate />;
       case 'organic':
         return <OrganicTemplate />;
       case 'default':
