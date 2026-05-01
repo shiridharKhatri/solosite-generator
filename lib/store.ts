@@ -446,7 +446,7 @@ export const initialProjectData: ProjectData = {
       multiplier: "X1",
       price: "69",
       features: ["30 Day Supply", "60-Day Guarantee"],
-      image: "/image/bottle-snap.webp",
+      image: "/image/default.png",
       buttonText: "Buy Now For $69",
       buttonHref: "order.html",
       guaranteeBadge: {
@@ -460,7 +460,7 @@ export const initialProjectData: ProjectData = {
       multiplier: "X6",
       price: "49",
       features: ["180 Day Supply", "Free Shipping", "Huge Savings Included"],
-      image: "/image/bottle-snap.webp",
+      image: "/image/default.png",
       imageAlt: "Best Value 6 Bottles",
       isPrimary: true,
       buttonText: "Buy Now For $294",
@@ -476,7 +476,7 @@ export const initialProjectData: ProjectData = {
       multiplier: "X3",
       price: "59",
       features: ["90 Day Supply", "Significant Savings"],
-      image: "/image/bottle-snap.webp",
+      image: "/image/default.png",
       buttonText: "Buy Now For $177",
       buttonHref: "order.html",
       guaranteeBadge: {
@@ -627,11 +627,11 @@ export const initialProjectData: ProjectData = {
     interval: 8000,
     displayTime: 5000,
     items: [
-      { name: "Anthony", location: "Ohio", content: "purchased 6 bottles", timeAgo: "5 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Anthony Purchase" },
-      { name: "Sarah", location: "California", content: "purchased 3 bottles", timeAgo: "12 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Sarah Purchase" },
-      { name: "Michael", location: "Texas", content: "purchased 1 bottle", timeAgo: "24 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "Michael Purchase" },
-      { name: "James", location: "Florida", content: "purchased 6 bottles", timeAgo: "45 minutes ago", image: "/image/bottle-snap.webp", imageAlt: "James Purchase" },
-      { name: "Emily", location: "New York", content: "purchased 3 bottles", timeAgo: "1 hour ago", image: "/image/bottle-snap.webp", imageAlt: "Emily Purchase" }
+      { name: "Anthony", location: "Ohio", content: "purchased 6 bottles", timeAgo: "5 minutes ago", image: "/image/default.png", imageAlt: "Anthony Purchase" },
+      { name: "Sarah", location: "California", content: "purchased 3 bottles", timeAgo: "12 minutes ago", image: "/image/default.png", imageAlt: "Sarah Purchase" },
+      { name: "Michael", location: "Texas", content: "purchased 1 bottle", timeAgo: "24 minutes ago", image: "/image/default.png", imageAlt: "Michael Purchase" },
+      { name: "James", location: "Florida", content: "purchased 6 bottles", timeAgo: "45 minutes ago", image: "/image/default.png", imageAlt: "James Purchase" },
+      { name: "Emily", location: "New York", content: "purchased 3 bottles", timeAgo: "1 hour ago", image: "/image/default.png", imageAlt: "Emily Purchase" }
     ]
   },
   sections: {

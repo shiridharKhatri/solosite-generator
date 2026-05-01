@@ -11,7 +11,7 @@ export async function generateProjectZip(data: any) {
     const renderBottleStack = (multiplier: string, image: string, title: string, height: string = '160px') => {
         const total = parseInt(multiplier.replace(/[^0-9]/g, '')) || 1;
         if (total <= 1) {
-            return `<img src="${image}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain;" />`;
+            return `<img src="${image || '/image/default.png'}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain;" />`;
         }
 
         const bottles = Array.from({ length: Math.min(total, 10) });
@@ -35,7 +35,7 @@ export async function generateProjectZip(data: any) {
                 filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.08))';
             }
 
-            return `<img src="${image}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
+            return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
         }).join('');
 
         return `<div style="position: relative; height: ${height}; width: 100%; margin-bottom: 20px;">${stackHtml}</div>`;
@@ -1474,7 +1474,7 @@ ${seoBlock}
                 <div class="p-4 p-md-5 bg-white shadow-sm border" style="border-radius: 0;">
                     <h1 class="fw-bold mb-5">${page.title}</h1>
                     <div class="text-secondary markdown-content" style="line-height: 1.8; font-size: 1.1rem; text-align: justify;">
-${page.content}
+${await marked.parse(page.content || '')}
                     </div>
                     <div class="mt-5 pt-4 border-top">
                         <a href="index.html" class="btn btn-outline-dark px-4 py-2 fw-bold uppercase" style="border-radius: 0; font-size: 12px; letter-spacing: 1px;">← Back to Home</a>

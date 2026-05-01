@@ -704,7 +704,7 @@ export const OrganicTemplate: React.FC = () => {
                         </div>
                       </div>
                       <BottleStack
-                        src={plan.image || '/image/bottle-snap.webp'}
+                        src={plan.image || '/image/default.png'}
                         alt={plan.imageAlt || ""}
                         multiplier={plan.multiplier || "X1"}
                         onChange={(val) => updatePricing(i, { image: val })}
@@ -866,10 +866,10 @@ export const OrganicTemplate: React.FC = () => {
           </div>
           <div className="flex-shrink-0 w-16 h-16 bg-stone-50 border border-stone-100 p-1 flex items-center justify-center">
             <img
-              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/default.png'}
               className="w-full h-full object-contain grayscale"
               alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Botanical Batch"}
-              onError={(e) => { (e.target as HTMLImageElement).src = '/image/bottle-snap.webp'; }}
+              onError={(e) => { (e.target as HTMLImageElement).src = '/image/default.png'; }}
             />
           </div>
           <div className="flex flex-col">

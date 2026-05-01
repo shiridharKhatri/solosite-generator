@@ -1240,7 +1240,7 @@ export const GlycopezilTemplate: React.FC = () => {
                       </div>
 
                       <BottleStack
-                        src={plan.image || '/image/bottle-snap.webp'}
+                        src={plan.image || '/image/default.png'}
                         alt={plan.imageAlt || plan.title}
                         multiplier={plan.multiplier || "X1"}
                         onChange={(val) => updatePricing(i, { image: val })}
@@ -1426,11 +1426,11 @@ export const GlycopezilTemplate: React.FC = () => {
           </div>
           <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
             <img
-              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/bottle-snap.webp'}
+              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/default.png'}
               className="w-full h-full object-contain"
               alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Purchased Product"}
               onError={(e) => {
-                (e.target as HTMLImageElement).src = '/image/bottle-snap.webp';
+                (e.target as HTMLImageElement).src = '/image/default.png';
               }}
             />
           </div>
@@ -1557,7 +1557,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 ))}
                 <button
                   onClick={() => {
-                    const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/bottle-snap.webp" }];
+                    const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/default.png" }];
                     updateSocialProof({ items: ni });
                   }}
                   className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-[10px] font-bold uppercase border border-blue-500/30 transition-all mt-2"

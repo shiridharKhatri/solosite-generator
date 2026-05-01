@@ -13,6 +13,7 @@ function DashboardContent() {
   const filterStatus = searchParams.get('status');
   const [projects, setProjects] = useState<any[]>([]);
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -59,6 +60,7 @@ function DashboardContent() {
       const res = await fetch(`/api/projects?id=${id}`, { method: 'DELETE' });
       if (res.ok) {
         setProjects(prev => prev.filter(p => p._id !== id));
+        setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
       } else {
         const error = await res.json();
         alert(error.error || 'Failed to delete');
@@ -67,6 +69,38 @@ function DashboardContent() {
       // Silently fail or use a toast in production
     }
   }, []);
+
+  const deleteSelected = async () => {
+    if (selectedIds.length === 0) return;
+    if (!confirm(`Are you sure you want to delete ${selectedIds.length} projects?`)) return;
+
+    try {
+      const res = await fetch(`/api/projects?ids=${selectedIds.join(',')}`, { method: 'DELETE' });
+      if (res.ok) {
+        setProjects(prev => prev.filter(p => !selectedIds.includes(p._id)));
+        setSelectedIds([]);
+      } else {
+        const error = await res.json();
+        alert(error.error || 'Failed to delete selected projects');
+      }
+    } catch (error) {
+      alert('An error occurred while deleting projects');
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === projects.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(projects.map(p => p._id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
 
 
   if (status === 'loading') return <div className="p-10 text-zinc-900">Loading...</div>;
@@ -81,26 +115,47 @@ function DashboardContent() {
             <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-zinc-900 leading-tight">Recent Projects</h1>
             <p className="text-zinc-500 font-body text-lg max-w-md">Continue building your digital experiences or start a new architectural journey.</p>
           </div>
-          <div className="flex gap-3">
-            <div className="flex bg-white rounded-md p-1 border border-zinc-200">
+          <div className="flex flex-col gap-4 items-end">
+            {selectedIds.length > 0 && (
               <button
-                onClick={() => router.push('/dashboard')}
-                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${!filterStatus ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                onClick={deleteSelected}
+                className="flex items-center gap-2 px-4 py-2 bg-rose-500 text-white rounded-lg font-bold text-sm hover:bg-rose-600 transition-all shadow-lg shadow-rose-200"
               >
-                All
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                Delete {selectedIds.length} Selected
               </button>
-              <button
-                onClick={() => router.push('/dashboard?status=published')}
-                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'published' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
-              >
-                Published
-              </button>
-              <button
-                onClick={() => router.push('/dashboard?status=draft')}
-                className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'draft' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
-              >
-                Drafts
-              </button>
+            )}
+            <div className="flex gap-3">
+              <div className="flex items-center gap-3 mr-4">
+                <input
+                  type="checkbox"
+                  id="selectAll"
+                  checked={projects.length > 0 && selectedIds.length === projects.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 rounded border-zinc-300 text-primary focus:ring-primary cursor-pointer"
+                />
+                <label htmlFor="selectAll" className="text-sm font-bold text-zinc-600 cursor-pointer">Select All</label>
+              </div>
+              <div className="flex bg-white rounded-md p-1 border border-zinc-200">
+                <button
+                  onClick={() => router.push('/dashboard')}
+                  className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${!filterStatus ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => router.push('/dashboard?status=published')}
+                  className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'published' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                >
+                  Published
+                </button>
+                <button
+                  onClick={() => router.push('/dashboard?status=draft')}
+                  className={`px-6 py-2 rounded-md text-sm font-bold transition-all ${filterStatus === 'draft' ? 'bg-primary text-white' : 'text-zinc-500 hover:text-zinc-900'}`}
+                >
+                  Drafts
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -123,46 +178,82 @@ function DashboardContent() {
             </>
           ) : (
             projects.map((project) => (
-              <div key={project._id} className="group relative flex flex-col bg-white rounded-lg overflow-hidden transition-all duration-300 card-shadow hover-card-shadow border border-zinc-100/50">
-                <div className="aspect-[16/10] overflow-hidden relative bg-zinc-50">
-                  <div className="w-full h-full flex items-center justify-center text-zinc-200">
-                    <svg className="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                  </div>
-                  <div className="absolute inset-0 bg-white/40 backdrop-blur-sm flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Link href={`/editor/${project._id}`} className="w-12 h-12 rounded-md bg-primary text-white flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-primary/20">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                    </Link>
-                    <button
-                      onClick={() => deleteProject(project._id)}
-                      className="w-12 h-12 rounded-md bg-white text-rose-500 flex items-center justify-center hover:scale-110 transition-transform shadow-lg shadow-zinc-200/50"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  </div>
+              <div
+                key={project._id}
+                className={`group relative flex flex-col bg-white rounded-2xl transition-all duration-500 border ${selectedIds.includes(project._id) ? 'border-primary shadow-[0_0_0_2px_rgba(101,163,13,0.1)]' : 'border-zinc-200/60'} hover:shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 min-h-[160px] justify-center overflow-hidden`}
+              >
+                {/* Selection Checkbox */}
+                <div className="absolute top-4 right-4 z-20">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.includes(project._id)}
+                    onChange={() => toggleSelect(project._id)}
+                    className="w-5 h-5 rounded border-zinc-300 text-primary focus:ring-primary cursor-pointer transition-transform hover:scale-110"
+                    onClick={(e) => e.stopPropagation()}
+                  />
                 </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-headline text-xl font-bold text-zinc-900">{project.name}</h3>
-                    <span className={`px-2 py-1 rounded text-[10px] font-bold uppercase tracking-wider ${project.status === 'published' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700'}`}>
+
+                {/* Status Indicator Bar */}
+                <div className={`absolute top-0 left-0 w-1.5 h-full ${project.status === 'published' ? 'bg-emerald-400' : 'bg-amber-400'}`} />
+
+                <div className="flex justify-between items-center mb-4">
+                  <div className="space-y-1">
+                    <h3 className="font-headline text-2xl font-bold text-zinc-900 tracking-tight leading-none group-hover:text-primary transition-colors duration-300">
+                      {project.name ? project.name.replace(/<[^>]*>/g, '') : 'Untitled Project'}
+                    </h3>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1.5 text-zinc-400">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <p className="text-[10px] uppercase font-bold tracking-widest leading-none">Last edited {new Date(project.updatedAt).toLocaleDateString()}</p>
+                      </div>
+                      <div className="h-3 w-px bg-zinc-200"></div>
+                      <div className="flex items-center gap-1.5">
+                        <i className={`fa-solid ${project.theme === 'organic' ? 'fa-leaf text-emerald-500' : 'fa-cube text-blue-500'} text-[10px]`}></i>
+                        <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-wider">{project.theme || 'Classic'}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col items-end gap-2">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter ${project.status === 'published' ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-amber-50 text-amber-600 border border-amber-100'}`}>
                       {project.status || 'draft'}
                     </span>
+                    <div className="flex items-center gap-2 px-2 py-0.5 rounded bg-zinc-50 border border-zinc-100">
+                      <span className="text-[9px] font-black text-zinc-400 uppercase tracking-tighter">SEO</span>
+                      <span className={`text-[10px] font-bold ${project.seoScore >= 80 ? 'text-emerald-500' : project.seoScore >= 50 ? 'text-amber-500' : 'text-rose-500'}`}>
+                        {project.seoScore || 0}%
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <svg className="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    <p className="text-zinc-500 font-body text-[11px] uppercase font-bold tracking-wider leading-none">Edited {new Date(project.updatedAt).toLocaleDateString()}</p>
-                  </div>
+                </div>
+
+                {/* Subtle Geometric Background Element */}
+                <div className="absolute -right-4 -bottom-4 opacity-[0.03] group-hover:opacity-[0.07] transition-opacity duration-500 pointer-events-none">
+                  <svg className="w-32 h-32" viewBox="0 0 100 100" fill="currentColor">
+                    <circle cx="50" cy="50" r="50" />
+                  </svg>
+                </div>
+
+                {/* Refined Action Overlay */}
+                <div className="absolute inset-0 bg-zinc-900/5 backdrop-blur-[1px] flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                  <Link
+                    href={`/editor/${project._id}`}
+                    className="flex items-center gap-2 px-6 py-3 rounded-xl bg-primary text-white font-bold text-sm hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/25"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
+                    Edit Project
+                  </Link>
+                  <button
+                    onClick={() => deleteProject(project._id)}
+                    className="w-11 h-11 rounded-xl bg-white text-rose-500 flex items-center justify-center hover:bg-rose-50 hover:text-rose-600 transition-all shadow-lg border border-zinc-100"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                  </button>
                 </div>
               </div>
             ))
           )}
 
-          <Link href="/editor/new" className="group relative flex flex-col border-2 border-dashed border-zinc-200 rounded-lg aspect-[16/10] items-center justify-center hover:border-primary/50 hover:bg-zinc-50 transition-all duration-300 cursor-pointer">
-            <div className="w-16 h-16 rounded-md bg-zinc-100 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
-              <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-            </div>
-            <p className="font-headline text-lg font-bold text-zinc-900">Create New Page</p>
-            <p className="text-zinc-500 font-body text-sm">Start from a blank canvas</p>
-          </Link>
+
         </div>
 
       </main>

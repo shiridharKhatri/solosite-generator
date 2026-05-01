@@ -11,7 +11,6 @@ export const TopNavBar = ({ userEmail }: { userEmail?: string | null }) => {
 
   const navLinks = [
     { name: 'Dashboard', href: '/dashboard' },
-    { name: 'Templates', href: '/templates' },
     { name: 'Analytics', href: '/analytics' },
     { name: 'Settings', href: '/settings' },
   ];

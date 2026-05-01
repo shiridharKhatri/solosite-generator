@@ -40,13 +40,16 @@ export async function POST(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await connectDB();
-  const { name, data, status } = await req.json();
+  const { name, data, status, theme, seoScore } = await req.json();
 
   const project = await Project.create({
     userId: session.user.id, // Record who created it
     name,
     data,
     status: status || 'draft',
+    thumbnail: data?.hero?.image || '',
+    theme: theme || data?.layoutStyle || 'default',
+    seoScore: seoScore || 0,
   });
 
   return NextResponse.json(project);
@@ -57,15 +60,20 @@ export async function PUT(req: NextRequest) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   await connectDB();
-  const { id, data, status, name } = await req.json();
+  const { id, data, status, name, theme, seoScore } = await req.json();
 
   // Find project that belongs to this user
   const project = await Project.findOne({ _id: id, userId: session.user.id });
   if (!project) return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 
-  if (data) project.data = data;
+  if (data) {
+    project.data = data;
+    project.thumbnail = data?.hero?.image || '';
+  }
   if (status) project.status = status;
   if (name) project.name = name;
+  if (theme) project.theme = theme;
+  if (seoScore !== undefined) project.seoScore = seoScore;
 
   await project.save();
   return NextResponse.json(project);
@@ -75,13 +83,23 @@ export async function DELETE(req: NextRequest) {
   const session = await getServerSession(authOptions);
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  await connectDB();
   const id = req.nextUrl.searchParams.get("id");
-  // Delete only if it belongs to the current user
-  const result = await Project.deleteOne({ _id: id, userId: session.user.id });
+  const idsParam = req.nextUrl.searchParams.get("ids");
 
-  if (result.deletedCount === 0) {
-    return NextResponse.json({ error: "Project not found" }, { status: 404 });
+  if (idsParam) {
+    const ids = idsParam.split(",");
+    const result = await Project.deleteMany({ _id: { $in: ids }, userId: session.user.id });
+    return NextResponse.json({ success: true, deletedCount: result.deletedCount });
   }
 
-  return NextResponse.json({ success: true });
+  if (id) {
+    const result = await Project.deleteOne({ _id: id, userId: session.user.id });
+    if (result.deletedCount === 0) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
+    }
+    return NextResponse.json({ success: true });
+  }
+
+  return NextResponse.json({ error: "ID or IDs required" }, { status: 400 });
 }

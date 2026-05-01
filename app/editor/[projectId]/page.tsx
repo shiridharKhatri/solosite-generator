@@ -9,6 +9,7 @@ marked.setOptions({
 
 import React, { useEffect, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useStore, initialProjectData } from '@/lib/store';
 import { GlycopezilTemplate } from '@/components/templates/GlycopezilTemplate';
 import { OrganicTemplate } from '@/components/templates/OrganicTemplate';
@@ -18,10 +19,85 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { ImageUploadField } from '@/components/editor/ImageUploadField';
 import { SEOChecker } from '@/components/editor/SEOChecker';
 
-const IconLayout = () => <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" /></svg>;
+
 const IconMonitor = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
 const IconSmartphone = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" /></svg>;
 const IconDownload = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>;
+
+const LegalMarkdownEditor = ({ label, value, onChange }: { label: string; value: string; onChange: (val: string) => void }) => {
+  const [tab, setTab] = useState<'write' | 'preview'>('write');
+
+  const handlePaste = React.useCallback((e: React.ClipboardEvent) => {
+    const html = e.clipboardData.getData('text/html');
+    if (html) {
+      e.preventDefault();
+      const turndownService = new TurndownService({
+        headingStyle: 'atx',
+        hr: '---',
+        bulletListMarker: '-',
+        codeBlockStyle: 'fenced'
+      });
+      const markdown = turndownService.turndown(html);
+      
+      // Get current selection and insert markdown
+      const target = e.target as HTMLTextAreaElement;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
+      const text = target.value;
+      const newText = text.substring(0, start) + markdown + text.substring(end);
+      onChange(newText);
+      
+      // Small timeout to move cursor after paste
+      setTimeout(() => {
+        target.selectionStart = target.selectionEnd = start + markdown.length;
+      }, 0);
+    }
+  }, [onChange]);
+
+  return (
+    <div className="space-y-3">
+      <div className="flex items-center justify-between">
+        <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">{label} (Markdown Supported)</label>
+        <div className="flex gap-2">
+          <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
+        </div>
+      </div>
+      <div className="border border-gray-200">
+        <div className="flex border-b border-gray-200 bg-gray-50">
+          <button
+            onClick={() => setTab('write')}
+            className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${tab === 'write' ? 'bg-white border-r border-gray-200 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            Write
+          </button>
+          <button
+            onClick={() => setTab('preview')}
+            className={`px-4 py-2 text-[10px] font-bold uppercase tracking-widest ${tab === 'preview' ? 'bg-white border-l border-r border-gray-200 text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            Preview
+          </button>
+          <div className="flex-1 bg-gray-50 border-b border-gray-200 -mb-[1px]"></div>
+        </div>
+        <div className="p-0 bg-white">
+          {tab === 'write' ? (
+            <textarea
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              onPaste={handlePaste}
+              className="w-full p-4 min-h-[300px] border-none focus:outline-none focus:ring-0 font-mono text-sm leading-relaxed resize-y text-gray-800 bg-gray-50"
+              placeholder={`Enter your ${label.toLowerCase()} content here...`}
+            />
+          ) : (
+            <div 
+              className="w-full p-6 min-h-[300px] bg-white legal-md-preview overflow-y-auto"
+              dangerouslySetInnerHTML={{ __html: marked.parse(value || '') as string }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function EditorPage() {
   const { projectId } = useParams();
@@ -153,9 +229,26 @@ export default function EditorPage() {
     try {
       const isNew = projectId === 'new';
       const method = isNew ? 'POST' : 'PUT';
+
+      // Calculate a rough SEO score for the dashboard
+      const seoScore = projectData.seo?.title && projectData.seo?.description ? 85 : 40;
+
       const body = isNew
-        ? { name: projectData.productName, data: projectData, status }
-        : { id: projectId, data: projectData, status, name: projectData.productName };
+        ? {
+          name: projectData.productName,
+          data: projectData,
+          status,
+          theme: projectData.layoutStyle || 'default',
+          seoScore
+        }
+        : {
+          id: projectId,
+          data: projectData,
+          status,
+          name: projectData.productName,
+          theme: projectData.layoutStyle || 'default',
+          seoScore
+        };
 
       const res = await fetch('/api/projects', {
         method,
@@ -169,15 +262,16 @@ export default function EditorPage() {
         setProjectStatus(status);
         setLastSaved(new Date());
 
-        // Only clear dirty flag if no new changes occurred during the save request
         const currentVersion = useStore.getState().version;
         if (currentVersion === startVersion) {
           setDirty(false);
         }
 
-        // Only redirect on manual save to avoid jarring focus loss / re-mounts
-        if (isNew && data._id && !isAutoSave) {
-          router.push(`/editor/${data._id}`);
+        if (isNew && data._id) {
+          // Immediately redirect to the new project ID to prevent further POSTs (duplicates)
+          // Using window.history.replaceState to update URL without full reload if possible, 
+          // but router.push is safer for Next.js consistency.
+          router.replace(`/editor/${data._id}`);
         }
       } else if (!isAutoSave) {
         alert(data.error || 'Failed to save');
@@ -310,9 +404,15 @@ export default function EditorPage() {
         <div className="flex items-center gap-4">
           {/* Logo & Brand Info */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-black rounded-none flex items-center justify-center text-white">
-              <IconLayout />
-            </div>
+            <Link
+              href="/dashboard"
+              className="w-10 h-10 bg-zinc-100 hover:bg-zinc-200 rounded-lg flex items-center justify-center text-zinc-600 transition-colors group"
+              title="Back to Dashboard"
+            >
+              <svg className="w-5 h-5 group-hover:-translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+            </Link>
             <div className="flex flex-col">
               <span className="font-bold text-sm tracking-tight leading-tight">SoloSite</span>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -1522,67 +1622,31 @@ export default function EditorPage() {
                 <i className="fa-solid fa-xmark text-gray-400"></i>
               </button>
             </div>
-            <div className="p-6 overflow-y-auto space-y-6 bg-white custom-scrollbar">
-              <div className="grid grid-cols-12 gap-8">
-                <div className="col-span-12 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Privacy Policy (Markdown Supported)</label>
-                    <div className="flex gap-2">
-                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
-                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
-                    </div>
-                  </div>
-                  <div className="border border-gray-200">
-                    <RichTextEditor
-                      value={projectData.legalPages?.privacyPolicy || ''}
-                      onChange={(val) => updateLegalPage('privacyPolicy', val)}
-                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
-                      tagName="div"
-                    />
-                  </div>
-                </div>
-                <style>{`
-                  .markdown-preview h1, .markdown-preview h2, .markdown-preview h3 { font-weight: 800; margin: 1.5rem 0 0.5rem; color: #111; }
-                  .markdown-preview p { margin-bottom: 1rem; line-height: 1.6; }
-                  .markdown-preview ul, .markdown-preview ol { padding-left: 1.5rem; margin-bottom: 1rem; }
-                  .markdown-preview li { margin-bottom: 0.25rem; }
-                  .markdown-preview strong { font-weight: 700; color: #000; }
-                `}</style>
-                <div className="col-span-12 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Terms & Conditions (Markdown Supported)</label>
-                    <div className="flex gap-2">
-                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
-                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
-                    </div>
-                  </div>
-                  <div className="border border-gray-200">
-                    <RichTextEditor
-                      value={projectData.legalPages?.termsAndConditions || ''}
-                      onChange={(val) => updateLegalPage('termsAndConditions', val)}
-                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
-                      tagName="div"
-                    />
-                  </div>
-                </div>
-                <div className="col-span-12 space-y-3">
-                  <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest block">Disclaimer (Markdown Supported)</label>
-                    <div className="flex gap-2">
-                      <span className="text-[8px] text-gray-400 italic">Hint: Use # for title, ## for heading, 1. for list</span>
-                      <span className="text-[9px] bg-blue-50 text-blue-600 px-2 py-0.5 font-bold uppercase">Live Preview</span>
-                    </div>
-                  </div>
-                  <div className="border border-gray-200">
-                    <RichTextEditor
-                      value={projectData.legalPages?.disclaimer || ''}
-                      onChange={(val) => updateLegalPage('disclaimer', val)}
-                      className="w-full p-4 text-sm min-h-[300px] bg-white leading-relaxed font-sans"
-                      tagName="div"
-                    />
-                  </div>
-                </div>
-              </div>
+            <div className="p-6 overflow-y-auto space-y-8 bg-white custom-scrollbar">
+              <style>{`
+                .legal-md-preview h1 { font-size: 1.6rem; font-weight: 800; margin: 1.5rem 0 0.5rem; color: #111; border-bottom: 2px solid #f0f0f0; padding-bottom: 0.25rem; }
+                .legal-md-preview h2 { font-size: 1.2rem; font-weight: 700; margin: 1.25rem 0 0.4rem; color: #222; }
+                .legal-md-preview h3 { font-size: 1rem; font-weight: 700; margin: 1rem 0 0.3rem; color: #333; }
+                .legal-md-preview p { margin-bottom: 0.75rem; line-height: 1.7; color: #444; font-size: 0.875rem; }
+                .legal-md-preview ul, .legal-md-preview ol { padding-left: 1.5rem; margin-bottom: 0.75rem; }
+                .legal-md-preview li { margin-bottom: 0.35rem; line-height: 1.6; font-size: 0.875rem; color: #444; }
+                .legal-md-preview strong { font-weight: 700; color: #111; }
+                .legal-md-preview a { color: #2563eb; text-decoration: underline; }
+                .legal-md-preview blockquote { border-left: 3px solid #e5e7eb; padding-left: 1rem; color: #6b7280; margin: 1rem 0; }
+                .legal-md-preview hr { border: none; border-top: 1px solid #e5e7eb; margin: 1.5rem 0; }
+              `}</style>
+              {([
+                { key: 'privacyPolicy' as const, label: 'Privacy Policy' },
+                { key: 'termsAndConditions' as const, label: 'Terms & Conditions' },
+                { key: 'disclaimer' as const, label: 'Disclaimer' },
+              ]).map(({ key, label }) => (
+                <LegalMarkdownEditor
+                  key={key}
+                  label={label}
+                  value={projectData.legalPages?.[key] || ''}
+                  onChange={(val) => updateLegalPage(key, val)}
+                />
+              ))}
             </div>
             <div className="bg-gray-50 p-4 border-t flex justify-end gap-3">
               <button
