@@ -38,7 +38,7 @@ const LegalMarkdownEditor = ({ label, value, onChange }: { label: string; value:
         codeBlockStyle: 'fenced'
       });
       const markdown = turndownService.turndown(html);
-      
+
       // Get current selection and insert markdown
       const target = e.target as HTMLTextAreaElement;
       const start = target.selectionStart;
@@ -46,7 +46,7 @@ const LegalMarkdownEditor = ({ label, value, onChange }: { label: string; value:
       const text = target.value;
       const newText = text.substring(0, start) + markdown + text.substring(end);
       onChange(newText);
-      
+
       // Small timeout to move cursor after paste
       setTimeout(() => {
         target.selectionStart = target.selectionEnd = start + markdown.length;
@@ -88,7 +88,7 @@ const LegalMarkdownEditor = ({ label, value, onChange }: { label: string; value:
               placeholder={`Enter your ${label.toLowerCase()} content here...`}
             />
           ) : (
-            <div 
+            <div
               className="w-full p-6 min-h-[300px] bg-white legal-md-preview overflow-y-auto"
               dangerouslySetInnerHTML={{ __html: marked.parse(value || '') as string }}
             />
@@ -103,7 +103,7 @@ export default function EditorPage() {
   const { projectId } = useParams();
   const router = useRouter();
   const {
-    projectData, setProjectData, updateTheme, updateLayoutStyle, updateProductName, updateSEO,
+    projectData, setProjectData, projectId: storeProjectId, setProjectId, updateTheme, updateLayoutStyle, updateProductName, updateSEO,
     updateHero, updateAbout, updateFeature, addFeature, removeFeature,
     updateIngredient, addIngredient, removeIngredient, updateBenefit, addBenefit, removeBenefit,
     updatePricing, addPricing, removePricing, updateFAQ, addFAQ, removeFAQ,
@@ -190,15 +190,9 @@ export default function EditorPage() {
 
   // Fetch project data if editing existing
   useEffect(() => {
+    if (projectId === storeProjectId) return; // Prevent re-fetching if already loaded
 
     if (projectId && projectId !== 'new') {
-      // Don't re-fetch if we already have the data for this project (prevents overwrite during redirect)
-      if (useStore.getState().projectData && useStore.getState().projectData?.productName !== initialProjectData.productName) {
-        // Data likely already loaded or edited
-        // return; 
-        // Actually, better to fetch but only if it's a first load or we're explicitly changing projects
-      }
-
       fetch(`/api/projects?id=${projectId}`)
         .then(res => res.json())
         .then(data => {
@@ -206,6 +200,7 @@ export default function EditorPage() {
             const sanitized = sanitizeProjectData(data.data);
             setProjectData(sanitized);
             setProjectStatus(data.status || 'draft');
+            setProjectId(projectId as string);
             setDirty(false); // Reset dirty after load
             setIsLoading(false);
           }
@@ -216,9 +211,11 @@ export default function EditorPage() {
         });
     } else if (projectId === 'new') {
       setProjectData(initialProjectData);
+      setProjectId('new');
+      setDirty(false);
       setIsLoading(false);
     }
-  }, [projectId, setProjectData, sanitizeProjectData, setDirty]);
+  }, [projectId, storeProjectId, setProjectData, setProjectId, sanitizeProjectData, setDirty]);
 
   const handleSave = React.useCallback(async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
     if (!projectData) return;
@@ -268,6 +265,7 @@ export default function EditorPage() {
         }
 
         if (isNew && data._id) {
+          setProjectId(data._id); // Update local store first to prevent fetch race condition
           // Immediately redirect to the new project ID to prevent further POSTs (duplicates)
           // Using window.history.replaceState to update URL without full reload if possible, 
           // but router.push is safer for Next.js consistency.
@@ -506,22 +504,7 @@ export default function EditorPage() {
                     <div className="text-[10px] text-gray-500">Edit policies & disclaimer</div>
                   </div>
                 </button>
-                <div className="h-px bg-gray-50 my-2"></div>
-                <div className="px-4 py-2">
-                  <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Project Info</div>
-                  <div className="flex flex-col gap-2">
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-gray-500 font-bold">Status</span>
-                      <span className={`px-2 py-0.5 rounded-none font-black uppercase text-[8px] ${projectStatus === 'published' ? 'bg-emerald-100 text-emerald-600' : 'bg-amber-100 text-amber-600'}`}>
-                        {projectStatus}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-gray-500 font-bold">Autosave</span>
-                      <span className="text-emerald-500 font-bold">Active</span>
-                    </div>
-                  </div>
-                </div>
+
               </div>
             )}
           </div>

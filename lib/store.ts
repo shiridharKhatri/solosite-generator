@@ -226,6 +226,7 @@ export interface ProjectData {
 interface EditorState {
   projectData: ProjectData | null;
   projectId: string | null;
+  setProjectId: (id: string | null) => void;
   setProjectData: (data: ProjectData) => void;
   updateProductName: (name: string) => void;
   updateHero: (hero: Partial<ProjectData['hero']>) => void;
@@ -661,6 +662,7 @@ export const initialProjectData: ProjectData = {
 export const useStore = create<EditorState>((set) => ({
   projectData: initialProjectData,
   projectId: null,
+  setProjectId: (id) => set({ projectId: id }),
   isDirty: false,
   version: 0,
   setDirty: (dirty) => set({ isDirty: dirty }),
