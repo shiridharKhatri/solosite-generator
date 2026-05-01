@@ -1007,69 +1007,74 @@ export const GlycopezilTemplate: React.FC = () => {
       )}
 
       {/* Ingredients Section */}
-      <section id="ingredients" className="container-fluid text-center mt-0 sectioncolor">
-        <div className="container">
-          <EditableText
-            tagName="h2"
-            className="fs-1 fw-bold py-3 text-white mb-0"
-            value={projectData.ingredients.title || "Purposefully Chosen Natural Ingredients"}
-            onChange={(val) => updateIngredient(-1, { title: val })}
-          />
-        </div>
-      </section>
+      {projectData.sections?.ingredients !== false && (
+        <>
+          <section id="ingredients" className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="ingredients" />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="fs-1 fw-bold py-3 text-white mb-0"
+                value={projectData.ingredients.title || "Purposefully Chosen Natural Ingredients"}
+                onChange={(val) => updateIngredient(-1, { title: val })}
+              />
+            </div>
+          </section>
 
-      <section className="container-fluid py-5 bg-light">
-        <div className="container mx-auto">
-          <div className="text-center mb-5">
-            <EditableText
-              tagName="p"
-              className="fs-5 text-gray-700 mx-auto w-100"
-              value={projectData.ingredients.subtitle || ""}
-              onChange={(val) => updateIngredient(-1, { subtitle: val })}
-            />
-          </div>
-          <div className="row g-4 justify-content-center">
-            {projectData.ingredients?.items?.map((item, i) => (
-              <div key={i} className="col-12 col-md-6 col-lg-4">
-                <div className="card h-100 border-0 shadow-sm bg-white hover:-translate-y-2 transition-all duration-300 rounded-[2.5rem] p-4 group">
-                  <div className="relative">
-                    <RemoveButton onClick={() => removeIngredient(i)} />
-                    <div className={`w-40 h-40 ${item.isCircular ? 'rounded-full' : 'rounded-none'} overflow-hidden border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner`} style={{ borderColor: '#fcfcfc', boxShadow: `0 0 0 2px ${projectData.theme?.secondary || '#fbbf24'}` }}>
-                      <EditableImage
-                        src={item.image || '/image/ingredient-schisandra.png'}
-                        alt={item.imageAlt || item.title}
-                        isCircular={item.isCircular}
-                        onToggleCircular={() => updateIngredient(i, { isCircular: !item.isCircular })}
-                        onChange={(val) => updateIngredient(i, { image: val })}
-                        onAltChange={(val) => updateIngredient(i, { imageAlt: val })}
-                        className="w-full h-full"
-                        style={{ objectFit: 'cover' }}
-                      />
+          <section className="container-fluid py-5 bg-light">
+            <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-gray-700 mx-auto w-100"
+                  value={projectData.ingredients.subtitle || ""}
+                  onChange={(val) => updateIngredient(-1, { subtitle: val })}
+                />
+              </div>
+              <div className="row g-4 justify-content-center">
+                {projectData.ingredients?.items?.map((item, i) => (
+                  <div key={i} className="col-12 col-md-6 col-lg-4">
+                    <div className="card h-100 border-0 shadow-sm bg-white hover:-translate-y-2 transition-all duration-300 rounded-[2.5rem] p-4 group">
+                      <div className="relative">
+                        <RemoveButton onClick={() => removeIngredient(i)} />
+                        <div className={`w-40 h-40 ${item.isCircular ? 'rounded-full' : 'rounded-none'} overflow-hidden border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner`} style={{ borderColor: '#fcfcfc', boxShadow: `0 0 0 2px ${projectData.theme?.secondary || '#fbbf24'}` }}>
+                          <EditableImage
+                            src={item.image || '/image/ingredient-schisandra.png'}
+                            alt={item.imageAlt || item.title}
+                            isCircular={item.isCircular}
+                            onToggleCircular={() => updateIngredient(i, { isCircular: !item.isCircular })}
+                            onChange={(val) => updateIngredient(i, { image: val })}
+                            onAltChange={(val) => updateIngredient(i, { imageAlt: val })}
+                            className="w-full h-full"
+                            style={{ objectFit: 'cover' }}
+                          />
+                        </div>
+                      </div>
+                      <div className="text-center px-2">
+                        <EditableText
+                          tagName="h3"
+                          className="fw-bold fs-4 mb-2 text-dark"
+                          value={item.title}
+                          onChange={(val) => updateIngredient(i, { title: val })}
+                        />
+                        <EditableText
+                          tagName="p"
+                          className="fs-6 text-gray-700 leading-relaxed mb-0"
+                          value={item.description}
+                          onChange={(val) => updateIngredient(i, { description: val })}
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="text-center px-2">
-                    <EditableText
-                      tagName="h3"
-                      className="fw-bold fs-4 mb-2 text-dark"
-                      value={item.title}
-                      onChange={(val) => updateIngredient(i, { title: val })}
-                    />
-                    <EditableText
-                      tagName="p"
-                      className="fs-6 text-gray-700 leading-relaxed mb-0"
-                      value={item.description}
-                      onChange={(val) => updateIngredient(i, { description: val })}
-                    />
-                  </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="mt-12">
-            <AddButton onClick={addIngredient} label="Ingredient" />
-          </div>
-        </div>
-      </section>
+              <div className="mt-12">
+                <AddButton onClick={addIngredient} label="Ingredient" />
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
 
 
@@ -1170,176 +1175,188 @@ export const GlycopezilTemplate: React.FC = () => {
 
 
       {/* Pricing Section */}
-      <section className="container-fluid text-center mt-0 sectioncolor" id="pricing">
-        <div className="container">
-          <EditableText
-            tagName="h2"
-            className="text-center fs-1 fw-bold py-3 text-white mb-0"
-            value={projectData.pricingTitle || "Select Your Dynamic Package"}
-            onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })}
-          />
-        </div>
-      </section>
+      {projectData.sections?.pricing !== false && (
+        <>
+          <section className="container-fluid text-center mt-0 sectioncolor relative group/section" id="pricing">
+            <SectionSettings sectionKey="pricing" />
+            <div className="container">
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 fw-bold py-3 text-white mb-0"
+                value={projectData.pricingTitle || "Select Your Dynamic Package"}
+                onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })}
+              />
+            </div>
+          </section>
 
-      <section className="container-fluid py-5" style={{ backgroundColor: '#f9f9f9' }}>
-        <div className="container mx-auto">
-          <div className="text-center mb-5">
-            <EditableText
-              tagName="p"
-              className="fs-5 text-gray-700 mx-auto w-100"
-              value={projectData.pricingSubtitle || ""}
-              onChange={(val) => useStore.getState().updateProjectData({ pricingSubtitle: val })}
-            />
-          </div>
-          <div className="row g-4 justify-content-center">
-            {projectData.pricing?.map((plan, i) => (
-              <div key={i} className="col-12 col-md-6 col-lg-4 mb-4 relative" style={{ zIndex: plan.isPrimary ? 10 : 1 }}>
-                <RemoveButton onClick={() => removePricing(i)} />
-                <div
-                  className={`h-100 border-0 transition-all duration-500 rounded-[2rem] p-4 text-center bg-white group hover:-translate-y-2`}
-                  style={{
-                    border: plan.isPrimary ? `2px solid ${projectData.theme?.secondary}` : '1px solid #efefef',
-                    transform: plan.isPrimary ? 'scale(1.04)' : 'scale(1.0)'
-                  }}
-                >
-                  {plan.isPrimary && (
+          <section className="container-fluid py-5" style={{ backgroundColor: '#f9f9f9' }}>
+            <div className="container mx-auto">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-gray-700 mx-auto w-100"
+                  value={projectData.pricingSubtitle || ""}
+                  onChange={(val) => useStore.getState().updateProjectData({ pricingSubtitle: val })}
+                />
+              </div>
+              <div className="row g-4 justify-content-center">
+                {projectData.pricing?.map((plan, i) => (
+                  <div key={i} className="col-12 col-md-6 col-lg-4 mb-4 relative" style={{ zIndex: plan.isPrimary ? 10 : 1 }}>
+                    <RemoveButton onClick={() => removePricing(i)} />
                     <div
-                      className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-none fw-bold text-xs"
-                      style={{ backgroundColor: projectData.theme?.secondary, color: '#000' }}
+                      className={`h-100 border-0 transition-all duration-500 rounded-[2rem] p-4 text-center bg-white group hover:-translate-y-2`}
+                      style={{
+                        border: plan.isPrimary ? `2px solid ${projectData.theme?.secondary}` : '1px solid #efefef',
+                        transform: plan.isPrimary ? 'scale(1.04)' : 'scale(1.0)'
+                      }}
                     >
-                      BEST VALUE BUNDLE
-                    </div>
-                  )}
+                      {plan.isPrimary && (
+                        <div
+                          className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-4 py-1 rounded-none fw-bold text-xs"
+                          style={{ backgroundColor: projectData.theme?.secondary, color: '#000' }}
+                        >
+                          BEST VALUE BUNDLE
+                        </div>
+                      )}
 
-                  <div className="mt-2">
-                    <EditableText
-                      className="fs-4 fw-bold mb-1 uppercase tracking-tight"
-                      value={plan.title}
-                      onChange={(val) => updatePricing(i, { title: val })}
-                    />
+                      <div className="mt-2">
+                        <EditableText
+                          className="fs-4 fw-bold mb-1 uppercase tracking-tight"
+                          value={plan.title}
+                          onChange={(val) => updatePricing(i, { title: val })}
+                        />
 
-                    <div className="mb-2">
-                      <EditableText
-                        className="fs-6 fw-black text-purple-600 bg-purple-50 px-3 py-1 rounded-none d-inline-block"
-                        value={plan.quantity || "1 Bottle"}
-                        onChange={(val) => updatePricing(i, { quantity: val })}
-                      />
-                    </div>
-
-                    <div className="mb-3 relative group mx-auto" style={{ width: '180px' }}>
-                      {/* Premium Quantity Multiplier Badge */}
-                      <div className="absolute -top-2 -right-2 z-20 pointer-events-auto">
-                        <div className="relative group/badge">
-                          <div className="absolute inset-0 bg-black/20 translate-x-1 translate-y-1" />
+                        <div className="mb-2">
                           <EditableText
-                            className="relative bg-[#2C0D67] text-white px-3 py-1 rounded-none flex items-center justify-center fw-black text-xs border border-white shadow-xl min-w-[40px]"
-                            value={plan.multiplier || "X1"}
-                            onChange={(val) => updatePricing(i, { multiplier: val })}
+                            className="fs-6 fw-black text-purple-600 bg-purple-50 px-3 py-1 rounded-none d-inline-block"
+                            value={plan.quantity || "1 Bottle"}
+                            onChange={(val) => updatePricing(i, { quantity: val })}
                           />
                         </div>
+
+                        <div className="mb-3 relative group mx-auto" style={{ width: '180px' }}>
+                          {/* Premium Quantity Multiplier Badge */}
+                          <div className="absolute -top-2 -right-2 z-20 pointer-events-auto">
+                            <div className="relative group/badge">
+                              <div className="absolute inset-0 bg-black/20 translate-x-1 translate-y-1" />
+                              <EditableText
+                                className="relative bg-[#2C0D67] text-white px-3 py-1 rounded-none flex items-center justify-center fw-black text-xs border border-white shadow-xl min-w-[40px]"
+                                value={plan.multiplier || "X1"}
+                                onChange={(val) => updatePricing(i, { multiplier: val })}
+                              />
+                            </div>
+                          </div>
+
+                          <BottleStack
+                            src={plan.image || '/image/default.png'}
+                            alt={plan.imageAlt || plan.title}
+                            multiplier={plan.multiplier || "X1"}
+                            onChange={(val) => updatePricing(i, { image: val })}
+                            onAltChange={(val) => updatePricing(i, { imageAlt: val })}
+                          />
+                        </div>
+
+                        <div className="mb-3">
+                          <div className="d-flex align-items-baseline justify-content-center gap-1">
+                            <span className="fs-2 fw-bold" style={{ color: projectData.theme?.primary }}>
+                              <EditableText value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
+                            </span>
+                            <span className="fs-6 text-gray-700">/ bottle</span>
+                          </div>
+                        </div>
+
+                        <div className="bg-light rounded-[1rem] p-3 mb-4 mx-auto border" style={{ maxWidth: '280px' }}>
+                          <ul className="list-unstyled mb-0 text-start d-inline-block">
+                            {plan.features.map((feature, fi) => (
+                              <li key={fi} className="mb-2 d-flex align-items-center gap-2">
+                                <i className="fa-solid fa-check-circle fs-6" style={{ color: projectData.theme?.primary }}></i>
+                                <EditableText
+                                  className="fw-medium text-dark small"
+                                  value={feature}
+                                  onChange={(val) => {
+                                    const newFeatures = [...plan.features];
+                                    newFeatures[fi] = val;
+                                    updatePricing(i, { features: newFeatures });
+                                  }}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+
+                        <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
+                          <button
+                            className="btn-custom-pill w-100 py-3.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
+                            style={{ backgroundColor: plan.isPrimary ? projectData.theme?.secondary : '#333', color: plan.isPrimary ? '#000' : '#fff', border: 'none' }}
+                          >
+                            <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
+                          </button>
+                        </Linkable>
+
+                        <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
+                          <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
+                          <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
+                        </div>
                       </div>
-
-                      <BottleStack
-                        src={plan.image || '/image/default.png'}
-                        alt={plan.imageAlt || plan.title}
-                        multiplier={plan.multiplier || "X1"}
-                        onChange={(val) => updatePricing(i, { image: val })}
-                        onAltChange={(val) => updatePricing(i, { imageAlt: val })}
-                      />
-                    </div>
-
-                    <div className="mb-3">
-                      <div className="d-flex align-items-baseline justify-content-center gap-1">
-                        <span className="fs-2 fw-bold" style={{ color: projectData.theme?.primary }}>
-                          <EditableText value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
-                        </span>
-                        <span className="fs-6 text-gray-700">/ bottle</span>
-                      </div>
-                    </div>
-
-                    <div className="bg-light rounded-[1rem] p-3 mb-4 mx-auto border" style={{ maxWidth: '280px' }}>
-                      <ul className="list-unstyled mb-0 text-start d-inline-block">
-                        {plan.features.map((feature, fi) => (
-                          <li key={fi} className="mb-2 d-flex align-items-center gap-2">
-                            <i className="fa-solid fa-check-circle fs-6" style={{ color: projectData.theme?.primary }}></i>
-                            <EditableText
-                              className="fw-medium text-dark small"
-                              value={feature}
-                              onChange={(val) => {
-                                const newFeatures = [...plan.features];
-                                newFeatures[fi] = val;
-                                updatePricing(i, { features: newFeatures });
-                              }}
-                            />
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
-                      <button
-                        className="btn-custom-pill w-100 py-3.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
-                        style={{ backgroundColor: plan.isPrimary ? projectData.theme?.secondary : '#333', color: plan.isPrimary ? '#000' : '#fff', border: 'none' }}
-                      >
-                        <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
-                      </button>
-                    </Linkable>
-
-                    <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
-                      <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
-                      <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
-          <div className="mt-8">
-            <AddButton onClick={addPricing} label="Pricing Plan" />
-          </div>
-        </div>
-      </section>
-      <section id="faq" className="container-fluid text-center mt-0 sectioncolor">
-        <EditableText
-          tagName="h2"
-          className="text-center fs-1 fw-bold py-3 text-white mb-0"
-          value={projectData.faqTitle || "Common Questions Answered"}
-          onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })}
-        />
-      </section>
+              <div className="mt-8">
+                <AddButton onClick={addPricing} label="Pricing Plan" />
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
-      <section className="container-fluid py-5 bg-white">
-        <div className="container">
-          <div className="text-center mb-5">
+      {/* FAQ Section */}
+      {projectData.sections?.faq !== false && (
+        <>
+          <section id="faq" className="container-fluid text-center mt-0 sectioncolor relative group/section">
+            <SectionSettings sectionKey="faq" />
             <EditableText
-              tagName="p"
-              className="fs-5 text-gray-700 mx-auto w-100"
-              value={projectData.faqSubtitle || ""}
-              onChange={(val) => useStore.getState().updateProjectData({ faqSubtitle: val })}
+              tagName="h2"
+              className="text-center fs-1 fw-bold py-3 text-white mb-0"
+              value={projectData.faqTitle || "Common Questions Answered"}
+              onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })}
             />
-          </div>
-        </div>
-        <div className="container mx-auto w-100">
-          <div className="accordion accordion-flush" id="glycopezilFAQ">
-            {projectData.faq?.map((item, i) => (
-              <div key={i} className="accordion-item mb-3 rounded border relative group">
-                <RemoveButton onClick={() => removeFAQ(i)} />
-                <h3 className="accordion-header">
-                  <div className="accordion-button fw-bold fs-5 p-4 bg-white shadow-none cursor-default">
-                    <EditableText value={item.question} onChange={(val) => updateFAQ(i, { question: val })} className="w-full" />
-                  </div>
-                </h3>
-                <div id={`faq${i}`} className="accordion-collapse show">
-                  <div className="accordion-body fs-5 text-gray-600 p-4 bg-white border-top">
-                    <EditableText value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} className="w-full" />
-                  </div>
-                </div>
+          </section>
+
+          <section className="container-fluid py-5 bg-white">
+            <div className="container">
+              <div className="text-center mb-5">
+                <EditableText
+                  tagName="p"
+                  className="fs-5 text-gray-700 mx-auto w-100"
+                  value={projectData.faqSubtitle || ""}
+                  onChange={(val) => useStore.getState().updateProjectData({ faqSubtitle: val })}
+                />
               </div>
-            ))}
-          </div>
-          <AddButton onClick={addFAQ} label="FAQ" />
-        </div>
-      </section>
+            </div>
+            <div className="container mx-auto w-100">
+              <div className="accordion accordion-flush" id="glycopezilFAQ">
+                {projectData.faq?.map((item, i) => (
+                  <div key={i} className="accordion-item mb-3 rounded border relative group">
+                    <RemoveButton onClick={() => removeFAQ(i)} />
+                    <h3 className="accordion-header">
+                      <div className="accordion-button fw-bold fs-5 p-4 bg-white shadow-none cursor-default">
+                        <EditableText value={item.question} onChange={(val) => updateFAQ(i, { question: val })} className="w-full" />
+                      </div>
+                    </h3>
+                    <div id={`faq${i}`} className="accordion-collapse show">
+                      <div className="accordion-body fs-5 text-gray-600 p-4 bg-white border-top">
+                        <EditableText value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} className="w-full" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <AddButton onClick={addFAQ} label="FAQ" />
+            </div>
+          </section>
+        </>
+      )}
 
       {/* Footer */}
       <footer className="navcolor text-white py-5">

@@ -497,7 +497,13 @@ ${seoBlock}
 
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
-                        ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
+                        ${(data.navbar?.links || []).filter((link: any) => {
+            if (link.href?.startsWith('#')) {
+                const sectionName = link.href.substring(1);
+                if ((data.sections as any)?.[sectionName] === false) return false;
+            }
+            return true;
+        }).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
                         <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
                     </div>
                 </div>
@@ -985,7 +991,13 @@ ${seoBlock}
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto align-items-center gap-5 mt-4 mt-lg-0">
-                    ${(data.navbar?.links || []).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-stone-700 hover:text-green-900 text-xs uppercase tracking-widest no-underline">${link.label}</a>`).join('')}
+                    ${(data.navbar?.links || []).filter((link: any) => {
+            if (link.href?.startsWith('#')) {
+                const sectionName = link.href.substring(1);
+                if ((data.sections as any)?.[sectionName] === false) return false;
+            }
+            return true;
+        }).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-stone-700 hover:text-green-900 text-xs uppercase tracking-widest no-underline">${link.label}</a>`).join('')}
                     <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary py-2 px-4">Shop Collection</a>
                 </div>
             </div>
@@ -1466,7 +1478,7 @@ ${seoBlock}
                 .markdown-content li { margin-bottom: 0.5rem; }
                 .markdown-content strong { color: #1a202c; }
                 .markdown-content blockquote { border-left: 4px solid #e2e8f0; padding-left: 1rem; color: #718096; font-style: italic; margin: 1.5rem 0; }
-            </style>
+            </style>    
         `;
         const bodyContent = `
             ${markdownStyles}

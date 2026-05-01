@@ -668,77 +668,80 @@ export const OrganicTemplate: React.FC = () => {
       )}
 
       {/* Pricing - Collection Gallery */}
-      <section className="py-5 bg-white section-reveal" id="pricing">
-        <div className="container py-lg-5">
-          <div className="text-center mb-5">
-            <EditableText tagName="h2" className="fw-bold mb-2 font-serif" style={{ color: primary, fontSize: '2.8rem' }} value={projectData.pricingTitle || "Select Your Batch"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
-            <div className="w-16 h-px bg-stone-200 mx-auto mt-4"></div>
-          </div>
-          <div className="row g-4 justify-content-center w-100 mx-auto">
-            {projectData.pricing?.map((plan, i) => (
-              <div key={i} className="col-12 col-md-4 relative">
-                <RemoveButton onClick={() => removePricing(i)} />
-                <div className={`organic-card h-100 flex flex-column bg-white ${plan.isPrimary ? 'border-green-800' : ''}`}
-                  onContextMenu={(e) => { e.preventDefault(); setSchemaEditor({ i, x: e.clientX, y: e.clientY }); }}
-                  title="Right-click to edit Metadata"
-                >
-                  {schemaEditor?.i === i && (
-                    <>
-                      <div className="fixed inset-0 z-[99998]" onClick={() => setSchemaEditor(null)} />
-                      <SchemaEditor plan={plan} onClose={() => setSchemaEditor(null)} onChange={(val) => updatePricing(i, val)} x={schemaEditor.x} y={schemaEditor.y} />
-                    </>
-                  )}
-                  {plan.isPrimary && <div className="bg-green-800 text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest">Recommended Choice</div>}
-                  <div className="p-5 flex-grow text-center">
-                    <EditableText tagName="h4" className="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600" value={plan.title} onChange={(val) => updatePricing(i, { title: val })} />
-                    <div className="relative mb-5 group/img">
-                      {/* Signature Leaf Multiplier Badge */}
-                      <div className="absolute -top-2 -right-2 z-10 pointer-events-auto">
-                        <div className="relative">
-                          <div className="absolute inset-0 bg-green-900/5 rotate-6" />
-                          <EditableText
-                            className="relative bg-[#1e3932] text-white px-3 py-1.5 rounded-none flex items-center justify-center font-serif italic text-xs border border-[#1e3932] shadow-sm min-w-[45px]"
-                            value={plan.multiplier || "X1"}
-                            onChange={(val) => updatePricing(i, { multiplier: val })}
-                          />
+      {projectData.sections?.pricing !== false && (
+        <section className="py-5 bg-white section-reveal relative group/section" id="pricing">
+          <SectionSettings sectionKey="pricing" />
+          <div className="container py-lg-5">
+            <div className="text-center mb-5">
+              <EditableText tagName="h2" className="fw-bold mb-2 font-serif" style={{ color: primary, fontSize: '2.8rem' }} value={projectData.pricingTitle || "Select Your Batch"} onChange={(val) => useStore.getState().updateProjectData({ pricingTitle: val })} />
+              <div className="w-16 h-px bg-stone-200 mx-auto mt-4"></div>
+            </div>
+            <div className="row g-4 justify-content-center w-100 mx-auto">
+              {projectData.pricing?.map((plan, i) => (
+                <div key={i} className="col-12 col-md-4 relative">
+                  <RemoveButton onClick={() => removePricing(i)} />
+                  <div className={`organic-card h-100 flex flex-column bg-white ${plan.isPrimary ? 'border-green-800' : ''}`}
+                    onContextMenu={(e) => { e.preventDefault(); setSchemaEditor({ i, x: e.clientX, y: e.clientY }); }}
+                    title="Right-click to edit Metadata"
+                  >
+                    {schemaEditor?.i === i && (
+                      <>
+                        <div className="fixed inset-0 z-[99998]" onClick={() => setSchemaEditor(null)} />
+                        <SchemaEditor plan={plan} onClose={() => setSchemaEditor(null)} onChange={(val) => updatePricing(i, val)} x={schemaEditor.x} y={schemaEditor.y} />
+                      </>
+                    )}
+                    {plan.isPrimary && <div className="bg-green-800 text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest">Recommended Choice</div>}
+                    <div className="p-5 flex-grow text-center">
+                      <EditableText tagName="h4" className="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600" value={plan.title} onChange={(val) => updatePricing(i, { title: val })} />
+                      <div className="relative mb-5 group/img">
+                        {/* Signature Leaf Multiplier Badge */}
+                        <div className="absolute -top-2 -right-2 z-10 pointer-events-auto">
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-green-900/5 rotate-6" />
+                            <EditableText
+                              className="relative bg-[#1e3932] text-white px-3 py-1.5 rounded-none flex items-center justify-center font-serif italic text-xs border border-[#1e3932] shadow-sm min-w-[45px]"
+                              value={plan.multiplier || "X1"}
+                              onChange={(val) => updatePricing(i, { multiplier: val })}
+                            />
+                          </div>
                         </div>
+                        <BottleStack
+                          src={plan.image || '/image/default.png'}
+                          alt={plan.imageAlt || ""}
+                          multiplier={plan.multiplier || "X1"}
+                          onChange={(val) => updatePricing(i, { image: val })}
+                          onAltChange={(val) => updatePricing(i, { imageAlt: val })}
+                        />
                       </div>
-                      <BottleStack
-                        src={plan.image || '/image/default.png'}
-                        alt={plan.imageAlt || ""}
-                        multiplier={plan.multiplier || "X1"}
-                        onChange={(val) => updatePricing(i, { image: val })}
-                        onAltChange={(val) => updatePricing(i, { imageAlt: val })}
-                      />
-                    </div>
-                    <EditableText tagName="div" className="fw-bold mb-4 font-serif text-3xl" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
-                    <div className="mb-5 text-start ps-4 border-start border-stone-100">
-                      {plan.features.map((f, fi) => (
-                        <div key={fi} className="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
-                          <i className="fa-solid fa-check text-green-700"></i>
-                          <EditableText tagName="span" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
-                        </div>
-                      ))}
-                    </div>
-                    <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
-                      <button className={`organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
-                        <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
-                      </button>
-                    </Linkable>
-                    <div className="mt-4 flex items-center justify-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
-                      <IconEditor className="text-xs" value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon || "fa-solid fa-shield-halved"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })} />
-                      <EditableText tagName="span" value={plan.guaranteeBadge?.text || projectData.guaranteeBadge?.text || "60-DAY PROMISE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), text: val } })} />
+                      <EditableText tagName="div" className="fw-bold mb-4 font-serif text-3xl" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
+                      <div className="mb-5 text-start ps-4 border-start border-stone-100">
+                        {plan.features.map((f, fi) => (
+                          <div key={fi} className="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
+                            <i className="fa-solid fa-check text-green-700"></i>
+                            <EditableText tagName="span" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
+                          </div>
+                        ))}
+                      </div>
+                      <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
+                        <button className={`organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
+                          <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
+                        </button>
+                      </Linkable>
+                      <div className="mt-4 flex items-center justify-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
+                        <IconEditor className="text-xs" value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon || "fa-solid fa-shield-halved"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })} />
+                        <EditableText tagName="span" value={plan.guaranteeBadge?.text || projectData.guaranteeBadge?.text || "60-DAY PROMISE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), text: val } })} />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+            <div className="mt-4 text-center">
+              <AddButton onClick={addPricing} label="Plan" />
+            </div>
           </div>
-          <div className="mt-4 text-center">
-            <AddButton onClick={addPricing} label="Plan" />
-          </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Testimonials - Narrative Style */}
       {projectData.sections?.testimonials && (
