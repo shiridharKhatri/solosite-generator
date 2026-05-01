@@ -7,7 +7,7 @@ marked.setOptions({
   gfm: true
 });
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useStore, initialProjectData } from '@/lib/store';
 import { GlycopezilTemplate } from '@/components/templates/GlycopezilTemplate';
@@ -49,6 +49,9 @@ export default function EditorPage() {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [activeContentTab, setActiveContentTab] = useState('hero');
   const [isLoading, setIsLoading] = useState(projectId !== 'new');
+  const [jsonSyncStatus, setJsonSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [jsonSyncError, setJsonSyncError] = useState('');
+  const [isSyncing, startSyncTransition] = useTransition();
 
   // Robust Deep Merge Migration: Ensure all new schema fields exist for old projects
   const sanitizeProjectData = React.useCallback((data: any) => {
@@ -1225,7 +1228,9 @@ export default function EditorPage() {
                                   const obj = JSON.parse(textarea.value);
                                   textarea.value = JSON.stringify(obj, null, 2);
                                 } catch (e) {
-                                  alert('Invalid JSON, cannot format.');
+                                  setJsonSyncStatus('error');
+                                  setJsonSyncError('Invalid JSON — cannot format.');
+                                  setTimeout(() => setJsonSyncStatus('idle'), 3000);
                                 }
                               }
                             }}
@@ -1238,7 +1243,9 @@ export default function EditorPage() {
                               const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
                               if (textarea) {
                                 navigator.clipboard.writeText(textarea.value);
-                                alert('JSON copied to clipboard!');
+                                setJsonSyncStatus('success');
+                                setJsonSyncError('Copied to clipboard!');
+                                setTimeout(() => setJsonSyncStatus('idle'), 2000);
                               }
                             }}
                             className="text-[10px] font-bold text-emerald-600 hover:underline transition-all"
@@ -1268,35 +1275,47 @@ export default function EditorPage() {
                       />
                     </div>
 
+                    {/* Status Toast */}
+                    {jsonSyncStatus !== 'idle' && (
+                      <div className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-none animate-in fade-in slide-in-from-bottom-2 duration-200 ${
+                        jsonSyncStatus === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
+                      }`}>
+                        <i className={`fa-solid ${jsonSyncStatus === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}`}></i>
+                        {jsonSyncStatus === 'success' ? (jsonSyncError || 'Content synced successfully!') : jsonSyncError}
+                      </div>
+                    )}
+
                     <div className="flex justify-end pt-2 pb-12">
                       <button
+                        disabled={isSyncing}
                         onClick={() => {
                           const textarea = document.getElementById('global-json-textarea') as HTMLTextAreaElement;
                           if (!textarea) return;
+                          setJsonSyncStatus('idle');
+                          let newData: any;
                           try {
-                            const newData = JSON.parse(textarea.value);
-                            // Basic structure validation
-                            if (typeof newData !== 'object') {
-                              throw new Error('Invalid project data structure. Object is required.');
-                            }
-
-                            // Use the same robust migration/sanitization used on page load
-                            // We need to define it or make it accessible. 
-                            // Since it's inside the EditorPage component scope now, we can use it.
-                            // However, we need to move the function definition above the return.
-
-                            // For immediate fix, I'll use a direct call to the logic
+                            newData = JSON.parse(textarea.value);
+                            if (typeof newData !== 'object') throw new Error('Object is required.');
+                          } catch (e: any) {
+                            setJsonSyncStatus('error');
+                            setJsonSyncError('Invalid JSON: ' + e.message);
+                            return;
+                          }
+                          // Defer the heavy re-render as a non-blocking low-priority transition
+                          startSyncTransition(() => {
                             const sanitized = sanitizeProjectData(newData);
                             setProjectData(sanitized);
                             setDirty(true);
-                            alert('Content synced successfully!');
-                          } catch (e: any) {
-                            alert('Error: ' + e.message);
-                          }
+                            setJsonSyncStatus('success');
+                            setJsonSyncError('');
+                            setTimeout(() => setJsonSyncStatus('idle'), 3000);
+                          });
                         }}
-                        className="px-6 py-2.5 bg-purple-600 text-white text-xs font-black uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-lg shadow-purple-100"
+                        className="flex items-center gap-2 px-6 py-2.5 bg-purple-600 text-white text-xs font-black uppercase tracking-widest hover:bg-purple-700 transition-colors shadow-lg shadow-purple-100 disabled:opacity-60 disabled:cursor-not-allowed"
                       >
-                        Sync JSON Content
+                        {isSyncing ? (
+                          <><i className="fa-solid fa-circle-notch animate-spin"></i> Syncing...</>
+                        ) : 'Sync JSON Content'}
                       </button>
                     </div>
                   </div>
