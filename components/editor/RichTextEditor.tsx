@@ -224,6 +224,12 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
             >
               <i className="fa-solid fa-align-right text-xs"></i>
             </button>
+            <button
+              onClick={() => editor.chain().focus().setTextAlign('justify').run()}
+              className={`p-1.5 rounded hover:bg-white/10 transition-colors ${editor.isActive({ textAlign: 'justify' }) ? 'text-blue-400 bg-white/10' : 'text-white/70'}`}
+            >
+              <i className="fa-solid fa-align-justify text-xs"></i>
+            </button>
 
             <div className="w-px h-3 bg-white/10 mx-1" />
 
