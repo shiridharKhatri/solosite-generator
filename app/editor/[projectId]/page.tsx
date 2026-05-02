@@ -676,6 +676,7 @@ export default function EditorPage() {
                     { id: 'benefits', name: 'Benefits', icon: 'fa-check-circle' },
                     { id: 'pricing', name: 'Pricing Plans', icon: 'fa-tags' },
                     { id: 'faq', name: 'FAQ', icon: 'fa-question-circle' },
+                    { id: 'custom-sections', name: 'Custom Sections', icon: 'fa-layer-group' },
                     { id: 'order', name: 'Order Page (Link)', icon: 'fa-shopping-cart' },
                     { id: 'footer', name: 'Footer', icon: 'fa-shoe-prints' },
                     { id: 'global-json', name: 'Global Content (JSON)', icon: 'fa-code' },
@@ -816,6 +817,204 @@ export default function EditorPage() {
                     >
                       <i className="fa-solid fa-plus"></i> Add Navbar Link
                     </button>
+                  </div>
+                )}
+
+                {activeContentTab === 'custom-sections' && (
+                  <div className="space-y-6">
+                    <div className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-4 flex items-center gap-2 border-b border-gray-100 pb-2">
+                      <i className="fa-solid fa-layer-group text-purple-500"></i> Manage Custom Sections
+                    </div>
+
+                    <div className="space-y-4">
+                      {(projectData.customSections || []).map((section, idx) => (
+                        <div key={section.id} className="p-4 bg-gray-50 border border-gray-200 relative group">
+                          <button
+                            onClick={() => useStore.getState().removeCustomSection(section.id)}
+                            className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white flex items-center justify-center rounded-none opacity-0 group-hover:opacity-100 transition-opacity shadow-sm z-10"
+                            title="Remove Section"
+                          >
+                            <i className="fa-solid fa-xmark text-[10px]"></i>
+                          </button>
+
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Position (Insert After)</label>
+                              <select
+                                value={section.afterSection}
+                                onChange={(e) => useStore.getState().updateCustomSection(section.id, { afterSection: e.target.value })}
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none text-xs bg-white font-bold"
+                              >
+                                <option value="hero">Hero Section</option>
+                                <option value="logos">Featured Logos</option>
+                                <option value="ingredients">Ingredients</option>
+                                <option value="features">Features</option>
+                                <option value="research">Research</option>
+                                <option value="about">About</option>
+                                <option value="benefits">Benefits</option>
+                                <option value="pricing">Pricing</option>
+                                <option value="testimonials">Testimonials</option>
+                                <option value="faq">FAQ</option>
+                              </select>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Type</label>
+                              <select
+                                value={section.type}
+                                onChange={(e) => useStore.getState().updateCustomSection(section.id, { type: e.target.value as any })}
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none text-xs bg-white font-bold"
+                              >
+                                <option value="text">Text Only</option>
+                                <option value="image-text">Image Left, Text Right</option>
+                                <option value="text-image">Text Left, Image Right</option>
+                                <option value="cards">Cards Grid</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          <div className="space-y-4">
+                            <div className="space-y-1.5">
+                              <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Section Title</label>
+                              <input
+                                type="text"
+                                value={section.title}
+                                onChange={(e) => useStore.getState().updateCustomSection(section.id, { title: e.target.value })}
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none font-bold text-gray-900 text-sm bg-white"
+                              />
+                            </div>
+
+                            <div className="space-y-1.5">
+                              <RichTextEditor
+                                value={section.content}
+                                onChange={(val) => useStore.getState().updateCustomSection(section.id, { content: val })}
+                                className="w-full px-3 py-2 rounded-none border border-gray-200 min-h-[100px] text-sm bg-white"
+                                tagName="div"
+                              />
+                            </div>
+
+                            {(section.type === 'image-text' || section.type === 'text-image') && (
+                              <ImageUploadField
+                                label="Section Image"
+                                value={section.image || ''}
+                                onChange={(url) => useStore.getState().updateCustomSection(section.id, { image: url })}
+                              />
+                            )}
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Button Text</label>
+                                <input
+                                  type="text"
+                                  value={section.buttonText || ''}
+                                  onChange={(e) => useStore.getState().updateCustomSection(section.id, { buttonText: e.target.value })}
+                                  className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none text-sm bg-white"
+                                  placeholder="e.g. Learn More"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Button Link</label>
+                                <input
+                                  type="text"
+                                  value={section.buttonHref || ''}
+                                  onChange={(e) => useStore.getState().updateCustomSection(section.id, { buttonHref: e.target.value })}
+                                  className="w-full px-3 py-2 rounded-none border border-gray-200 focus:ring-2 focus:ring-purple-500 outline-none text-sm bg-white"
+                                  placeholder="#order or https://..."
+                                />
+                              </div>
+                            </div>
+
+                            {section.type === 'cards' && (
+                              <div className="space-y-3 pt-3 border-t border-gray-200">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cards</label>
+                                {(section.cards || []).map((card, cIdx) => (
+                                  <div key={cIdx} className="p-3 border border-gray-200 bg-gray-50 space-y-3 relative group/card">
+                                    <button 
+                                      onClick={() => { const nc = [...(section.cards || [])]; nc.splice(cIdx, 1); useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                      className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover/card:opacity-100 transition-opacity"
+                                    >
+                                      <i className="fa-solid fa-trash text-xs"></i>
+                                    </button>
+                                    <input 
+                                      type="text" 
+                                      value={card.title} 
+                                      onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].title = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                      placeholder="Card Title" 
+                                      className="w-full px-2 py-1.5 text-sm border outline-none" 
+                                    />
+                                    <textarea 
+                                      value={card.content} 
+                                      onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].content = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                      placeholder="Card Content" 
+                                      className="w-full px-2 py-1.5 text-sm border outline-none min-h-[60px]" 
+                                    />
+                                    <input 
+                                      type="text" 
+                                      value={card.icon || ''} 
+                                      onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].icon = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                      placeholder="Icon (e.g. fa-solid fa-star)" 
+                                      className="w-full px-2 py-1.5 text-sm border outline-none font-mono" 
+                                    />
+                                    <ImageUploadField
+                                      label="Card Image"
+                                      value={card.image || ''}
+                                      onChange={(url) => { const nc = [...(section.cards || [])]; nc[cIdx].image = url; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                    />
+                                    <div className="grid grid-cols-2 gap-2">
+                                      <input 
+                                        type="text" 
+                                        value={card.buttonText || ''} 
+                                        onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].buttonText = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                        placeholder="Button Text" 
+                                        className="px-2 py-1.5 text-xs border outline-none" 
+                                      />
+                                      <input 
+                                        type="text" 
+                                        value={card.buttonHref || ''} 
+                                        onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].buttonHref = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                        placeholder="Button Link" 
+                                        className="px-2 py-1.5 text-xs border outline-none" 
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                                <button 
+                                  onClick={() => { const nc = [...(section.cards || [])]; nc.push({ title: 'New Card', content: 'Card content goes here', icon: 'fa-solid fa-star' }); useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
+                                  className="w-full py-2 bg-gray-100 text-gray-600 font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200"
+                                >
+                                  + Add Card
+                                </button>
+                              </div>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-4 pt-2 border-t border-gray-200 mt-2">
+                              <div className="space-y-1.5">
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Background Color</label>
+                                <div className="flex items-center gap-2">
+                                  <input type="color" value={section.bgColor} onChange={(e) => useStore.getState().updateCustomSection(section.id, { bgColor: e.target.value })} className="w-6 h-6 p-0 border-0" />
+                                  <input type="text" value={section.bgColor} onChange={(e) => useStore.getState().updateCustomSection(section.id, { bgColor: e.target.value })} className="flex-1 text-xs px-2 py-1 border border-gray-200 font-mono" />
+                                </div>
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[9px] font-black uppercase tracking-widest text-gray-400">Text Color</label>
+                                <div className="flex items-center gap-2">
+                                  <input type="color" value={section.textColor} onChange={(e) => useStore.getState().updateCustomSection(section.id, { textColor: e.target.value })} className="w-6 h-6 p-0 border-0" />
+                                  <input type="text" value={section.textColor} onChange={(e) => useStore.getState().updateCustomSection(section.id, { textColor: e.target.value })} className="flex-1 text-xs px-2 py-1 border border-gray-200 font-mono" />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+
+                      <div className="pt-2">
+                        <button
+                          onClick={() => useStore.getState().addCustomSection('hero')}
+                          className="w-full py-3 bg-purple-50 text-purple-600 border border-purple-100 hover:bg-purple-100 transition-colors text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2"
+                        >
+                          <i className="fa-solid fa-plus"></i> Add Custom Section
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
 

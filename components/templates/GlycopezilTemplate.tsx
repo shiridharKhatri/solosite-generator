@@ -5,6 +5,8 @@ import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
 import { CountdownTimer } from './CountdownTimer';
+import { CustomSections } from './CustomSections';
+import { AddSectionButton } from './AddSectionButton';
 
 // Helper for Context Menu (Right Click)
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => {
@@ -687,6 +689,9 @@ export const GlycopezilTemplate: React.FC = () => {
         </div>
       </section>
 
+      <CustomSections afterSection="hero" />
+      <AddSectionButton afterSection="hero" />
+
       {/* Why Choose Section */}
       {projectData.sections?.features !== false && (
         <>
@@ -747,6 +752,9 @@ export const GlycopezilTemplate: React.FC = () => {
           </section>
         </>
       )}
+
+      <CustomSections afterSection="features" />
+      <AddSectionButton afterSection="features" />
 
       {/* Understanding the Formula Section */}
       {projectData.sections?.about !== false && (
@@ -811,6 +819,9 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
+      <CustomSections afterSection="about" />
+      <AddSectionButton afterSection="about" />
+
       {/* Research */}
       {projectData.research && projectData.sections?.research !== false && (
         <>
@@ -872,6 +883,9 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
+      <CustomSections afterSection="research" />
+      <AddSectionButton afterSection="research" />
+
       {/* Benefits Section */}
       {projectData.sections?.benefits !== false && (
         <>
@@ -932,6 +946,9 @@ export const GlycopezilTemplate: React.FC = () => {
           </section>
         </>
       )}
+
+      <CustomSections afterSection="benefits" />
+      <AddSectionButton afterSection="benefits" />
 
       {/* Money Back Section */}
       {projectData.sections?.guarantee !== false && (
@@ -1006,6 +1023,9 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
+      <CustomSections afterSection="guarantee" />
+      <AddSectionButton afterSection="guarantee" />
+
       {/* Ingredients Section */}
       {projectData.sections?.ingredients !== false && (
         <>
@@ -1076,8 +1096,8 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
-
-
+      <CustomSections afterSection="ingredients" />
+      <AddSectionButton afterSection="ingredients" />
 
       {/* Testimonials Section */}
       {projectData.testimonials && (
@@ -1173,6 +1193,8 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
+      <CustomSections afterSection="testimonials" />
+      <AddSectionButton afterSection="testimonials" />
 
       {/* Pricing Section */}
       {projectData.sections?.pricing !== false && (
@@ -1310,6 +1332,9 @@ export const GlycopezilTemplate: React.FC = () => {
         </>
       )}
 
+      <CustomSections afterSection="pricing" />
+      <AddSectionButton afterSection="pricing" />
+
       {/* FAQ Section */}
       {projectData.sections?.faq !== false && (
         <>
@@ -1357,6 +1382,9 @@ export const GlycopezilTemplate: React.FC = () => {
           </section>
         </>
       )}
+
+      <CustomSections afterSection="faq" />
+      <AddSectionButton afterSection="faq" />
 
       {/* Footer */}
       <footer className="navcolor text-white py-5">

@@ -41,6 +41,101 @@ export async function generateProjectZip(data: any) {
         return `<div style="position: relative; height: ${height}; width: 100%; margin-bottom: 20px;">${stackHtml}</div>`;
     };
 
+    // Helper to render custom sections
+    const renderCustomSections = (afterSection: string) => {
+        const sections = data.customSections?.filter((s: any) => s.afterSection === afterSection) || [];
+        if (!sections.length) return '';
+
+        return sections.map((section: any) => {
+            let innerHtml = '';
+            
+            const isOrganic = layoutStyle === 'organic';
+            const showTitleInContent = section.title && isOrganic;
+            const titleHtml = showTitleInContent ? `<h2 class="fw-bold mb-4 font-serif" style="font-size: 2.5rem;">${section.title}</h2>` : '';
+            
+            const contentHtml = section.content ? `<div class="fs-5 opacity-90" style="line-height: 1.8;">${section.content}</div>` : '';
+            const contentHtmlLg = section.content ? `<div class="opacity-90" style="line-height: 1.9; font-size: 1.1rem;">${section.content}</div>` : '';
+            const imageHtml = `<div class="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-sm" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;"><img src="${section.image || '/image/banner-img.webp'}" alt="${section.imageAlt || section.title}" class="img-fluid rounded-xl mx-auto d-block" style="max-height: 450px; object-fit: contain; border-radius: 0.75rem;" /></div>`;
+
+            const buttonHtml = section.buttonText ? `
+                <div class="mt-4 ${section.type === 'text' || section.type === 'cards' ? 'text-center mt-5' : ''}">
+                    <a href="${section.buttonHref || '#order'}" class="d-inline-block fw-bold ${isOrganic ? 'organic-btn organic-btn-primary' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${secondaryColor}; color: #000; font-size: 1.1rem; padding: 1rem 2.5rem; text-decoration: none; border-radius: 50px;` : ''}">
+                        ${section.buttonText}
+                    </a>
+                </div>
+            ` : '';
+
+            if (section.type === 'text') {
+                innerHtml = `
+                    <div class="text-center mx-auto" style="max-width: 800px;">
+                        ${titleHtml}
+                        ${contentHtml}
+                        ${buttonHtml}
+                    </div>
+                `;
+            } else if (section.type === 'image-text') {
+                innerHtml = `
+                    <div class="row align-items-center g-5">
+                        <div class="col-lg-6">${imageHtml}</div>
+                        <div class="col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
+                    </div>
+                `;
+            } else if (section.type === 'text-image') {
+                innerHtml = `
+                    <div class="row align-items-center g-5 flex-column-reverse flex-lg-row">
+                        <div class="col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
+                        <div class="col-lg-6">${imageHtml}</div>
+                    </div>
+                `;
+            } else if (section.type === 'cards') {
+                const cardsHtml = (section.cards || []).map((card: any) => {
+                    const cardImageHtml = card.image ? `<div class="mb-3 rounded-2 overflow-hidden" style="max-height: 180px;"><img src="${card.image}" alt="${card.title}" class="img-fluid w-100" style="object-fit: cover; max-height: 180px;" /></div>` : '';
+                    const cardIconHtml = !card.image && card.icon ? `<i class="${card.icon} fs-1 mb-3 d-block" style="color: ${primaryColor};"></i>` : '';
+                    const cardButtonHtml = card.buttonText ? `<div class="mt-3 pt-3 border-top"><a href="${card.buttonHref || '#'}" class="d-inline-block fw-bold text-decoration-none ${isOrganic ? 'organic-btn organic-btn-outline' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${primaryColor}; color: #fff; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 50px;` : ''}">${card.buttonText}</a></div>` : '';
+                    return `
+                    <div class="col-12 col-md-6 col-lg-4">
+                        <div class="h-100 p-4 border rounded-3 bg-white text-dark shadow-sm text-center d-flex flex-column">
+                            ${cardImageHtml}
+                            ${cardIconHtml}
+                            <h4 class="fw-bold mb-3">${card.title}</h4>
+                            <p class="mb-0 text-muted flex-grow-1" style="line-height: 1.6;">${card.content}</p>
+                            ${cardButtonHtml}
+                        </div>
+                    </div>`;
+                }).join('');
+
+                innerHtml = `
+                    <div>
+                        ${titleHtml ? `<div class="text-center mb-5">${titleHtml}</div>` : ''}
+                        ${contentHtml ? `<div class="text-center max-w-4xl mx-auto mb-5">${contentHtml}</div>` : ''}
+                        <div class="row g-4 justify-content-center">
+                            ${cardsHtml}
+                        </div>
+                        ${buttonHtml}
+                    </div>
+                `;
+            }
+
+            let topTitleHtml = '';
+            if (!isOrganic && section.title) {
+                topTitleHtml = `
+                <section class="container-fluid text-center mt-0 sectioncolor" style="background-color: ${primaryColor};">
+                    <div class="container">
+                        <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${section.title}</h2>
+                    </div>
+                </section>
+                `;
+            }
+
+            return `
+            ${topTitleHtml}
+            <section class="container-fluid relative group/section section-reveal ${section.padding || 'py-5'}" style="background-color: ${section.bgColor || '#ffffff'}; color: ${section.textColor || '#333333'};">
+                <div class="container">${innerHtml}</div>
+            </section>
+            `;
+        }).join('');
+    };
+
     const zip = new JSZip();
     const imagesFolder = zip.folder("images");
     const cssFolder = zip.folder("css");
@@ -561,6 +656,8 @@ ${seoBlock}
         </div>
     </section>
 
+    ${renderCustomSections('hero')}
+
     <!-- Features -->
     ${(data.sections?.features !== false) ? `
     <section id="features" class="container-fluid text-center mt-0 sectioncolor">
@@ -579,6 +676,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('features')}
 
     <!-- About -->
     ${(data.sections?.about !== false) ? `
@@ -603,6 +702,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('about')}
 
     <!-- Research -->
     ${(data.sections?.research !== false && data.research) ? `
@@ -635,6 +736,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('research')}
+
     <!-- Benefits -->
     ${(data.sections?.benefits !== false) ? `
     <section id="benefits" class="container-fluid text-center sectioncolor">
@@ -653,6 +756,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('benefits')}
 
     <!-- Ingredients -->
     ${(data.sections?.ingredients !== false) ? `
@@ -681,6 +786,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('ingredients')}
+
     <!-- Money Back -->
     <section id="guarantee" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
@@ -705,6 +812,8 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+    ${renderCustomSections('guarantee')}
 
     <!-- Pricing -->
     ${(data.sections?.pricing !== false) ? `
@@ -743,6 +852,8 @@ ${seoBlock}
         </div></div>
     </section>` : ''}
 
+    ${renderCustomSections('pricing')}
+
     <!-- Testimonials -->
     ${(data.sections?.testimonials !== false && data.testimonials) ? `
     <section id="testimonials" class="container-fluid text-center mt-0 sectioncolor">
@@ -780,6 +891,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('testimonials')}
+
     <!-- FAQ -->
     ${(data.sections?.faq !== false && data.faq?.length) ? `
     <section id="faq" class="container-fluid text-center mt-0 sectioncolor">
@@ -807,6 +920,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('faq')}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
@@ -1031,6 +1146,8 @@ ${seoBlock}
         </div>
     </section>
 
+    ${renderCustomSections('hero')}
+
     <!-- Logos & Timer -->
     <section class="py-4 border-top border-bottom" style="background-color: white;">
         <div class="container">
@@ -1095,6 +1212,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('ingredients')}
+
     <!-- Features -->
     ${data.sections?.features !== false ? `
     <section id="features" class="py-5 bg-white section-reveal">
@@ -1113,6 +1232,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('features')}
 
     <!-- Research -->
     ${data.research && data.sections?.research !== false ? `
@@ -1144,6 +1265,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('research')}
+
     <!-- About Section -->
     ${data.sections?.about !== false && data.about ? `
     <section id="about" class="py-5 bg-white section-reveal">
@@ -1165,6 +1288,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('about')}
 
     <!-- Benefits -->
     ${data.sections?.benefits !== false && data.benefits ? `
@@ -1194,6 +1319,8 @@ ${seoBlock}
             </div>
         </div>
     </section>` : ''}
+
+    ${renderCustomSections('benefits')}
 
     <!-- Pricing -->
     ${data.sections?.pricing !== false ? `
@@ -1238,6 +1365,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('pricing')}
+
     <!-- Testimonials -->
     ${data.sections?.testimonials !== false && data.testimonials ? `
     <section id="testimonials" class="py-5 bg-[#F9F7F2] section-reveal">
@@ -1265,6 +1394,8 @@ ${seoBlock}
         </div>
     </section>` : ''}
 
+    ${renderCustomSections('testimonials')}
+
     <!-- Satisfaction Promise -->
     <section class="py-5 bg-white border-top border-[#E6D5C3]">
         <div class="container">
@@ -1280,6 +1411,8 @@ ${seoBlock}
             </div>
         </div>
     </section>
+
+    ${renderCustomSections('guarantee')}
 
     <!-- FAQ -->
     ${data.sections?.faq !== false && data.faq ? `
@@ -1305,6 +1438,8 @@ ${seoBlock}
             .rotate-45 { transform: rotate(45deg); }
         </style>
     </section>` : ''}
+
+    ${renderCustomSections('faq')}
 
     <!-- Footer -->
     <footer class="py-5 text-center" style="background-color: #1e3932; color: rgba(249, 247, 242, 0.6); font-family: 'Playfair Display', serif;">
@@ -1346,6 +1481,10 @@ ${seoBlock}
     if (data.seo?.twitterImage) imageSources.add(data.seo.twitterImage);
     if (data.seo?.favicon) imageSources.add(data.seo.favicon);
     if (data.socialProof?.items) data.socialProof.items.forEach((item: any) => { if (item.image) imageSources.add(item.image); });
+    if (data.customSections) data.customSections.forEach((s: any) => {
+      if (s.image) imageSources.add(s.image);
+      if (s.cards) s.cards.forEach((c: any) => { if (c.image) imageSources.add(c.image); });
+    });
 
     const sourcesArray = Array.from(imageSources);
     sourcesArray.sort((a, b) => b.length - a.length);

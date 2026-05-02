@@ -220,6 +220,28 @@ export interface ProjectData {
     minutes: number;
     text: string;
   };
+  customSections?: {
+    id: string;
+    afterSection: string;
+    type: 'text' | 'image-text' | 'text-image' | 'cards';
+    title: string;
+    content: string;
+    image?: string;
+    imageAlt?: string;
+    bgColor?: string;
+    textColor?: string;
+    padding?: string;
+    buttonText?: string;
+    buttonHref?: string;
+    cards?: {
+      title: string;
+      content: string;
+      image?: string;
+      icon?: string;
+      buttonText?: string;
+      buttonHref?: string;
+    }[];
+  }[];
 }
 
 
@@ -267,6 +289,9 @@ interface EditorState {
   setDirty: (dirty: boolean) => void;
   version: number;
   updateTimer: (timer: Partial<ProjectData['timer']>) => void;
+  addCustomSection: (afterSection: string) => void;
+  updateCustomSection: (id: string, data: Partial<NonNullable<ProjectData['customSections']>[0]>) => void;
+  removeCustomSection: (id: string) => void;
 }
 
 export const initialProjectData: ProjectData = {
@@ -656,7 +681,8 @@ export const initialProjectData: ProjectData = {
     enabled: true,
     minutes: 3,
     text: "HURRY! OFFER ENDS IN:"
-  }
+  },
+  customSections: []
 };
 
 export const useStore = create<EditorState>((set) => ({
@@ -797,6 +823,53 @@ export const useStore = create<EditorState>((set) => ({
     if (!state.projectData) return state;
     const newPricing = state.projectData.pricing.filter((_, i) => i !== index);
     return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
+  }),
+
+  addCustomSection: (afterSection) => set((state) => {
+    if (!state.projectData) return state;
+    const newSection = {
+      id: Math.random().toString(36).substr(2, 9),
+      afterSection,
+      type: 'text' as const,
+      title: 'New Custom Section',
+      content: 'Write your custom content here...',
+      bgColor: '#ffffff',
+      textColor: '#333333',
+      padding: 'py-5',
+      buttonText: '',
+      buttonHref: '',
+      cards: [] as { title: string; content: string; image?: string; icon?: string }[]
+    };
+    return {
+      projectData: {
+        ...state.projectData,
+        customSections: [...(state.projectData.customSections || []), newSection]
+      },
+      isDirty: true,
+      version: state.version + 1
+    };
+  }),
+
+  updateCustomSection: (id, data) => set((state) => {
+    if (!state.projectData) return state;
+    const sections = state.projectData.customSections || [];
+    const newSections = sections.map(s => s.id === id ? { ...s, ...data } : s);
+    return {
+      projectData: { ...state.projectData, customSections: newSections },
+      isDirty: true,
+      version: state.version + 1
+    };
+  }),
+
+  removeCustomSection: (id) => set((state) => {
+    if (!state.projectData) return state;
+    const sections = state.projectData.customSections || [];
+    const newSections = sections.filter(s => s.id !== id);
+    return {
+      projectData: { ...state.projectData, customSections: newSections },
+      isDirty: true,
+      version: state.version + 1
+    };
   }),
 
   updateFAQ: (index, faq) => set((state) => {

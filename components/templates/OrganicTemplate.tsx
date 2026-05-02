@@ -5,6 +5,8 @@ import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
 import { CountdownTimer } from './CountdownTimer';
+import { CustomSections } from './CustomSections';
+import { AddSectionButton } from './AddSectionButton';
 
 // Reusable helpers
 const RemoveButton = ({ onClick }: { onClick: () => void }) => (
@@ -432,6 +434,9 @@ export const OrganicTemplate: React.FC = () => {
         </div>
       </section>
 
+      <CustomSections afterSection="hero" />
+      <AddSectionButton afterSection="hero" />
+
       {/* Featured Logos */}
       <section className="py-4 border-y border-[#E6D5C3]" style={{ backgroundColor: 'white' }}>
         <div className="container">
@@ -482,6 +487,9 @@ export const OrganicTemplate: React.FC = () => {
         </div>
       </section>
 
+      <CustomSections afterSection="logos" />
+      <AddSectionButton afterSection="logos" />
+
       {/* Ingredients Grid */}
       {projectData.sections?.ingredients && (
         <section id="ingredients" className="py-5 group/section relative section-reveal" style={{ backgroundColor: bgAccent }}>
@@ -521,6 +529,9 @@ export const OrganicTemplate: React.FC = () => {
         </section>
       )}
 
+      <CustomSections afterSection="ingredients" />
+      <AddSectionButton afterSection="ingredients" />
+
       {/* Core Philosophies (Features) */}
       {projectData.sections?.features && (
         <section id="features" className="py-5 bg-white group/section relative section-reveal">
@@ -552,6 +563,9 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
+
+      <CustomSections afterSection="features" />
+      <AddSectionButton afterSection="features" />
 
       {/* Research */}
       {projectData.research && projectData.sections?.research !== false && (
@@ -601,6 +615,9 @@ export const OrganicTemplate: React.FC = () => {
         </section>
       )}
 
+      <CustomSections afterSection="research" />
+      <AddSectionButton afterSection="research" />
+
       {/* About Section - Journal Style */}
       {projectData.sections?.about && (
         <section id="about" className="py-5 bg-white group/section relative section-reveal">
@@ -632,6 +649,9 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
+
+      <CustomSections afterSection="about" />
+      <AddSectionButton afterSection="about" />
 
       {/* Benefits - List Format */}
       {projectData.sections?.benefits && (
@@ -666,6 +686,9 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
+
+      <CustomSections afterSection="benefits" />
+      <AddSectionButton afterSection="benefits" />
 
       {/* Pricing - Collection Gallery */}
       {projectData.sections?.pricing !== false && (
@@ -743,6 +766,9 @@ export const OrganicTemplate: React.FC = () => {
         </section>
       )}
 
+      <CustomSections afterSection="pricing" />
+      <AddSectionButton afterSection="pricing" />
+
       {/* Testimonials - Narrative Style */}
       {projectData.sections?.testimonials && (
         <section id="testimonials" className="py-5 bg-[#F9F7F2] group/section relative section-reveal">
@@ -780,6 +806,9 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
+
+      <CustomSections afterSection="testimonials" />
+      <AddSectionButton afterSection="testimonials" />
 
       {/* Satisfaction Promise */}
       <section className="py-5 bg-white border-t border-[#E6D5C3]">
