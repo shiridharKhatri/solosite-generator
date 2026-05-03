@@ -274,7 +274,7 @@ export const GlycopezilTemplate: React.FC = () => {
         }
 
         .logo {
-            color: ${projectData.theme?.secondary || '#FF9202'};
+            color: ${projectData.theme?.secondary || '#fbbf24'};
         }
 
         .bannerimg {

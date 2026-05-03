@@ -22,7 +22,7 @@ export const GlycopezilStyles = ({ primaryColor, secondaryColor }: { primaryColo
         .nav { background-color: white; }
         .navcolor, .sectioncolor { background-color: var(--primary-color); }
         .navtext { color: rgb(5, 1, 1); font-weight: 550; }
-        .logo { color: #FF9202; font-weight: 800; cursor: pointer; }
+        .logo { color: #fbbf24; font-weight: 800; cursor: pointer; }
         .bannerimg { height: 50vh; object-fit: contain; }
         .banner-img1 { height: 40vh; object-fit: contain; }
         .bgbadge { background-color: white; border: 0.5px solid var(--primary-color); border-radius: 24px; color: rgb(5, 0, 0); min-height: 300px; padding: 2rem; position: relative; }
