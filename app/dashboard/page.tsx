@@ -14,6 +14,12 @@ function DashboardContent() {
   const [projects, setProjects] = useState<any[]>([]);
   const [isProjectsLoading, setIsProjectsLoading] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const itemsPerPage = 12;
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -22,11 +28,17 @@ function DashboardContent() {
   }, [status, router]);
 
   useEffect(() => {
-    const url = filterStatus ? `/api/projects?status=${filterStatus}` : '/api/projects';
+    const page = parseInt(searchParams.get('page') || '1');
+    setCurrentPage(page);
+    
+    const url = new URL('/api/projects', window.location.origin);
+    if (filterStatus) url.searchParams.set('status', filterStatus);
+    url.searchParams.set('page', page.toString());
+    url.searchParams.set('limit', itemsPerPage.toString());
 
     if (status === 'authenticated') {
       setIsProjectsLoading(true);
-      fetch(url)
+      fetch(url.toString())
         .then(async res => {
           if (!res.ok) {
             const text = await res.text();
@@ -39,10 +51,14 @@ function DashboardContent() {
           throw new Error("Response is not JSON");
         })
         .then(data => {
-          if (Array.isArray(data)) {
-            setProjects(data);
+          if (data && Array.isArray(data.projects)) {
+            setProjects(data.projects);
+            setTotalPages(data.totalPages || 1);
+            setTotalCount(data.total || 0);
           } else {
             setProjects([]);
+            setTotalPages(1);
+            setTotalCount(0);
           }
         })
         .catch(err => {
@@ -52,7 +68,14 @@ function DashboardContent() {
           setIsProjectsLoading(false);
         });
     }
-  }, [status, filterStatus]);
+  }, [status, filterStatus, searchParams]);
+
+  const handlePageChange = (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
+    const params = new URLSearchParams(searchParams.toString());
+    params.set('page', newPage.toString());
+    router.push(`/dashboard?${params.toString()}`);
+  };
 
   const deleteProject = React.useCallback(async (id: string) => {
     if (!confirm('Are you sure you want to delete this project?')) return;
@@ -61,6 +84,7 @@ function DashboardContent() {
       if (res.ok) {
         setProjects(prev => prev.filter(p => p._id !== id));
         setSelectedIds(prev => prev.filter(selectedId => selectedId !== id));
+        setTotalCount(prev => prev - 1);
       } else {
         const error = await res.json();
         alert(error.error || 'Failed to delete');
@@ -77,8 +101,10 @@ function DashboardContent() {
     try {
       const res = await fetch(`/api/projects?ids=${selectedIds.join(',')}`, { method: 'DELETE' });
       if (res.ok) {
+        const deletedCount = selectedIds.length;
         setProjects(prev => prev.filter(p => !selectedIds.includes(p._id)));
         setSelectedIds([]);
+        setTotalCount(prev => prev - deletedCount);
       } else {
         const error = await res.json();
         alert(error.error || 'Failed to delete selected projects');
@@ -112,7 +138,12 @@ function DashboardContent() {
       <main className="max-w-[1440px] mx-auto pt-16 pb-12 px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-6">
           <div className="space-y-2">
-            <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-zinc-900 leading-tight">Recent Projects</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="font-headline text-5xl font-extrabold tracking-tighter text-zinc-900 leading-tight">Recent Projects</h1>
+              <span className="bg-zinc-100 text-zinc-500 px-3 py-1 rounded-full text-sm font-bold mt-2">
+                {totalCount}
+              </span>
+            </div>
             <p className="text-zinc-500 font-body text-lg max-w-md">Continue building your digital experiences or start a new architectural journey.</p>
           </div>
           <div className="flex flex-col gap-4 items-end">
@@ -223,6 +254,7 @@ function DashboardContent() {
                         {project.seoScore || 0}%
                       </span>
                     </div>
+
                   </div>
                 </div>
 
@@ -255,6 +287,61 @@ function DashboardContent() {
 
 
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-16 flex items-center justify-center gap-4">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-zinc-200 text-zinc-600 font-bold text-sm hover:bg-zinc-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 19l-7-7 7-7" /></svg>
+              Previous
+            </button>
+            
+            <div className="flex items-center gap-2">
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                // Only show a few page numbers around current page
+                if (
+                  page === 1 || 
+                  page === totalPages || 
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => handlePageChange(page)}
+                      className={`w-10 h-10 rounded-lg font-bold text-sm transition-all ${
+                        currentPage === page 
+                          ? 'bg-primary text-white shadow-lg shadow-primary/20' 
+                          : 'bg-white border border-zinc-200 text-zinc-500 hover:border-primary/40 hover:text-primary'
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  );
+                } else if (
+                  page === currentPage - 2 || 
+                  page === currentPage + 2
+                ) {
+                  return <span key={page} className="text-zinc-400">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="flex items-center gap-2 px-6 py-3 rounded-xl bg-white border border-zinc-200 text-zinc-600 font-bold text-sm hover:bg-zinc-50 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 5l7 7-7 7" /></svg>
+            </button>
+          </div>
+        )}
 
       </main>
     </div>
