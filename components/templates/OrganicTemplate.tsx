@@ -842,7 +842,36 @@ export const OrganicTemplate: React.FC = () => {
                     <EditableText tagName="h5" className="fw-bold mb-1 text-sm font-serif" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
                     <EditableText tagName="p" className="mb-3 text-[10px] text-stone-600 uppercase tracking-widest" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
                     <div className="mb-3 d-flex gap-1 text-stone-200 text-[10px]">
-                      {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star text-[#D4C3B2]"></i>)}
+                      {[...Array(5)].map((_, starIndex) => {
+                        const fill = starIndex + 1;
+                        let starClass = 'fa-star';
+                        let opacity = '';
+                        
+                        if (item.rating >= fill) {
+                          starClass = 'fa-star';
+                        } else if (item.rating >= fill - 0.5) {
+                          starClass = 'fa-star-half-stroke';
+                        } else {
+                          starClass = 'fa-star';
+                          opacity = 'opacity-30';
+                        }
+                        
+                        return (
+                          <i
+                            key={starIndex}
+                            className={`fa-solid ${starClass} ${opacity} cursor-pointer text-[#D4C3B2]`}
+                            onClick={() => {
+                              const currentRating = item.rating || 5;
+                              const newRating = starIndex + 1;
+                              if (currentRating === newRating) {
+                                updateTestimonials(i, { rating: newRating - 0.5 });
+                              } else {
+                                updateTestimonials(i, { rating: newRating });
+                              }
+                            }}
+                          ></i>
+                        );
+                      })}
                     </div>
                     <EditableText tagName="p" className="mb-0 text-stone-600 italic text-sm" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />
                   </div>

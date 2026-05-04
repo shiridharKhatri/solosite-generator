@@ -911,7 +911,20 @@ ${seoBlock}
                             </div>
                         </div>
                         <div class="mb-3 text-warning">
-                            ${[...Array(5)].map((_, idx) => `<i class="fa-solid fa-star ${idx < (item.rating || 5) ? '' : 'opacity-25'}"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => {
+                                const fill = idx + 1;
+                                let starClass = 'fa-star';
+                                let opacity = '';
+                                if ((item.rating || 5) >= fill) {
+                                    starClass = 'fa-star';
+                                } else if ((item.rating || 5) >= fill - 0.5) {
+                                    starClass = 'fa-star-half-stroke';
+                                } else {
+                                    starClass = 'fa-star';
+                                    opacity = 'opacity-25';
+                                }
+                                return `<i class="fa-solid ${starClass} ${opacity}"></i>`;
+                            }).join('')}
                         </div>
                         <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
@@ -1427,7 +1440,20 @@ ${sourcesHtml}
                         <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>
                         <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
                         <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
-                            ${[...Array(5)].map(() => `<i class="fa-solid fa-star"></i>`).join('')}
+                            ${[...Array(5)].map((_, idx) => {
+                                const fill = idx + 1;
+                                let starClass = 'fa-star';
+                                let opacity = '';
+                                if ((t.rating || 5) >= fill) {
+                                    starClass = 'fa-star';
+                                } else if ((t.rating || 5) >= fill - 0.5) {
+                                    starClass = 'fa-star-half-stroke';
+                                } else {
+                                    starClass = 'fa-star';
+                                    opacity = 'opacity-25';
+                                }
+                                return `<i class="fa-solid ${starClass} ${opacity}"></i>`;
+                            }).join('')}
                         </div>
                         <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
                     </div>

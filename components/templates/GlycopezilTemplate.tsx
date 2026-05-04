@@ -1190,13 +1190,36 @@ export const GlycopezilTemplate: React.FC = () => {
                       </div>
 
                       <div className="mb-3 text-warning">
-                        {[...Array(5)].map((_, starIndex) => (
-                          <i
-                            key={starIndex}
-                            className={`fa-solid fa-star ${starIndex < item.rating ? '' : 'opacity-30'}`}
-                            onClick={() => updateTestimonials(i, { rating: starIndex + 1 })}
-                          ></i>
-                        ))}
+                        {[...Array(5)].map((_, starIndex) => {
+                          const fill = starIndex + 1;
+                          let starClass = 'fa-star';
+                          let opacity = '';
+
+                          if (item.rating >= fill) {
+                            starClass = 'fa-star';
+                          } else if (item.rating >= fill - 0.5) {
+                            starClass = 'fa-star-half-stroke';
+                          } else {
+                            starClass = 'fa-star';
+                            opacity = 'opacity-30';
+                          }
+
+                          return (
+                            <i
+                              key={starIndex}
+                              className={`fa-solid ${starClass} ${opacity} cursor-pointer`}
+                              onClick={() => {
+                                const currentRating = item.rating || 5;
+                                const newRating = starIndex + 1;
+                                if (currentRating === newRating) {
+                                  updateTestimonials(i, { rating: newRating - 0.5 });
+                                } else {
+                                  updateTestimonials(i, { rating: newRating });
+                                }
+                              }}
+                            ></i>
+                          );
+                        })}
                       </div>
 
                       <div className="relative">
