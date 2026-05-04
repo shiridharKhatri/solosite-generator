@@ -160,7 +160,7 @@ export async function generateProjectZip(data: any) {
     const lastMod = new Date().toISOString();
     
     const pages = [
-        { loc: 'index.html', priority: '1.0', changefreq: 'daily' },
+        { loc: '', priority: '1.0', changefreq: 'daily' },
         ...legalPageLinks.map(link => ({ loc: link, priority: '0.7', changefreq: 'monthly' }))
     ];
 
