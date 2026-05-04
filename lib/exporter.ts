@@ -157,10 +157,21 @@ export async function generateProjectZip(data: any) {
         return !!data.legalPages?.[key];
     });
 
+    const lastMod = new Date().toISOString();
+    
+    const pages = [
+        { loc: 'index.html', priority: '1.0', changefreq: 'daily' },
+        ...legalPageLinks.map(link => ({ loc: link, priority: '0.7', changefreq: 'monthly' }))
+    ];
+
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc>${baseUrl}/index.html</loc><priority>1.0</priority></url>
-${legalPageLinks.map(link => `  <url><loc>${baseUrl}/${link}</loc><priority>0.5</priority></url>`).join('\n')}
+${pages.map(page => `  <url>
+    <loc>${baseUrl}/${page.loc}</loc>
+    <lastmod>${lastMod}</lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`).join('\n')}
 </urlset>`;
     zip.file("sitemap.xml", sitemap);
 
@@ -170,11 +181,16 @@ header('Content-Type: application/xml; charset=utf-8');
 $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
 $host = $_SERVER['HTTP_HOST'];
 $domain = $protocol . "://" . $host;
+$lastMod = "${lastMod}";
 echo '<?xml version="1.0" encoding="UTF-8"?>';
 ?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url><loc><?php echo $domain; ?>/index.html</loc><priority>1.0</priority></url>
-${legalPageLinks.map(link => `  <url><loc><?php echo $domain; ?>/${link}</loc><priority>0.5</priority></url>`).join('\n')}
+${pages.map(page => `  <url>
+    <loc><?php echo $domain; ?>/${page.loc}</loc>
+    <lastmod><?php echo $lastMod; ?></lastmod>
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`).join('\n')}
 </urlset>`;
     zip.file("sitemap.php", sitemapPhp);
 
