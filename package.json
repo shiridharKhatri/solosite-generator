@@ -6,7 +6,8 @@
     "dev": "NODE_OPTIONS='--max-old-space-size=4096' next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed:admin": "node scripts/seed-admin.mjs"
   },
   "dependencies": {
     "@tiptap/core": "^3.22.5",
@@ -24,6 +25,7 @@
     "@types/bcryptjs": "^2.4.6",
     "@types/turndown": "^5.0.6",
     "bcryptjs": "^3.0.3",
+    "dotenv": "^17.2.1",
     "jszip": "^3.10.1",
     "marked": "^18.0.2",
     "mongoose": "^9.4.1",
