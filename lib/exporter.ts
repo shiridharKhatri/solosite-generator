@@ -27,18 +27,18 @@ export async function generateProjectZip(data: any) {
                 zIndex = 100;
                 filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.12))';
             } else {
-                const x = side * (pairIndex * 44) - 50;
+                const x = side * (pairIndex * 38) - 50;
                 const y = -50;
                 const scale = 0.95;
                 transform = `translate(${x}%, ${y}%) scale(${scale})`;
                 zIndex = 50 - pairIndex;
-                filter = 'drop-shadow(0 10px 20px rgba(0,0,0,0.08))';
+                filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))';
             }
 
             return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
         }).join('');
 
-        return `<div style="position: relative; height: ${height}; width: 100%; margin-bottom: 20px;">${stackHtml}</div>`;
+        return `<div style="position: relative; height: ${height}; width: 100%; perspective: 1200px; overflow: visible;">${stackHtml}</div>`;
     };
 
     // Helper to render custom sections
@@ -418,6 +418,29 @@ Sitemap: ${baseUrl}/sitemap.xml`);
 
     const alternates = seo.alternates || [];
 
+    const sourcesFallback = `<ol><li>Panossian, A. and Wikman, G., 2008. Pharmacology of Schisandra chinensis Bail.: an overview of Russian research and uses in medicine. <i>Journal of ethnopharmacology</i>, 118(2), pp.183-212. Available at: <a href="https://pubmed.ncbi.nlm.nih.gov/18515024/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/18515024/</a></li><li>D'Souza, J.J. et al., 2014. Anti-diabetic effects of the Indian gooseberry (Emblica officinalis Gaertn): a review. <i>Journal of Basic and Clinical Physiology and Pharmacology</i>, 25(2), pp.125-133. Available at: <a href="https://pubmed.ncbi.nlm.nih.gov/24362590/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/24362590/</a></li><li>Ishaque, S. et al., 2012. Rhodiola rosea for physical and mental fatigue: a systematic review. <i>BMC complementary and alternative medicine</i>, 12(1), pp.1-9. Available at: <a href="https://pubmed.ncbi.nlm.nih.gov/22643043/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/22643043/</a></li><li>Katz, D.L., Doughty, K. and Ali, A., 2011. Cocoa and chocolate in human health and disease. <i>Antioxidants & redox signaling</i>, 15(10), pp.2779-2811. Available at: <a href="https://pubmed.ncbi.nlm.nih.gov/21470061/" target="_blank">https://pubmed.ncbi.nlm.nih.gov/21470061/</a></li></ol>`;
+    const sourcesHtml = (data.sections?.sources !== false) ? `
+    <section id="sources" class="py-5 bg-white border-top">
+        <div class="container mx-auto px-4" ${layoutStyle === 'organic' ? 'style="max-width: 800px;"' : ''}>
+            <h3 class="fs-4 fw-bold mb-4 pb-2 d-inline-block text-uppercase" style="color: #000; border-bottom: 2px solid ${secondaryColor};">
+                ${data.sourcesTitle || "SCIENTIFIC REFERENCES"}
+            </h3>
+            <div class="p-4 p-lg-5 border" style="background-color: #f8f9fa; border-color: ${layoutStyle === 'organic' ? '#E6D5C3' : '#e9ecef'}; font-size: 0.9rem; line-height: 1.8;">
+                <div class="text-black source-links ${layoutStyle === 'organic' ? 'font-serif' : ''}">
+                    ${data.sources || sourcesFallback}
+                </div>
+            </div>
+        </div>
+    </section>
+    <style>
+        .source-links ol { list-style-type: decimal; padding-left: 1.25rem; margin-bottom: 0; }
+        .source-links li { margin-bottom: 0.5rem; }
+        .source-links a { color: #0d6efd; text-decoration: underline; }
+        .source-links a:hover { color: #0a58ca; }
+    </style>
+` : '';
+
+
     const defaultGuaranteeDescription = `Your happiness is our highest priority. Every order of ${data.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`;
 
     // Auto-generate schema if not provided
@@ -612,17 +635,22 @@ ${seoBlock}
                 <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0">
                     <div class="position-relative d-inline-block" style="width: 100%; max-width: 400px; margin-top: -30px;">
                         <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="img-fluid mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'} width: 100%;" />
+                        ${data.hero?.badge?.enabled ? `
+                        <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
+                            <img src="${data.hero.badge.image}" alt="${data.hero.badge.imageAlt || 'Badge'}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
+                        </div>
+                        ` : ''}
                     </div>
                     ${data.timer?.enabled ? `
                     <div class="my-3 d-flex justify-content-center w-100 px-3">
                         <div class="d-flex align-items-center justify-content-between text-white rounded-4 px-4 py-3 w-100 shadow-lg" style="background-color: #cc1d1d; max-width: 500px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
                             <div class="d-flex flex-column align-items-start gap-1">
-                                <div class="fw-black text-uppercase lh-1" style="font-size: 16px; letter-spacing: 0.025em; font-family: sans-serif;">LIMITED TIME OFFER</div>
+                                <div class="fw-black text-uppercase lh-1" style="font-size: 16px; letter-spacing: 0.025em; font-family: sans-serif;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
                                 <div class="fw-medium fst-italic opacity-75" style="font-size: 13px; font-family: sans-serif;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
                             </div>
                             <div class="bg-white text-dark rounded-3 px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="min-width: 90px;">
                                 <div id="countdown-timer-display" class="fw-black tabular-nums" style="font-size: 24px; letter-spacing: -0.05em; font-family: sans-serif;">
-                                    ${String(data.timer.minutes || 10).padStart(2, '0')}:00
+                                    ${String(data.timer.minutes || 3).padStart(2, '0')}:00
                                 </div>
                             </div>
                         </div>
@@ -630,10 +658,10 @@ ${seoBlock}
                     <style>@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .85; } }</style>
                     <script>
                         (function() {
-                            var t = ${(data.timer.minutes || 10) * 60};
+                            var t = ${(data.timer.minutes || 3) * 60};
                             var el = document.getElementById('countdown-timer-display');
                             setInterval(function() {
-                                t = t <= 1 ? ${(data.timer.minutes || 10) * 60} : t - 1;
+                                t = t <= 1 ? ${(data.timer.minutes || 3) * 60} : t - 1;
                                 var m = Math.floor(t / 60), s = t % 60;
                                 el.textContent = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
                             }, 1000);
@@ -825,28 +853,30 @@ ${seoBlock}
 
     <section class="container-fluid py-5" style="background-color: #f9f9f9;">
         <div class="container">
-            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.pricingSubtitle}</p></div>` : ''}
+            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-dark mx-auto" style="width: 100%;">${data.pricingSubtitle}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
-            <div class="col-lg-4 col-md-6 mb-4"><div class="card h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
-                ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-md fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">Best Value Bundle</div>` : ''}
-                <h3 class="fs-4 fw-bold mb-3 text-uppercase">${plan.title}</h3>
-                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 160px;">
-                    <div class="position-absolute top-0 end-0" style="z-index: 150; transform: translate(10%, -10%);">
-                        <div style="position: relative;">
-                            <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.2); transform: translate(3px, 3px);"></div>
-                            <div style="position: relative; background: #000; color: #fff; padding: 4px 8px; font-weight: 900; font-size: 11px; border: 1px solid #fff;">${plan.multiplier || 'X1'}</div>
-                        </div>
-                    </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
+                ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-none fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">BEST VALUE BUNDLE</div>` : ''}
+                <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${plan.title}</h3>
+                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 180px; display: inline-block;">
                     ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '160px')}
+                    <div style="position: absolute; left: 50%; bottom: -12px; z-index: 20; transform: translateX(35px) rotate(8deg);">
+                        <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier || 'X1'}</div>
+                    </div>
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
                     <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
-                    <span class="fs-6 text-muted">/ bottle</span>
+                    <span class="fs-6 text-dark">/ bottle</span>
                 </div>
-                <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;"><ul class="list-unstyled mb-0 text-start d-inline-block">${plan.features.map((f: string) => `<li class="mb-2 small fw-medium"><i class="fa-solid fa-check-circle me-2" style="color: ${primaryColor};"></i>${f}</li>`).join('')}</ul></div>
-                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3 fs-6 fw-bold" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
-                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 text-muted fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;">
+                    <ul class="list-unstyled mb-0 text-start d-inline-block w-100">
+                        ${plan.features.map((f: string) => `<li class="mb-2 small fw-medium d-flex align-items-center gap-2"><i class="fa-solid fa-check-circle fs-6" style="color: ${primaryColor};"></i><span>${f}</span></li>`).join('')}
+                    </ul>
+                </div>
+                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3.5 fs-6 fw-bold text-decoration-none d-flex align-items-center justify-content-center" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
+                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
             </div></div>
             `).join('')}
         </div></div>
@@ -922,6 +952,8 @@ ${seoBlock}
     </section>` : ''}
 
     ${renderCustomSections('faq')}
+
+${sourcesHtml}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
@@ -1137,9 +1169,14 @@ ${seoBlock}
                 <div class="col-12 col-lg-5">
                     <div class="position-relative">
                         <div class="position-absolute organic-blob bg-stone-100 rotate-12" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(12deg) translateX(20px);"></div>
-                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]" style="position: relative; z-index: 10;">
                             <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
                         </div>
+                        ${data.hero?.badge?.enabled ? `
+                        <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
+                            <img src="${data.hero.badge.image}" alt="${data.hero.badge.imageAlt || 'Badge'}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
+                        </div>
+                        ` : ''}
                     </div>
                 </div>
             </div>
@@ -1162,7 +1199,7 @@ ${seoBlock}
             <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
                 <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white px-4 py-3 w-100 shadow-lg" style="max-width: 500px; border-radius: 12px; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
                     <div class="d-flex flex-column align-items-start">
-                        <div class="text-[14px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 14px; font-weight: 800;">LIMITED TIME OFFER</div>
+                        <div class="text-[14px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 14px; font-weight: 800;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
                         <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
                     </div>
                     <div class="bg-white text-black px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="background-color: white; color: black; border-radius: 8px; min-width: 80px;">
@@ -1175,13 +1212,18 @@ ${seoBlock}
             </style>
             <script>
                 (function() {
-                    let time = ${data.timer.minutes || 15} * 60;
+                    let time = ${data.timer.minutes || 3} * 60;
                     const display = document.getElementById('timer-display');
                     function update() {
                         const m = Math.floor(time / 60);
                         const s = time % 60;
                         display.innerText = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
-                        if (time > 0) { time--; setTimeout(update, 1000); }
+                        if (time > 0) { 
+                            time--; 
+                        } else {
+                            time = ${data.timer.minutes || 3} * 60;
+                        }
+                        setTimeout(update, 1000);
                     }
                     update();
                 })();
@@ -1337,18 +1379,18 @@ ${seoBlock}
                         ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
                         <div class="p-5 flex-grow-1 text-center">
                             <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
-                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 150px;">
+                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
+                                ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                                 ${plan.multiplier ? `
-                                <div class="position-absolute top-0 end-0 translate-middle-y me-n2 mt-n2" style="z-index: 150;">
-                                    <div class="bg-dark text-white px-3 py-1.5 font-serif italic text-xs shadow-sm" style="background-color: #1e3932;">${plan.multiplier}</div>
+                                <div style="position: absolute; left: 50%; bottom: -12px; z-index: 20; transform: translateX(35px) rotate(8deg);">
+                                    <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier}</div>
                                 </div>` : ''}
-                                ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '150px')}
                             </div>
                             <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
                             <div class="mb-5 text-start ps-4 border-start border-stone-100">
                                 ${plan.features.map((f: string) => `
                                 <div class="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
-                                    <i class="fa-solid fa-check text-success"></i>
+                                    <i class="fa-solid fa-check" style="color: var(--org-primary);"></i>
                                     <span>${f}</span>
                                 </div>`).join('')}
                             </div>
@@ -1441,8 +1483,10 @@ ${seoBlock}
 
     ${renderCustomSections('faq')}
 
+${sourcesHtml}
+
     <!-- Footer -->
-    <footer class="py-5 text-center" style="background-color: #1e3932; color: rgba(249, 247, 242, 0.6); font-family: 'Playfair Display', serif;">
+    <footer class="py-5 text-center" style="background-color: #1e3932; color: rgba(249, 247, 242, 0.6); font-family: 'Fraunces', serif;">
         <div class="container">
             <h2 class="fw-bold mb-2 text-white" style="font-size: 1.4rem;">${data.footerHeadline || 'Botanical Wisdom'}</h2>
             <p class="mx-auto mb-4 text-xs italic" style="max-width: 600px;">${data.footer?.companyInfo}</p>

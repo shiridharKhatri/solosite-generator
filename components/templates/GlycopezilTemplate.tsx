@@ -18,7 +18,7 @@ const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChang
     >
       <div className="flex justify-between items-center mb-3">
         <span className="text-[10px] font-bold uppercase text-gray-400">Link Settings</span>
-        <button onClick={onClose} className="text-gray-300 hover:text-gray-600"><i className="fa-solid fa-xmark"></i></button>
+        <button onClick={onClose} className="text-gray-300 hover:text-dark"><i className="fa-solid fa-xmark"></i></button>
       </div>
       <div className="space-y-3">
         <div>
@@ -579,7 +579,7 @@ export const GlycopezilTemplate: React.FC = () => {
             {/* Image Column - Left on desktop, top on mobile */}
             <div className="col-12 col-lg-5 text-center mb-3 mb-lg-0 d-flex flex-column align-items-center">
               {/* Product Image */}
-              <div style={{ width: '100%', maxWidth: '400px' }} className="relative mt-[-30px]">
+              <div style={{ width: '100%', maxWidth: '400px' }} className="relative mt-[-30px] group/hero">
                 <EditableImage
                   src={projectData.hero.image || '/image/index-img.webp'}
                   alt={projectData.hero.imageAlt}
@@ -590,6 +590,33 @@ export const GlycopezilTemplate: React.FC = () => {
                   className="mx-auto d-block img-fluid"
                   style={{ objectFit: 'contain', width: '100%' }}
                 />
+
+                {/* Hero Badge Overlay */}
+                {projectData.hero.badge?.enabled ? (
+                  <div className="absolute -top-4 -right-4 z-20 w-[140px] h-[140px] pointer-events-auto rotate-[5deg] hover:scale-105 transition-transform group/badge">
+                    <button
+                      onClick={() => updateHero({ badge: { ...projectData.hero.badge!, enabled: false } })}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/badge:opacity-100 transition-all z-30 border-2 border-white shadow-md hover:scale-110"
+                      title="Remove Badge"
+                    >
+                      <i className="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                    <EditableImage
+                      src={projectData.hero.badge?.image || '/image/badge-free-shipping.png'}
+                      alt={projectData.hero.badge?.imageAlt || 'Special Offer Badge'}
+                      onChange={(val) => updateHero({ badge: { ...projectData.hero.badge!, image: val } })}
+                      onAltChange={(val) => updateHero({ badge: { ...projectData.hero.badge!, imageAlt: val } })}
+                      className="w-full h-full object-contain drop-shadow-xl"
+                    />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => updateHero({ badge: { ...(projectData.hero.badge || { image: '/image/badge-free-shipping.png' }), enabled: true } })}
+                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-stone-200 text-stone-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm opacity-0 group-hover/hero:opacity-100 transition-all hover:bg-stone-50 hover:text-blue-600 z-20"
+                  >
+                    + Add Badge Overlay
+                  </button>
+                )}
               </div>
 
               {projectData.timer?.enabled && (
@@ -597,6 +624,7 @@ export const GlycopezilTemplate: React.FC = () => {
                   <CountdownTimer
                     minutes={projectData.timer.minutes}
                     text={projectData.timer.text}
+                    title={projectData.timer.title}
                     onUpdate={updateTimer}
                   />
                 </div>
@@ -664,7 +692,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 tagName="p"
                 value={projectData.hero.subtitle}
                 onChange={(val) => updateHero({ subtitle: val })}
-                className="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100"
+                className="fs-6 mt-2 fw-medium text-dark mx-auto mx-lg-0 w-100"
                 style={{ whiteSpace: 'pre-line', lineHeight: '1.7', textAlign: 'justify' }}
               />
 
@@ -713,7 +741,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="text-center mb-4">
                   <EditableText
                     tagName="p"
-                    className="fs-5 text-gray-700 mx-auto w-100"
+                    className="fs-5 text-dark mx-auto w-100"
                     value={projectData.featuresSubtitle}
                     onChange={(val) => useStore.getState().updateProjectData({ featuresSubtitle: val })}
                   />
@@ -740,7 +768,7 @@ export const GlycopezilTemplate: React.FC = () => {
                     />
                     <EditableText
                       tagName="p"
-                      className="fs-5 text-gray-700"
+                      className="fs-5 text-dark"
                       value={feature.description}
                       onChange={(val) => updateFeature(i, { description: val })}
                     />
@@ -777,7 +805,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="text-center mb-4">
                   <EditableText
                     tagName="p"
-                    className="fs-5 text-gray-700 mx-auto w-100"
+                    className="fs-5 text-dark mx-auto w-100"
                     value={projectData.about.subtitle}
                     onChange={(val) => updateAbout({ subtitle: val })}
                   />
@@ -809,8 +837,8 @@ export const GlycopezilTemplate: React.FC = () => {
                     tagName="div"
                     value={projectData.about.description}
                     onChange={(val) => updateAbout({ description: val })}
-                    className="fs-5 text-secondary about-description"
-                    style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.7', color: '#444' }}
+                    className="fs-5 text-dark about-description"
+                    style={{ textAlign: 'justify', whiteSpace: 'pre-line', lineHeight: '1.7', color: '#333' }}
                   />
                 </div>
               </div>
@@ -837,7 +865,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="d-flex justify-content-center mb-4">
                   <EditableText
                     tagName="p"
-                    className="text-center fs-5 text-white-50 border-bottom border-white-10 pb-2 mb-0"
+                    className="text-center fs-5 text-dark border-bottom border-gray-200 pb-2 mb-0"
                     value={projectData.research?.subtitle || ""}
                     onChange={(val) => updateResearch({ subtitle: val })}
                   />
@@ -845,7 +873,7 @@ export const GlycopezilTemplate: React.FC = () => {
               )}
               <div className="row align-items-center g-5">
                 <div className="col-lg-6">
-                  <EditableText tagName="div" className="fs-5 text-gray-700 mb-5" value={projectData.research?.description || ""} onChange={(val) => updateResearch({ description: val })} style={{ whiteSpace: 'pre-line' }} />
+                  <EditableText tagName="div" className="fs-5 text-dark mb-5" value={projectData.research?.description || ""} onChange={(val) => updateResearch({ description: val })} style={{ whiteSpace: 'pre-line' }} />
                   <div className="row g-4 mb-4">
                     {(projectData.research?.stats || []).map((stat, i) => (
                       <div key={i} className="col-4">
@@ -854,7 +882,7 @@ export const GlycopezilTemplate: React.FC = () => {
                           ns[i] = { ...stat, value: val };
                           updateResearch({ stats: ns });
                         }} />
-                        <EditableText tagName="div" className="text-gray-700 small fw-bold uppercase" value={stat.label} onChange={(val) => {
+                        <EditableText tagName="div" className="text-dark small fw-bold uppercase" value={stat.label} onChange={(val) => {
                           const ns = [...projectData.research!.stats];
                           ns[i] = { ...stat, label: val };
                           updateResearch({ stats: ns });
@@ -907,7 +935,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="text-center mb-4">
                   <EditableText
                     tagName="p"
-                    className="fs-5 text-gray-700 mx-auto w-100"
+                    className="fs-5 text-dark mx-auto w-100"
                     value={projectData.benefits.subtitle}
                     onChange={(val) => updateBenefit(-1, { subtitle: val })}
                   />
@@ -915,7 +943,7 @@ export const GlycopezilTemplate: React.FC = () => {
               )}
               <EditableText
                 tagName="p"
-                className="fs-5 text-center mb-5 mx-auto text-gray-700 w-100"
+                className="fs-5 text-center mb-5 mx-auto text-dark w-100"
                 value={projectData.benefits.description}
                 onChange={(val) => updateBenefit(-1, { description: val })}
               />
@@ -933,7 +961,7 @@ export const GlycopezilTemplate: React.FC = () => {
                       />
                       <EditableText
                         tagName="p"
-                        className="fs-5 text-gray-600 mb-0"
+                        className="fs-5 text-dark mb-0"
                         value={benefit.description}
                         onChange={(val) => updateBenefit(i, { description: val })}
                       />
@@ -970,7 +998,7 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="text-center mb-5">
                 <EditableText
                   tagName="p"
-                  className="fs-5 text-gray-700 mx-auto w-100"
+                  className="fs-5 text-dark mx-auto w-100"
                   value={projectData.guaranteeSubtitle || ""}
                   onChange={(val) => useStore.getState().updateProjectData({ guaranteeSubtitle: val })}
                 />
@@ -1004,7 +1032,7 @@ export const GlycopezilTemplate: React.FC = () => {
                     />
                     <EditableText
                       tagName="p"
-                      className="fs-5 text-gray-700 leading-relaxed"
+                      className="fs-5 text-dark leading-relaxed"
                       style={{ textAlign: 'left' }}
                       value={projectData.guaranteeDescription || `Your happiness is our highest priority. Every order of ${projectData.productName} comes protected by a comprehensive 60-day satisfaction promise. If you are not completely satisfied with the results, simply contact our support team for a full refund.`}
                       onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
@@ -1046,7 +1074,7 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="text-center mb-5">
                 <EditableText
                   tagName="p"
-                  className="fs-5 text-gray-700 mx-auto w-100"
+                  className="fs-5 text-dark mx-auto w-100"
                   value={projectData.ingredients.subtitle || ""}
                   onChange={(val) => updateIngredient(-1, { subtitle: val })}
                 />
@@ -1079,7 +1107,7 @@ export const GlycopezilTemplate: React.FC = () => {
                         />
                         <EditableText
                           tagName="p"
-                          className="fs-6 text-gray-700 leading-relaxed mb-0"
+                          className="fs-6 text-dark leading-relaxed mb-0"
                           value={item.description}
                           onChange={(val) => updateIngredient(i, { description: val })}
                         />
@@ -1120,7 +1148,7 @@ export const GlycopezilTemplate: React.FC = () => {
                 <div className="text-center mb-4">
                   <EditableText
                     tagName="p"
-                    className="fs-5 text-gray-700 mx-auto w-100"
+                    className="fs-5 text-dark mx-auto w-100"
                     value={projectData.testimonials.subtitle}
                     onChange={(val) => useStore.getState().updateTestimonials(-1, { subtitle: val })}
                   />
@@ -1154,7 +1182,7 @@ export const GlycopezilTemplate: React.FC = () => {
                           />
                           <EditableText
                             tagName="span"
-                            className="text-gray-700 small"
+                            className="text-dark small"
                             value={item.role || "Verified Buyer"}
                             onChange={(val) => updateTestimonials(i, { role: val })}
                           />
@@ -1216,7 +1244,7 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="text-center mb-5">
                 <EditableText
                   tagName="p"
-                  className="fs-5 text-gray-700 mx-auto w-100"
+                  className="fs-5 text-dark mx-auto w-100"
                   value={projectData.pricingSubtitle || ""}
                   onChange={(val) => useStore.getState().updateProjectData({ pricingSubtitle: val })}
                 />
@@ -1243,32 +1271,12 @@ export const GlycopezilTemplate: React.FC = () => {
 
                       <div className="mt-2">
                         <EditableText
-                          className="fs-4 fw-bold mb-1 uppercase tracking-tight"
+                          className="fs-4 fw-bold mb-3 uppercase tracking-tight"
                           value={plan.title}
                           onChange={(val) => updatePricing(i, { title: val })}
                         />
 
-                        <div className="mb-2">
-                          <EditableText
-                            className="fs-6 fw-black text-purple-600 bg-purple-50 px-3 py-1 rounded-none d-inline-block"
-                            value={plan.quantity || "1 Bottle"}
-                            onChange={(val) => updatePricing(i, { quantity: val })}
-                          />
-                        </div>
-
-                        <div className="mb-3 relative group mx-auto" style={{ width: '180px' }}>
-                          {/* Premium Quantity Multiplier Badge */}
-                          <div className="absolute -top-2 -right-2 z-20 pointer-events-auto">
-                            <div className="relative group/badge">
-                              <div className="absolute inset-0 bg-black/20 translate-x-1 translate-y-1" />
-                              <EditableText
-                                className="relative bg-[#2C0D67] text-white px-3 py-1 rounded-none flex items-center justify-center fw-black text-xs border border-white shadow-xl min-w-[40px]"
-                                value={plan.multiplier || "X1"}
-                                onChange={(val) => updatePricing(i, { multiplier: val })}
-                              />
-                            </div>
-                          </div>
-
+                        <div className="relative inline-block w-full">
                           <BottleStack
                             src={plan.image || '/image/default.png'}
                             alt={plan.imageAlt || plan.title}
@@ -1276,52 +1284,84 @@ export const GlycopezilTemplate: React.FC = () => {
                             onChange={(val) => updatePricing(i, { image: val })}
                             onAltChange={(val) => updatePricing(i, { imageAlt: val })}
                           />
-                        </div>
 
-                        <div className="mb-3">
-                          <div className="d-flex align-items-baseline justify-content-center gap-1">
-                            <span className="fs-2 fw-bold" style={{ color: projectData.theme?.primary }}>
-                              <EditableText value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
-                            </span>
-                            <span className="fs-6 text-gray-700">/ bottle</span>
+                          {/* Premium Red Multiplier Badge on Bottles */}
+                          <div className="absolute -bottom-4 right-1/4 z-20 pointer-events-auto rotate-[5deg]">
+                            <EditableText
+                              className="bg-red-600 text-white px-4 py-1.5 rounded-full fw-black text-sm border-[3px] border-white shadow-xl min-w-[50px] tracking-widest uppercase flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                              value={plan.multiplier || "X1"}
+                              onChange={(val) => updatePricing(i, { multiplier: val })}
+                            />
                           </div>
                         </div>
+                      </div>
 
-                        <div className="bg-light rounded-[1rem] p-3 mb-4 mx-auto border" style={{ maxWidth: '280px' }}>
-                          <ul className="list-unstyled mb-0 text-start d-inline-block">
-                            {plan.features.map((feature, fi) => (
-                              <li key={fi} className="mb-2 d-flex align-items-center gap-2">
-                                <i className="fa-solid fa-check-circle fs-6" style={{ color: projectData.theme?.primary }}></i>
-                                <EditableText
-                                  className="fw-medium text-dark small"
-                                  value={feature}
-                                  onChange={(val) => {
-                                    const newFeatures = [...plan.features];
-                                    newFeatures[fi] = val;
-                                    updatePricing(i, { features: newFeatures });
-                                  }}
-                                />
-                              </li>
-                            ))}
-                          </ul>
+                      <div className="mb-3">
+                        <div className="d-flex align-items-baseline justify-content-center gap-1">
+                          <span className="fs-2 fw-bold" style={{ color: projectData.theme?.primary }}>
+                            <EditableText value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
+                          </span>
+                          <span className="fs-6 text-dark">/ bottle</span>
                         </div>
+                      </div>
 
-                        <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
+                      <div className="bg-light rounded-[1rem] p-3 mb-4 mx-auto border" style={{ maxWidth: '280px' }}>
+                        <ul className="list-unstyled mb-0 text-start d-inline-block w-100">
+                          {plan.features.map((feature, fi) => (
+                            <li key={fi} className="mb-2 d-flex align-items-center gap-2 group/feat">
+                              <i className="fa-solid fa-check-circle fs-6" style={{ color: projectData.theme?.primary }}></i>
+                              <EditableText
+                                className="fw-medium text-dark small flex-grow-1"
+                                value={feature}
+                                onChange={(val) => {
+                                  const newFeatures = [...plan.features];
+                                  newFeatures[fi] = val;
+                                  updatePricing(i, { features: newFeatures });
+                                }}
+                              />
+                              <button
+                                onClick={() => {
+                                  const nf = [...plan.features];
+                                  nf.splice(fi, 1);
+                                  updatePricing(i, { features: nf });
+                                }}
+                                className="border-0 bg-transparent text-red-400 p-0 opacity-0 group-hover/feat:opacity-100 hover:text-red-600 transition-all flex-shrink-0"
+                                title="Remove point"
+                              >
+                                <i className="fa-solid fa-times text-xs"></i>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="text-center mt-2 border-top pt-2">
                           <button
-                            className="btn-custom-pill w-100 py-3.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
-                            style={{ backgroundColor: plan.isPrimary ? projectData.theme?.secondary : '#333', color: plan.isPrimary ? '#000' : '#fff', border: 'none' }}
+                            onClick={() => {
+                              const nf = [...plan.features, "New point"];
+                              updatePricing(i, { features: nf });
+                            }}
+                            className="border-0 bg-transparent text-stone-400 hover:text-stone-600 text-[10px] fw-bold text-uppercase tracking-widest transition-colors flex items-center justify-center gap-1 mx-auto"
                           >
-                            <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
+                            <i className="fa-solid fa-plus"></i> Add Point
                           </button>
-                        </Linkable>
-
-                        <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
-                          <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
-                          <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                         </div>
+                      </div>
+
+                      <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
+                        <button
+                          className="btn-custom-pill w-100 py-3.5 fs-6 fw-bold d-flex align-items-center justify-content-center"
+                          style={{ backgroundColor: plan.isPrimary ? projectData.theme?.secondary : '#333', color: plan.isPrimary ? '#000' : '#fff', border: 'none' }}
+                        >
+                          <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
+                        </button>
+                      </Linkable>
+
+                      <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
+                        <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
+                        <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                       </div>
                     </div>
                   </div>
+
                 ))}
               </div>
               <div className="mt-8">
@@ -1330,61 +1370,90 @@ export const GlycopezilTemplate: React.FC = () => {
             </div>
           </section>
         </>
-      )}
+      )
+      }
 
       <CustomSections afterSection="pricing" />
       <AddSectionButton afterSection="pricing" />
 
       {/* FAQ Section */}
-      {projectData.sections?.faq !== false && (
-        <>
-          <section id="faq" className="container-fluid text-center mt-0 sectioncolor relative group/section">
-            <SectionSettings sectionKey="faq" />
-            <EditableText
-              tagName="h2"
-              className="text-center fs-1 fw-bold py-3 text-white mb-0"
-              value={projectData.faqTitle || "Common Questions Answered"}
-              onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })}
-            />
-          </section>
+      {
+        projectData.sections?.faq !== false && (
+          <>
+            <section id="faq" className="container-fluid text-center mt-0 sectioncolor relative group/section">
+              <SectionSettings sectionKey="faq" />
+              <EditableText
+                tagName="h2"
+                className="text-center fs-1 fw-bold py-3 text-white mb-0"
+                value={projectData.faqTitle || "Common Questions Answered"}
+                onChange={(val) => useStore.getState().updateProjectData({ faqTitle: val })}
+              />
+            </section>
 
-          <section className="container-fluid py-5 bg-white">
-            <div className="container">
-              <div className="text-center mb-5">
+            <section className="container-fluid py-5 bg-white">
+              <div className="container">
+                <div className="text-center mb-5">
+                  <EditableText
+                    tagName="p"
+                    className="fs-5 text-dark mx-auto w-100"
+                    value={projectData.faqSubtitle || ""}
+                    onChange={(val) => useStore.getState().updateProjectData({ faqSubtitle: val })}
+                  />
+                </div>
+              </div>
+              <div className="container mx-auto w-100">
+                <div className="accordion accordion-flush" id="glycopezilFAQ">
+                  {projectData.faq?.map((item, i) => (
+                    <div key={i} className="accordion-item mb-3 rounded border relative group">
+                      <RemoveButton onClick={() => removeFAQ(i)} />
+                      <h3 className="accordion-header">
+                        <div className="accordion-button fw-bold fs-5 p-4 bg-white shadow-none cursor-default">
+                          <EditableText value={item.question} onChange={(val) => updateFAQ(i, { question: val })} className="w-full" />
+                        </div>
+                      </h3>
+                      <div id={`faq${i}`} className="accordion-collapse show">
+                        <div className="accordion-body fs-5 text-dark p-4 bg-white border-top">
+                          <EditableText value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} className="w-full" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <AddButton onClick={addFAQ} label="FAQ" />
+              </div>
+            </section>
+          </>
+        )
+      }
+
+      <CustomSections afterSection="faq" />
+      < AddSectionButton afterSection="faq" />
+
+      {/* Sources Section */}
+      {
+        projectData.sections?.sources !== false && (
+          <section id="sources" className="py-5 bg-white">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <EditableText
+                tagName="h3"
+                className="fs-4 fw-bold mb-4 pb-2 d-inline-block text-uppercase"
+                style={{ color: '#000000', borderBottom: `2px solid ${projectData.theme?.secondary || '#000000'}` }}
+                value={projectData.sourcesTitle || "SCIENTIFIC REFERENCES"}
+                onChange={(val) => useStore.getState().updateProjectData({ sourcesTitle: val })}
+              />
+              <div className="bg-[#f8f9fa] p-6 border border-gray-200">
                 <EditableText
-                  tagName="p"
-                  className="fs-5 text-gray-700 mx-auto w-100"
-                  value={projectData.faqSubtitle || ""}
-                  onChange={(val) => useStore.getState().updateProjectData({ faqSubtitle: val })}
+                  tagName="div"
+                  className="text-black [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-2 [&_a]:text-blue-500 [&_a]:underline hover:[&_a]:text-blue-700"
+                  style={{ lineHeight: '1.8', fontSize: '0.9rem' }}
+                  value={projectData.sources || "<ol><li>Panossian, A. and Wikman, G., 2008. Pharmacology of Schisandra chinensis Bail.: an overview of Russian research and uses in medicine. <i>Journal of ethnopharmacology</i>, 118(2), pp.183-212. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/18515024/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/18515024/</a></li><li>D'Souza, J.J. et al., 2014. Anti-diabetic effects of the Indian gooseberry (Emblica officinalis Gaertn): a review. <i>Journal of Basic and Clinical Physiology and Pharmacology</i>, 25(2), pp.125-133. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/24362590/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/24362590/</a></li><li>Ishaque, S. et al., 2012. Rhodiola rosea for physical and mental fatigue: a systematic review. <i>BMC complementary and alternative medicine</i>, 12(1), pp.1-9. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/22643043/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/22643043/</a></li><li>Katz, D.L., Doughty, K. and Ali, A., 2011. Cocoa and chocolate in human health and disease. <i>Antioxidants & redox signaling</i>, 15(10), pp.2779-2811. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/21470061/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/21470061/</a></li></ol>"}
+                  onChange={(val) => useStore.getState().updateProjectData({ sources: val })}
                 />
               </div>
             </div>
-            <div className="container mx-auto w-100">
-              <div className="accordion accordion-flush" id="glycopezilFAQ">
-                {projectData.faq?.map((item, i) => (
-                  <div key={i} className="accordion-item mb-3 rounded border relative group">
-                    <RemoveButton onClick={() => removeFAQ(i)} />
-                    <h3 className="accordion-header">
-                      <div className="accordion-button fw-bold fs-5 p-4 bg-white shadow-none cursor-default">
-                        <EditableText value={item.question} onChange={(val) => updateFAQ(i, { question: val })} className="w-full" />
-                      </div>
-                    </h3>
-                    <div id={`faq${i}`} className="accordion-collapse show">
-                      <div className="accordion-body fs-5 text-gray-600 p-4 bg-white border-top">
-                        <EditableText value={item.answer} onChange={(val) => updateFAQ(i, { answer: val })} className="w-full" />
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <AddButton onClick={addFAQ} label="FAQ" />
-            </div>
           </section>
-        </>
-      )}
-
-      <CustomSections afterSection="faq" />
-      <AddSectionButton afterSection="faq" />
+        )
+      }
 
       {/* Footer */}
       <footer className="navcolor text-white py-5">
@@ -1460,168 +1529,172 @@ export const GlycopezilTemplate: React.FC = () => {
       </div>
 
       {/* Purchase Proof Popup */}
-      {projectData.socialProof?.enabled && (
-        <div
-          className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-400 transition-colors`}
-          onClick={() => setShowProofSettings(true)}
-          title="Click to customize social proof"
-        >
-          <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
-            <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
-          </div>
-          <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
-            <img
-              src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/default.png'}
-              className="w-full h-full object-contain"
-              alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Purchased Product"}
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = '/image/default.png';
-              }}
-            />
-          </div>
-          <div className="flex flex-col">
-            <div className="text-yellow-500 text-[8px] mb-1">
-              {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+      {
+        projectData.socialProof?.enabled && (
+          <div
+            className={`purchase-proof ${showProof ? 'active' : ''} group/proof cursor-pointer hover:border-blue-400 transition-colors`}
+            onClick={() => setShowProofSettings(true)}
+            title="Click to customize social proof"
+          >
+            <div className="absolute -top-10 left-0 bg-blue-600 text-white text-[9px] font-bold px-2 py-1.5 rounded-sm opacity-0 group-hover/proof:opacity-100 transition-all shadow-xl pointer-events-none">
+              <i className="fa-solid fa-gear mr-1"></i> Edit Popup Settings
             </div>
-            <div className="text-white/90 text-xs leading-tight">
-              <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
-              {projectData.socialProof?.items[proofIndex]?.content}
+            <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-white/10 flex items-center justify-center">
+              <img
+                src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/default.png'}
+                className="w-full h-full object-contain"
+                alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Purchased Product"}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/image/default.png';
+                }}
+              />
             </div>
-            <small className="text-white/60 text-[9px] mt-1 font-bold uppercase tracking-wider">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Buyer</small>
+            <div className="flex flex-col">
+              <div className="text-yellow-500 text-[8px] mb-1">
+                {[...Array(5)].map((_, si) => <i key={si} className="fa-solid fa-star"></i>)}
+              </div>
+              <div className="text-white/90 text-xs leading-tight">
+                <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.name}</strong> from <strong className="text-green-500">{projectData.socialProof?.items[proofIndex]?.location}</strong> <br />
+                {projectData.socialProof?.items[proofIndex]?.content}
+              </div>
+              <small className="text-white/60 text-[9px] mt-1 font-bold uppercase tracking-wider">{projectData.socialProof?.items[proofIndex]?.timeAgo} • Verified Buyer</small>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Social Proof Settings Modal */}
-      {showProofSettings && (
-        <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowProofSettings(false)}></div>
-          <div className="bg-white w-full max-w-xl rounded-none shadow-2xl z-10 overflow-hidden animate-in zoom-in-95 duration-200">
-            <div className="bg-gray-50 p-4 border-bottom d-flex justify-content-between align-items-center">
-              <h3 className="m-0 fs-5 fw-bold text-dark uppercase tracking-tight">Social Proof Popup Settings</h3>
-              <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-gray-400 hover:text-dark">
-                <i className="fa-solid fa-xmark fs-4"></i>
-              </button>
-            </div>
-            <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
-              <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 mb-4">
-                <span className="text-sm font-bold text-blue-900">Enable Social Proof Widget</span>
-                <button
-                  onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
-                  className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-gray-600'}`}
-                >
-                  {projectData.socialProof?.enabled ? 'ENABLED' : 'DISABLED'}
+      {
+        showProofSettings && (
+          <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowProofSettings(false)}></div>
+            <div className="bg-white w-full max-w-xl rounded-none shadow-2xl z-10 overflow-hidden animate-in zoom-in-95 duration-200">
+              <div className="bg-gray-50 p-4 border-bottom d-flex justify-content-between align-items-center">
+                <h3 className="m-0 fs-5 fw-bold text-dark uppercase tracking-tight">Social Proof Popup Settings</h3>
+                <button onClick={() => setShowProofSettings(false)} className="border-none bg-transparent text-gray-400 hover:text-dark">
+                  <i className="fa-solid fa-xmark fs-4"></i>
                 </button>
               </div>
+              <div className="p-4 max-h-[70vh] overflow-y-auto space-y-4">
+                <div className="flex items-center justify-between p-3 bg-blue-50 border border-blue-100 mb-4">
+                  <span className="text-sm font-bold text-blue-900">Enable Social Proof Widget</span>
+                  <button
+                    onClick={() => updateSocialProof({ enabled: !projectData.socialProof?.enabled })}
+                    className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all border-none ${projectData.socialProof?.enabled ? 'bg-green-600 text-white' : 'bg-gray-300 text-dark'}`}
+                  >
+                    {projectData.socialProof?.enabled ? 'ENABLED' : 'DISABLED'}
+                  </button>
+                </div>
 
-              <div className="row g-3">
-                <div className="col-md-6">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Display Duration (ms)</label>
-                  <input
-                    type="number"
-                    className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={projectData.socialProof?.displayTime}
-                    onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })}
-                  />
+                <div className="row g-3">
+                  <div className="col-md-6">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Display Duration (ms)</label>
+                    <input
+                      type="number"
+                      className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      value={projectData.socialProof?.displayTime}
+                      onChange={(e) => updateSocialProof({ displayTime: parseInt(e.target.value) })}
+                    />
+                  </div>
+                  <div className="col-md-6">
+                    <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Interval Between (ms)</label>
+                    <input
+                      type="number"
+                      className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
+                      value={projectData.socialProof?.interval}
+                      onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })}
+                    />
+                  </div>
                 </div>
-                <div className="col-md-6">
-                  <label className="text-[10px] font-bold text-gray-400 uppercase mb-1 block">Interval Between (ms)</label>
-                  <input
-                    type="number"
-                    className="w-full p-2 border text-sm focus:ring-2 focus:ring-blue-500 outline-none"
-                    value={projectData.socialProof?.interval}
-                    onChange={(e) => updateSocialProof({ interval: parseInt(e.target.value) })}
-                  />
-                </div>
-              </div>
-              <div className="space-y-4">
-                <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Entries</label>
-                {(projectData.socialProof?.items || []).map((item, idx) => (
-                  <div key={idx} className="p-3 bg-gray-50 border border-gray-100 relative group/item">
-                    <button
-                      onClick={() => {
-                        const ni = [...(projectData.socialProof?.items || [])];
-                        ni.splice(idx, 1);
-                        updateSocialProof({ items: ni });
-                      }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none shadow-sm"
-                    >
-                      <i className="fa-solid fa-times text-[10px]"></i>
-                    </button>
-                    <div className="row g-2">
-                      <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Name</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.name} onChange={(e) => {
+                <div className="space-y-4">
+                  <label className="text-[10px] font-bold text-gray-400 uppercase block mb-1">Entries</label>
+                  {(projectData.socialProof?.items || []).map((item, idx) => (
+                    <div key={idx} className="p-3 bg-gray-50 border border-gray-100 relative group/item">
+                      <button
+                        onClick={() => {
                           const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], name: e.target.value };
+                          ni.splice(idx, 1);
                           updateSocialProof({ items: ni });
-                        }} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Location</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.location} onChange={(e) => {
-                          const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], location: e.target.value };
-                          updateSocialProof({ items: ni });
-                        }} />
-                      </div>
-                      <div className="col-md-12">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Content</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.content} onChange={(e) => {
-                          const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], content: e.target.value };
-                          updateSocialProof({ items: ni });
-                        }} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Time</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.timeAgo} onChange={(e) => {
-                          const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], timeAgo: e.target.value };
-                          updateSocialProof({ items: ni });
-                        }} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Image URL</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.image} onChange={(e) => {
-                          const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], image: e.target.value };
-                          updateSocialProof({ items: ni });
-                        }} />
-                      </div>
-                      <div className="col-md-6">
-                        <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Alt Tag</label>
-                        <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.imageAlt} onChange={(e) => {
-                          const ni = [...(projectData.socialProof?.items || [])];
-                          ni[idx] = { ...ni[idx], imageAlt: e.target.value };
-                          updateSocialProof({ items: ni });
-                        }} />
+                        }}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/item:opacity-100 transition-opacity border-none shadow-sm"
+                      >
+                        <i className="fa-solid fa-times text-[10px]"></i>
+                      </button>
+                      <div className="row g-2">
+                        <div className="col-md-6">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Name</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.name} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], name: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Location</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.location} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], location: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
+                        <div className="col-md-12">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Content</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.content} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], content: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Time</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.timeAgo} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], timeAgo: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Image URL</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.image} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], image: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
+                        <div className="col-md-6">
+                          <label className="text-[9px] font-bold text-gray-500 uppercase block mb-1">Alt Tag</label>
+                          <input type="text" className="w-full p-1.5 bg-white border border-gray-200 text-dark text-[11px] outline-none focus:border-blue-500" value={item.imageAlt} onChange={(e) => {
+                            const ni = [...(projectData.socialProof?.items || [])];
+                            ni[idx] = { ...ni[idx], imageAlt: e.target.value };
+                            updateSocialProof({ items: ni });
+                          }} />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                  <button
+                    onClick={() => {
+                      const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/default.png" }];
+                      updateSocialProof({ items: ni });
+                    }}
+                    className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-[10px] font-bold uppercase border border-blue-500/30 transition-all mt-2"
+                  >
+                    <i className="fa-solid fa-plus mr-1"></i> Add Entry
+                  </button>
+                </div>
+              </div>
+              <div className="bg-gray-50 p-4 border-top text-right">
                 <button
-                  onClick={() => {
-                    const ni = [...(projectData.socialProof?.items || []), { name: "New Client", location: "New York", content: "purchased 3 bottles", timeAgo: "2 minutes ago", image: projectData.hero.image || "/image/default.png" }];
-                    updateSocialProof({ items: ni });
-                  }}
-                  className="w-full py-2 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 text-[10px] font-bold uppercase border border-blue-500/30 transition-all mt-2"
+                  onClick={() => setShowProofSettings(false)}
+                  className="bg-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider border-none hover:bg-black transition-all"
                 >
-                  <i className="fa-solid fa-plus mr-1"></i> Add Entry
+                  Done
                 </button>
               </div>
             </div>
-            <div className="bg-gray-50 p-4 border-top text-right">
-              <button
-                onClick={() => setShowProofSettings(false)}
-                className="bg-dark text-white px-6 py-2 text-xs font-bold uppercase tracking-wider border-none hover:bg-black transition-all"
-              >
-                Done
-              </button>
-            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Scroll Button */}
       <button
@@ -1632,6 +1705,6 @@ export const GlycopezilTemplate: React.FC = () => {
         <i className="fa-solid fa-arrow-up fs-4"></i>
       </button>
 
-    </div>
+    </div >
   );
 };

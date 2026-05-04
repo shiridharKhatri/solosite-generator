@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -416,9 +417,9 @@ export const OrganicTemplate: React.FC = () => {
               </div>
             </div>
             <div className="col-12 col-lg-5">
-              <div className="position-relative">
+              <div className="position-relative group/hero">
                 <div className="absolute inset-0 organic-blob bg-stone-100 rotate-12 -z-10 translate-x-4"></div>
-                <div className="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                <div className="p-4 organic-blob bg-white border border-[#E6D5C3] relative z-10">
                   <EditableImage
                     src={projectData.hero.image || '/image/index-img.webp'}
                     alt={projectData.hero.imageAlt}
@@ -428,6 +429,32 @@ export const OrganicTemplate: React.FC = () => {
                     style={{ maxHeight: '450px', objectFit: 'contain' }}
                   />
                 </div>
+                {/* Hero Badge Overlay */}
+                {projectData.hero.badge?.enabled ? (
+                  <div className="absolute -top-4 -right-4 z-20 w-[140px] h-[140px] pointer-events-auto rotate-[5deg] hover:scale-105 transition-transform group/badge">
+                    <button
+                      onClick={() => updateHero({ badge: { ...projectData.hero.badge!, enabled: false } })}
+                      className="absolute -top-2 -right-2 bg-red-500 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/badge:opacity-100 transition-all z-30 border-2 border-white shadow-md hover:scale-110"
+                      title="Remove Badge"
+                    >
+                      <i className="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                    <EditableImage
+                      src={projectData.hero.badge?.image || '/image/badge-free-shipping.png'}
+                      alt={projectData.hero.badge?.imageAlt || 'Special Offer Badge'}
+                      onChange={(val) => updateHero({ badge: { ...projectData.hero.badge!, image: val } })}
+                      onAltChange={(val) => updateHero({ badge: { ...projectData.hero.badge!, imageAlt: val } })}
+                      className="w-full h-full object-contain drop-shadow-xl"
+                    />
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => updateHero({ badge: { ...(projectData.hero.badge || { image: '/image/badge-free-shipping.png' }), enabled: true } })}
+                    className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm border border-stone-200 text-stone-600 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm opacity-0 group-hover/hero:opacity-100 transition-all hover:bg-stone-50 hover:text-green-800 z-30"
+                  >
+                    + Add Badge Overlay
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -469,6 +496,7 @@ export const OrganicTemplate: React.FC = () => {
               <CountdownTimer
                 minutes={projectData.timer.minutes}
                 text={projectData.timer.text}
+                title={projectData.timer.title}
                 onUpdate={updateTimer}
               />
             </div>
@@ -716,18 +744,7 @@ export const OrganicTemplate: React.FC = () => {
                     {plan.isPrimary && <div className="bg-green-800 text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest">Recommended Choice</div>}
                     <div className="p-5 flex-grow text-center">
                       <EditableText tagName="h4" className="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600" value={plan.title} onChange={(val) => updatePricing(i, { title: val })} />
-                      <div className="relative mb-5 group/img">
-                        {/* Signature Leaf Multiplier Badge */}
-                        <div className="absolute -top-2 -right-2 z-10 pointer-events-auto">
-                          <div className="relative">
-                            <div className="absolute inset-0 bg-green-900/5 rotate-6" />
-                            <EditableText
-                              className="relative bg-[#1e3932] text-white px-3 py-1.5 rounded-none flex items-center justify-center font-serif italic text-xs border border-[#1e3932] shadow-sm min-w-[45px]"
-                              value={plan.multiplier || "X1"}
-                              onChange={(val) => updatePricing(i, { multiplier: val })}
-                            />
-                          </div>
-                        </div>
+                      <div className="relative mb-5 group/img inline-block w-full">
                         <BottleStack
                           src={plan.image || '/image/default.png'}
                           alt={plan.imageAlt || ""}
@@ -735,15 +752,45 @@ export const OrganicTemplate: React.FC = () => {
                           onChange={(val) => updatePricing(i, { image: val })}
                           onAltChange={(val) => updatePricing(i, { imageAlt: val })}
                         />
+                        {/* Premium Red Multiplier Badge on Bottles */}
+                        <div className="absolute -bottom-4 right-1/4 z-20 pointer-events-auto rotate-[5deg]">
+                          <EditableText
+                            className="bg-red-600 text-white px-4 py-1.5 rounded-full fw-black text-sm border-[3px] border-white shadow-xl min-w-[50px] tracking-widest uppercase flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                            value={plan.multiplier || "X1"}
+                            onChange={(val) => updatePricing(i, { multiplier: val })}
+                          />
+                        </div>
                       </div>
                       <EditableText tagName="div" className="fw-bold mb-4 font-serif text-3xl" value={plan.price} onChange={(val) => updatePricing(i, { price: val })} />
                       <div className="mb-5 text-start ps-4 border-start border-stone-100">
                         {plan.features.map((f, fi) => (
-                          <div key={fi} className="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
+                          <div key={fi} className="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs group/feat">
                             <i className="fa-solid fa-check text-green-700"></i>
-                            <EditableText tagName="span" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
+                            <EditableText tagName="span" className="flex-grow-1" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
+                            <button
+                                onClick={() => {
+                                  const nf = [...plan.features];
+                                  nf.splice(fi, 1);
+                                  updatePricing(i, { features: nf });
+                                }}
+                                className="border-0 bg-transparent text-red-300 p-0 opacity-0 group-hover/feat:opacity-100 hover:text-red-500 transition-all flex-shrink-0"
+                                title="Remove point"
+                              >
+                                <i className="fa-solid fa-times text-[10px]"></i>
+                            </button>
                           </div>
                         ))}
+                        <div className="text-start mt-3 pt-2 border-top border-stone-100/50">
+                          <button
+                            onClick={() => {
+                              const nf = [...plan.features, "New point"];
+                              updatePricing(i, { features: nf });
+                            }}
+                            className="border-0 bg-transparent text-stone-300 hover:text-stone-500 text-[9px] fw-bold text-uppercase tracking-widest transition-colors flex items-center gap-1"
+                          >
+                            <i className="fa-solid fa-plus"></i> Add Point
+                          </button>
+                        </div>
                       </div>
                       <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
                         <button className={`organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
@@ -861,6 +908,34 @@ export const OrganicTemplate: React.FC = () => {
           </div>
         </section>
       )}
+
+      {/* Scientific References */}
+      {projectData.sections?.sources && (
+        <section id="sources" className="py-5 bg-white group/section relative section-reveal border-t border-[#E6D5C3]">
+          <SectionSettings sectionKey="sources" />
+          <div className="container py-lg-4" style={{ maxWidth: '1024px' }}>
+            <EditableText
+              tagName="h3"
+              className="fs-4 fw-bold mb-4 pb-2 d-inline-block text-uppercase"
+              style={{ color: '#000000', borderBottom: `2px solid ${secondary}` }}
+              value={projectData.sourcesTitle || "SCIENTIFIC REFERENCES"}
+              onChange={(val) => useStore.getState().updateProjectData({ sourcesTitle: val })}
+            />
+            <div className="bg-[#f8f9fa] p-6 border border-[#E6D5C3]">
+              <EditableText
+                tagName="div"
+                className="text-black [&_ol]:list-decimal [&_ol]:pl-5 [&_ol]:space-y-2 [&_a]:text-blue-500 [&_a]:underline hover:[&_a]:text-blue-700 font-serif"
+                style={{ lineHeight: '1.8', fontSize: '0.9rem' }}
+                value={projectData.sources || "<ol><li>Panossian, A. and Wikman, G., 2008. Pharmacology of Schisandra chinensis Bail.: an overview of Russian research and uses in medicine. <i>Journal of ethnopharmacology</i>, 118(2), pp.183-212. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/18515024/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/18515024/</a></li><li>D'Souza, J.J. et al., 2014. Anti-diabetic effects of the Indian gooseberry (Emblica officinalis Gaertn): a review. <i>Journal of Basic and Clinical Physiology and Pharmacology</i>, 25(2), pp.125-133. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/24362590/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/24362590/</a></li><li>Ishaque, S. et al., 2012. Rhodiola rosea for physical and mental fatigue: a systematic review. <i>BMC complementary and alternative medicine</i>, 12(1), pp.1-9. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/22643043/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/22643043/</a></li><li>Katz, D.L., Doughty, K. and Ali, A., 2011. Cocoa and chocolate in human health and disease. <i>Antioxidants & redox signaling</i>, 15(10), pp.2779-2811. Available at: <a href=\"https://pubmed.ncbi.nlm.nih.gov/21470061/\" target=\"_blank\">https://pubmed.ncbi.nlm.nih.gov/21470061/</a></li></ol>"}
+                onChange={(val) => useStore.getState().updateProjectData({ sources: val })}
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      <CustomSections afterSection="sources" />
+      <AddSectionButton afterSection="sources" />
 
       {/* Footer */}
       <footer className="bg-[#1e3932] text-[#F9F7F2]/60 py-5 font-serif">

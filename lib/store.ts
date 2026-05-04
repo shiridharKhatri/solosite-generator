@@ -17,6 +17,11 @@ export interface ProjectData {
     logoImageAlt?: string;
     imageIsCircular?: boolean;
     logoImageIsCircular?: boolean;
+    badge?: {
+      enabled: boolean;
+      image: string;
+      imageAlt?: string;
+    };
   };
   logos: { src: string; alt?: string; isCircular?: boolean }[];
   features: {
@@ -182,6 +187,8 @@ export interface ProjectData {
   guaranteeSubtitle?: string;
   guaranteeSmallText?: string;
   footerHeadline?: string;
+  sourcesTitle?: string;
+  sources?: string;
 
 
   socialProof?: {
@@ -208,6 +215,7 @@ export interface ProjectData {
     testimonials: boolean;
     faq: boolean;
     pricing: boolean;
+    sources: boolean;
   };
   legalPages?: {
     privacyPolicy: string;
@@ -219,6 +227,7 @@ export interface ProjectData {
     enabled: boolean;
     minutes: number;
     text: string;
+    title?: string;
   };
   customSections?: {
     id: string;
@@ -669,7 +678,8 @@ export const initialProjectData: ProjectData = {
     ingredients: true,
     testimonials: true,
     faq: true,
-    pricing: true
+    pricing: true,
+    sources: true
   },
   legalPages: {
     privacyPolicy: "This Privacy Policy describes how your personal information is collected, used, and shared when you visit or make a purchase from this site...",
@@ -680,7 +690,8 @@ export const initialProjectData: ProjectData = {
   timer: {
     enabled: true,
     minutes: 3,
-    text: "HURRY! OFFER ENDS IN:"
+    text: "HURRY! OFFER ENDS IN:",
+    title: "LIMITED TIME OFFER"
   },
   customSections: []
 };
@@ -995,7 +1006,7 @@ export const useStore = create<EditorState>((set) => ({
     if (!state.projectData) return state;
     const currentSections = state.projectData.sections || {
       features: true, about: true, research: true, benefits: true, guarantee: true,
-      ingredients: true, testimonials: true, faq: true, pricing: true
+      ingredients: true, testimonials: true, faq: true, pricing: true, sources: true
     };
     return {
       projectData: {

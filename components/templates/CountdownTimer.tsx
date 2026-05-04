@@ -1,15 +1,17 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { EditableText } from '../editor/EditableText';
 
 interface CountdownTimerProps {
   minutes: number;
   text: string;
-  onUpdate: (timer: { enabled?: boolean; minutes?: number; text?: string }) => void;
+  onUpdate: (timer: { enabled?: boolean; minutes?: number; text?: string; title?: string }) => void;
   className?: string;
+  title?: string;
 }
 
-export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, onUpdate, className = "" }) => {
+export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, onUpdate, className = "", title = "LIMITED TIME OFFER" }) => {
   const [timeLeft, setTimeLeft] = useState(minutes * 60);
 
   useEffect(() => {
@@ -43,15 +45,29 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
       </button>
 
       <div className="flex flex-col items-start gap-0.5">
-        <div className="text-[14px] font-black uppercase leading-tight tracking-wider font-serif">
-          LIMITED TIME OFFER
-        </div>
-        <div className="text-[11px] font-medium opacity-90 italic">
-          {text || 'Hurry, Stock Running Low!'}
-        </div>
+        <EditableText
+          className="text-[14px] font-black uppercase leading-tight tracking-wider font-serif"
+          value={title}
+          onChange={(val) => onUpdate({ title: val })}
+        />
+        <EditableText
+          className="text-[11px] font-medium opacity-90 italic"
+          value={text || 'Hurry, Stock Running Low!'}
+          onChange={(val) => onUpdate({ text: val })}
+        />
       </div>
 
-      <div className="bg-white text-black rounded-lg px-3 py-1.5 min-w-[85px] flex items-center justify-center shadow-inner">
+      <div
+        className="bg-white text-black rounded-lg px-3 py-1.5 min-w-[85px] flex items-center justify-center shadow-inner cursor-pointer hover:bg-gray-100 transition-colors"
+        onClick={(e) => {
+          e.stopPropagation();
+          const newMins = prompt('Enter timer minutes:', minutes.toString());
+          if (newMins !== null && !isNaN(parseInt(newMins))) {
+            onUpdate({ minutes: parseInt(newMins) });
+          }
+        }}
+        title="Click to edit timer duration"
+      >
         <div className="text-[22px] font-black tabular-nums tracking-tighter">
           {formatTime(timeLeft)}
         </div>
