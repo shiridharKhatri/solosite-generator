@@ -2,6 +2,22 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Environment
+
+Set at minimum:
+
+- `MONGODB_URI`
+- `NEXTAUTH_SECRET`
+
+### Seed an admin user
+
+This project uses credentials auth; you need at least one admin user in MongoDB.
+
+```bash
+npm install
+npm run seed:admin -- --email admin@example.com --password 'StrongPass123' --name 'Admin'
+```
+
 First, run the development server:
 
 ```bash

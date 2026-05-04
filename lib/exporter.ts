@@ -76,15 +76,15 @@ export async function generateProjectZip(data: any) {
             } else if (section.type === 'image-text') {
                 innerHtml = `
                     <div class="row align-items-center g-5">
-                        <div class="col-lg-6">${imageHtml}</div>
-                        <div class="col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
+                        <div class="col-12 col-lg-6">${imageHtml}</div>
+                        <div class="col-12 col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
                     </div>
                 `;
             } else if (section.type === 'text-image') {
                 innerHtml = `
                     <div class="row align-items-center g-5 flex-column-reverse flex-lg-row">
-                        <div class="col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
-                        <div class="col-lg-6">${imageHtml}</div>
+                        <div class="col-12 col-lg-6">${titleHtml}${contentHtmlLg}${buttonHtml}</div>
+                        <div class="col-12 col-lg-6">${imageHtml}</div>
                     </div>
                 `;
             } else if (section.type === 'cards') {
@@ -566,6 +566,23 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
     .about-description { text-align: center !important; }
 }
 @media (max-width: 768px) { .bgbadge { max-width: 100%; } .py-5 { padding-top: 3rem !important; padding-bottom: 3rem !important; } }
+@media (max-width: 576px) {
+    /* Phone-friendly spacing + typography */
+    .hero-media { margin-top: 0 !important; }
+    .py-5 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+    .fs-1 { font-size: 1.8rem !important; }
+    h1 { font-size: 2rem !important; line-height: 1.15 !important; }
+    h2 { font-size: 1.6rem !important; line-height: 1.2 !important; }
+    /* Justified text looks bad on narrow screens (huge word gaps) */
+    .about-description { text-align: left !important; }
+    [style*="text-align: justify"] { text-align: left !important; }
+    p, li { hyphens: auto; overflow-wrap: anywhere; word-break: normal; }
+    .bgbadge { min-height: auto !important; padding: 1.25rem !important; }
+    .ingredient-card { padding: 1.5rem !important; border-radius: 2rem !important; }
+    .testimonial-card { border-radius: 2rem !important; }
+    .avatar-frame { width: 56px !important; height: 56px !important; }
+    .navbar .container { padding-left: 1rem !important; padding-right: 1rem !important; }
+}
 /* Rich Text Editor Support */
 ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
 [style*="text-align: center"] { text-align: center !important; }
@@ -584,13 +601,13 @@ ${seoBlock}
     <link rel="stylesheet" href="css/style.css" />
     <style>
       .sectioncolor { background-color: ${primaryColor}; color: white; }
-      .sectioncolor1 { background-color: #f8f9fa; padding: 5rem 0; }
+            .sectioncolor1 { background-color: #f8f9fa; }
       .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
       .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
       .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; overflow: hidden; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
       .pricing-card { border-radius: 2rem; transition: all 0.3s; }
       .pricing-card.primary { border: 4px solid ${secondaryColor} !important; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-      .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 2rem; transition: all 0.3s; }
+            .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s; }
       .testimonial-card:hover { transform: translateY(-5px); }
       .avatar-frame { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 2px solid ${secondaryColor}; }
       .accordion-button:not(.collapsed) { background-color: ${primaryColor}10; color: ${primaryColor}; }
@@ -636,7 +653,7 @@ ${seoBlock}
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0">
-                    <div class="position-relative d-inline-block" style="width: 100%; max-width: 400px; margin-top: -30px;">
+                    <div class="position-relative d-inline-block hero-media" style="width: 100%; max-width: 400px; margin-top: -30px;">
                         <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="img-fluid mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'} width: 100%;" />
                         ${data.hero?.badge?.enabled ? `
                         <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
@@ -747,7 +764,7 @@ ${seoBlock}
         <div class="container">
             ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.research.subtitle}</p></div>` : ''}
             <div class="row align-items-center g-5">
-                <div class="col-lg-6 text-center text-lg-start">
+                <div class="col-12 col-lg-6 text-center text-lg-start">
                     <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${data.research.description}</p>
                     <div class="row g-4 mt-2">
                         ${data.research.stats.map((stat: any) => `
@@ -758,7 +775,7 @@ ${seoBlock}
                         `).join('')}
                     </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-12 col-lg-6">
                     <div class="p-3 bg-white border rounded shadow-sm">
                         <img src="${data.research.image}" alt="${data.research.imageAlt || 'Clinical Research'}" class="img-fluid rounded w-100" style="max-height: 400px; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                     </div>
@@ -830,11 +847,11 @@ ${seoBlock}
             ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.guaranteeSubtitle}</p></div>` : ''}
             <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
                 <div class="row align-items-center g-5">
-                    <div class="col-lg-4 text-center">
+                    <div class="col-12 col-lg-4 text-center">
                         <img src="${data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee'}" alt="${data.footer?.trustImageAlt || 'Money Back Guarantee'}" class="img-fluid mb-3 mx-auto" style="max-width: 300px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
                         <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSmallText || "Zero Risk • Complete Satisfaction Promise"}</p>
                     </div>
-                    <div class="col-lg-8 text-center text-lg-start">
+                    <div class="col-12 col-lg-8 text-center text-lg-start">
                         <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
                         <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${data.guaranteeDescription || defaultGuaranteeDescription}</p>
                         <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Grab Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
@@ -859,7 +876,7 @@ ${seoBlock}
             ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-dark mx-auto" style="width: 100%;">${data.pricingSubtitle}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
-            <div class="col-lg-4 col-md-6 mb-4">
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
                 <div class="h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-none fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">BEST VALUE BUNDLE</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${plan.title}</h3>
@@ -895,22 +912,24 @@ ${seoBlock}
         </div>
     </section>
 
-    <section class="container py-5 bg-white">
-        <div class="container py-lg-5">
-            <div class="text-center mb-5">
-                <p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.testimonials.subtitle || ''}</p>
+    <section class="container-fluid py-5" style="background-color: #fff;">
+        <div class="container mx-auto">
+            ${data.testimonials.subtitle ? `
+            <div class="text-center mb-4">
+                <p class="fs-5 text-dark mx-auto w-100 mb-0">${data.testimonials.subtitle}</p>
             </div>
+            ` : ''}
             <div class="row g-4 justify-content-center">
                 ${data.testimonials.items.map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
-                    <div class="testimonial-card bg-white shadow-sm h-100 p-4 border rounded-0">
+                    <div class="card h-100 border-0 shadow-sm bg-white p-4 testimonial-card" style="border-radius: 2rem;">
                         <div class="d-flex align-items-center gap-3 mb-4">
-                            <div class="avatar-frame overflow-hidden" style="width: 48px; height: 48px; ${item.isCircular !== false ? 'border-radius: 50%;' : ''}">
+                            <div class="avatar-frame overflow-hidden" style="${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 0;'}">
                                 <img src="${item.image || 'https://i.pravatar.cc/150'}" alt="${item.imageAlt || item.name}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}">
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-0 text-dark fs-6">${item.name}</h4>
-                                <span class="text-muted small">${item.role || 'Verified Buyer'}</span>
+                                <h4 class="fw-bold mb-0 text-dark">${item.name}</h4>
+                                <span class="text-dark small">${item.role || 'Verified Buyer'}</span>
                             </div>
                         </div>
                         <div class="mb-3 text-warning d-flex gap-1">
