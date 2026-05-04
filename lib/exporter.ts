@@ -141,7 +141,7 @@ export async function generateProjectZip(data: any) {
     const cssFolder = zip.folder("css");
 
     // Sitemap & Robots
-    let baseUrl = data.seo?.canonicalUrl || 'https://example.com';
+    let baseUrl = (data.seo?.canonicalUrl || 'https://example.com').replace(/\/+$/, '');
 
     // Prevent localhost from leaking into production exports
     if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
