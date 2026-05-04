@@ -930,7 +930,10 @@ ${seoBlock}
             }
         }).join('')}
                         </div>
-                        <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
+                        <div style="position: relative;">
+                            <i class="fa-solid fa-quote-left" style="position: absolute; top: -10px; left: -10px; opacity: 0.1; font-size: 2rem;"></i>
+                            <p class="fs-6 text-dark font-italic italic mb-0" style="line-height: 1.6; position: relative; z-index: 1;">${(item.content || '').trim()}</p>
+                        </div>
                     </div>
                 </div>
                 `).join('')}
@@ -1460,7 +1463,7 @@ ${sourcesHtml}
             }
         }).join('')}
                         </div>
-                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
+                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${(t.content || '').trim()}</p>
                     </div>
                 </div>`).join('')}
             </div>
