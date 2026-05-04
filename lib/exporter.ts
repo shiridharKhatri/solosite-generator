@@ -158,9 +158,25 @@ export async function generateProjectZip(data: any) {
     });
 
     const lastMod = new Date().toISOString();
-    
+
+    const sectionLinks = [
+        { id: 'ingredients', priority: '0.8' },
+        { id: 'features', priority: '0.8' },
+        { id: 'research', priority: '0.8' },
+        { id: 'about', priority: '0.7' },
+        { id: 'benefits', priority: '0.7' },
+        { id: 'pricing', priority: '0.9' },
+        { id: 'testimonials', priority: '0.8' },
+        { id: 'faq', priority: '0.6' }
+    ].filter(s => data.sections?.[s.id] !== false).map(s => ({
+        loc: `#${s.id}`,
+        priority: s.priority,
+        changefreq: 'weekly'
+    }));
+
     const pages = [
         { loc: '', priority: '1.0', changefreq: 'daily' },
+        ...sectionLinks,
         ...legalPageLinks.map(link => ({ loc: link, priority: '0.7', changefreq: 'monthly' }))
     ];
 
@@ -197,10 +213,6 @@ ${pages.map(page => `  <url>
     zip.file("robots.txt", `User-agent: *
 Allow: /
 
-# Auto-detecting Sitemap (Works on PHP/Hostinger)
-Sitemap: /sitemap.php
-
-# Fallback Sitemap
 Sitemap: ${baseUrl}/sitemap.xml`);
 
     // Order Page (order.html) - Professional high-trust redirect
