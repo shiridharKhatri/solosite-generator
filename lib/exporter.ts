@@ -910,21 +910,21 @@ ${seoBlock}
                                 <span class="text-muted small">${item.role || 'Verified Buyer'}</span>
                             </div>
                         </div>
-                        <div class="mb-3 text-warning">
+                        <div class="mb-3 text-warning d-flex justify-content-center gap-1">
                             ${[...Array(5)].map((_, idx) => {
-                                const fill = idx + 1;
-                                let starClass = 'fa-star';
-                                let opacity = '';
-                                if ((item.rating || 5) >= fill) {
-                                    starClass = 'fa-star';
-                                } else if ((item.rating || 5) >= fill - 0.5) {
-                                    starClass = 'fa-star-half-stroke';
-                                } else {
-                                    starClass = 'fa-star';
-                                    opacity = 'opacity-25';
-                                }
-                                return `<i class="fa-solid ${starClass} ${opacity}"></i>`;
-                            }).join('')}
+            const fill = idx + 1;
+            if ((item.rating || 5) >= fill) {
+                return `<i class="fa-solid fa-star"></i>`;
+            } else if ((item.rating || 5) >= fill - 0.5) {
+                return `
+                                    <span style="position: relative; display: inline-block;">
+                                        <i class="fa-solid fa-star opacity-25"></i>
+                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0;"></i>
+                                    </span>`;
+            } else {
+                return `<i class="fa-solid fa-star opacity-25"></i>`;
+            }
+        }).join('')}
                         </div>
                         <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
@@ -1441,19 +1441,19 @@ ${sourcesHtml}
                         <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
                         <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
                             ${[...Array(5)].map((_, idx) => {
-                                const fill = idx + 1;
-                                let starClass = 'fa-star';
-                                let opacity = '';
-                                if ((t.rating || 5) >= fill) {
-                                    starClass = 'fa-star';
-                                } else if ((t.rating || 5) >= fill - 0.5) {
-                                    starClass = 'fa-star-half-stroke';
-                                } else {
-                                    starClass = 'fa-star';
-                                    opacity = 'opacity-25';
-                                }
-                                return `<i class="fa-solid ${starClass} ${opacity}"></i>`;
-                            }).join('')}
+            const fill = idx + 1;
+            if ((t.rating || 5) >= fill) {
+                return `<i class="fa-solid fa-star"></i>`;
+            } else if ((t.rating || 5) >= fill - 0.5) {
+                return `
+                                    <span style="position: relative; display: inline-block;">
+                                        <i class="fa-solid fa-star opacity-25"></i>
+                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0;"></i>
+                                    </span>`;
+            } else {
+                return `<i class="fa-solid fa-star opacity-25"></i>`;
+            }
+        }).join('')}
                         </div>
                         <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
                     </div>

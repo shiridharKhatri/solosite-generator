@@ -844,33 +844,32 @@ export const OrganicTemplate: React.FC = () => {
                     <div className="mb-3 d-flex gap-1 text-stone-200 text-[10px]">
                       {[...Array(5)].map((_, starIndex) => {
                         const fill = starIndex + 1;
-                        let starClass = 'fa-star';
-                        let opacity = '';
+                        const currentRating = item.rating || 5;
                         
-                        if (item.rating >= fill) {
-                          starClass = 'fa-star';
-                        } else if (item.rating >= fill - 0.5) {
-                          starClass = 'fa-star-half-stroke';
+                        if (currentRating >= fill) {
+                          return (
+                            <i
+                              key={starIndex}
+                              className="fa-solid fa-star cursor-pointer text-[#D4C3B2]"
+                              onClick={() => updateTestimonials(i, { rating: currentRating === fill ? fill - 0.5 : fill })}
+                            ></i>
+                          );
+                        } else if (currentRating >= fill - 0.5) {
+                          return (
+                            <div key={starIndex} className="relative inline-block cursor-pointer" onClick={() => updateTestimonials(i, { rating: fill })}>
+                              <i className="fa-solid fa-star opacity-30 text-[#D4C3B2]"></i>
+                              <i className="fa-solid fa-star-half-stroke absolute left-0 top-0 text-[#D4C3B2]"></i>
+                            </div>
+                          );
                         } else {
-                          starClass = 'fa-star';
-                          opacity = 'opacity-30';
+                          return (
+                            <i
+                              key={starIndex}
+                              className="fa-solid fa-star opacity-30 cursor-pointer text-[#D4C3B2]"
+                              onClick={() => updateTestimonials(i, { rating: fill })}
+                            ></i>
+                          );
                         }
-                        
-                        return (
-                          <i
-                            key={starIndex}
-                            className={`fa-solid ${starClass} ${opacity} cursor-pointer text-[#D4C3B2]`}
-                            onClick={() => {
-                              const currentRating = item.rating || 5;
-                              const newRating = starIndex + 1;
-                              if (currentRating === newRating) {
-                                updateTestimonials(i, { rating: newRating - 0.5 });
-                              } else {
-                                updateTestimonials(i, { rating: newRating });
-                              }
-                            }}
-                          ></i>
-                        );
                       })}
                     </div>
                     <EditableText tagName="p" className="mb-0 text-stone-600 italic text-sm" style={{ lineHeight: 1.8 }} value={item.content} onChange={(val) => updateTestimonials(i, { content: val })} />

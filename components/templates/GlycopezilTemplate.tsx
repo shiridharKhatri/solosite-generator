@@ -1189,36 +1189,35 @@ export const GlycopezilTemplate: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="mb-3 text-warning">
+                      <div className="mb-3 text-warning d-flex gap-1">
                         {[...Array(5)].map((_, starIndex) => {
                           const fill = starIndex + 1;
-                          let starClass = 'fa-star';
-                          let opacity = '';
-
-                          if (item.rating >= fill) {
-                            starClass = 'fa-star';
-                          } else if (item.rating >= fill - 0.5) {
-                            starClass = 'fa-star-half-stroke';
+                          const currentRating = item.rating || 5;
+                          
+                          if (currentRating >= fill) {
+                            return (
+                              <i
+                                key={starIndex}
+                                className="fa-solid fa-star cursor-pointer"
+                                onClick={() => updateTestimonials(i, { rating: currentRating === fill ? fill - 0.5 : fill })}
+                              ></i>
+                            );
+                          } else if (currentRating >= fill - 0.5) {
+                            return (
+                              <div key={starIndex} className="position-relative d-inline-block cursor-pointer" onClick={() => updateTestimonials(i, { rating: fill })}>
+                                <i className="fa-solid fa-star opacity-30"></i>
+                                <i className="fa-solid fa-star-half-stroke position-absolute start-0 top-0"></i>
+                              </div>
+                            );
                           } else {
-                            starClass = 'fa-star';
-                            opacity = 'opacity-30';
+                            return (
+                              <i
+                                key={starIndex}
+                                className="fa-solid fa-star opacity-30 cursor-pointer"
+                                onClick={() => updateTestimonials(i, { rating: fill })}
+                              ></i>
+                            );
                           }
-
-                          return (
-                            <i
-                              key={starIndex}
-                              className={`fa-solid ${starClass} ${opacity} cursor-pointer`}
-                              onClick={() => {
-                                const currentRating = item.rating || 5;
-                                const newRating = starIndex + 1;
-                                if (currentRating === newRating) {
-                                  updateTestimonials(i, { rating: newRating - 0.5 });
-                                } else {
-                                  updateTestimonials(i, { rating: newRating });
-                                }
-                              }}
-                            ></i>
-                          );
                         })}
                       </div>
 
