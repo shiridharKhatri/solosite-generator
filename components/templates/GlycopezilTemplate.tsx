@@ -1193,7 +1193,7 @@ export const GlycopezilTemplate: React.FC = () => {
                         {[...Array(5)].map((_, starIndex) => {
                           const fill = starIndex + 1;
                           const currentRating = item.rating || 5;
-                          
+
                           if (currentRating >= fill) {
                             return (
                               <i
@@ -1206,7 +1206,7 @@ export const GlycopezilTemplate: React.FC = () => {
                             return (
                               <div key={starIndex} className="position-relative d-inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
                                 <i className="fa-solid fa-star opacity-30" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
-                                <i className="fa-solid fa-star-half-stroke position-absolute start-0 top-0" style={{ width: '100%' }}></i>
+                                <i className="fa-solid fa-star position-absolute start-0 top-0" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)' }}></i>
                               </div>
                             );
                           } else {

@@ -858,7 +858,7 @@ export const OrganicTemplate: React.FC = () => {
                           return (
                             <div key={starIndex} className="relative inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
                               <i className="fa-solid fa-star opacity-30 text-[#D4C3B2]" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
-                              <i className="fa-solid fa-star-half-stroke absolute left-0 top-0 text-[#D4C3B2]" style={{ width: '100%' }}></i>
+                              <i className="fa-solid fa-star absolute left-0 top-0 text-[#D4C3B2]" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)' }}></i>
                             </div>
                           );
                         } else {

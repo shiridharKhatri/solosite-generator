@@ -912,19 +912,20 @@ ${seoBlock}
                         </div>
                         <div class="mb-3 text-warning d-flex gap-1">
                             ${[...Array(5)].map((_, idx) => {
-                                const fill = idx + 1;
-                                if ((item.rating || 5) >= fill) {
-                                    return `<i class="fa-solid fa-star"></i>`;
-                                } else if ((item.rating || 5) >= fill - 0.5) {
-                                    return `
+            const fill = idx + 1;
+            const rating = Number(item.rating || 5);
+            if (rating >= fill) {
+                return `<i class="fa-solid fa-star"></i>`;
+            } else if (rating >= fill - 0.5) {
+                return `
                                     <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
                                         <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
-                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
                                     </span>`;
-                                } else {
-                                    return `<i class="fa-solid fa-star opacity-25"></i>`;
-                                }
-                            }).join('')}
+            } else {
+                return `<i class="fa-solid fa-star opacity-25"></i>`;
+            }
+        }).join('')}
                         </div>
                         <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
@@ -1441,19 +1442,20 @@ ${sourcesHtml}
                         <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
                         <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
                             ${[...Array(5)].map((_, idx) => {
-                                const fill = idx + 1;
-                                if ((t.rating || 5) >= fill) {
-                                    return `<i class="fa-solid fa-star"></i>`;
-                                } else if ((t.rating || 5) >= fill - 0.5) {
-                                    return `
+            const fill = idx + 1;
+            const rating = Number(t.rating || 5);
+            if (rating >= fill) {
+                return `<i class="fa-solid fa-star"></i>`;
+            } else if (rating >= fill - 0.5) {
+                return `
                                     <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
                                         <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
-                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
                                     </span>`;
-                                } else {
-                                    return `<i class="fa-solid fa-star opacity-25"></i>`;
-                                }
-                            }).join('')}
+            } else {
+                return `<i class="fa-solid fa-star opacity-25"></i>`;
+            }
+        }).join('')}
                         </div>
                         <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
                     </div>
