@@ -268,7 +268,7 @@ Sitemap: ${baseUrl}/sitemap.xml`);
         <img id="proof-img" src="${data.socialProof?.items[0]?.image || data.hero.image}" alt="${data.socialProof?.items[0]?.imageAlt || 'Product'}">
       </div>
       <div class="proof-content">
-        <div class="proof-stars">
+        <div class="proof-stars" style="color: #fbbf24; font-size: 10px; margin-bottom: 4px;">
           <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
         </div>
         <div id="proof-text" class="proof-text">
@@ -596,6 +596,9 @@ ${seoBlock}
       .accordion-button:not(.collapsed) { background-color: ${primaryColor}10; color: ${primaryColor}; }
       .accordion-button:focus { box-shadow: none; }
       .btn-custom-pill { box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; }
+      .opacity-25 { opacity: 0.25; }
+      .opacity-50 { opacity: 0.5; }
+      .opacity-75 { opacity: 0.75; }
     </style>
 </head>
 <body>
@@ -919,11 +922,11 @@ ${seoBlock}
             } else if (rating >= fill - 0.5) {
                 return `
                                     <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
-                                        <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; opacity: 0.25;"></i>
                                         <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
                                     </span>`;
             } else {
-                return `<i class="fa-solid fa-star opacity-25"></i>`;
+                return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
             }
         }).join('')}
                         </div>
@@ -971,7 +974,7 @@ ${sourcesHtml}
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
-        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5  mx-auto  opacity-75" style="line-height: 1.6;" style="width: 100%;">${data.footer?.companyInfo}</p><hr class="my-5 opacity-25" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6 opacity-75">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
+        <div class="container mx-auto px-4"><h2 class="fw-bold fs-1 mb-4">${data.footerHeadline || "Questions?"}</h2><p class="fs-5 fw-medium mb-5  mx-auto" style="line-height: 1.6; width: 100%; opacity: 0.75;">${data.footer?.companyInfo}</p><hr class="my-5" style="opacity: 0.25;" /><ul class="list-inline fw-semibold fs-5 mb-5">${(data.footer?.links || []).map((link: any) => `<li class="list-inline-item mx-3"><a href="${link.href}" class="text-white text-decoration-none">${link.label}</a></li>`).join('')}</ul><p class="fs-6" style="opacity: 0.75;">© ${new Date().getFullYear()} ${data.productName} All Rights Reserved.</p></div>
     </footer>
     
     <script>
@@ -1449,11 +1452,11 @@ ${sourcesHtml}
             } else if (rating >= fill - 0.5) {
                 return `
                                     <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
-                                        <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; opacity: 0.25;"></i>
                                         <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
                                     </span>`;
             } else {
-                return `<i class="fa-solid fa-star opacity-25"></i>`;
+                return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
             }
         }).join('')}
                         </div>

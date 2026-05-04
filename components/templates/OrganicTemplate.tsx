@@ -841,7 +841,7 @@ export const OrganicTemplate: React.FC = () => {
                     </div>
                     <EditableText tagName="h5" className="fw-bold mb-1 text-sm font-serif" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
                     <EditableText tagName="p" className="mb-3 text-[10px] text-stone-600 uppercase tracking-widest" value={item.role || ""} onChange={(val) => updateTestimonials(i, { role: val })} />
-                    <div className="mb-3 d-flex gap-1 text-stone-200 text-[10px]">
+                    <div className="mb-3 flex gap-1 text-[10px]">
                       {[...Array(5)].map((_, starIndex) => {
                         const fill = starIndex + 1;
                         const currentRating = item.rating || 5;
@@ -850,22 +850,24 @@ export const OrganicTemplate: React.FC = () => {
                           return (
                             <i
                               key={starIndex}
-                              className="fa-solid fa-star cursor-pointer text-[#D4C3B2]"
+                              className="fa-solid fa-star cursor-pointer"
                               onClick={() => updateTestimonials(i, { rating: currentRating === fill ? fill - 0.5 : fill })}
+                              style={{ color: '#D4C3B2' }}
                             ></i>
                           );
                         } else if (currentRating >= fill - 0.5) {
                           return (
                             <div key={starIndex} className="relative inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
-                              <i className="fa-solid fa-star opacity-30 text-[#D4C3B2]" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
-                              <i className="fa-solid fa-star absolute left-0 top-0 text-[#D4C3B2]" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)' }}></i>
+                              <i className="fa-solid fa-star" style={{ position: 'absolute', left: 0, top: 0, width: '100%', color: '#e5e7eb' }}></i>
+                              <i className="fa-solid fa-star absolute left-0 top-0" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)', color: '#D4C3B2' }}></i>
                             </div>
                           );
                         } else {
                           return (
                             <i
                               key={starIndex}
-                              className="fa-solid fa-star opacity-30 cursor-pointer text-[#D4C3B2]"
+                              className="fa-solid fa-star cursor-pointer"
+                              style={{ color: '#e5e7eb' }}
                               onClick={() => updateTestimonials(i, { rating: fill })}
                             ></i>
                           );

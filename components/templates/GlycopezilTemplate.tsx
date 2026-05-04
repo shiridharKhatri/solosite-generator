@@ -1189,7 +1189,7 @@ export const GlycopezilTemplate: React.FC = () => {
                         </div>
                       </div>
 
-                      <div className="mb-3 text-warning d-flex gap-1">
+                      <div className="mb-3 flex gap-1">
                         {[...Array(5)].map((_, starIndex) => {
                           const fill = starIndex + 1;
                           const currentRating = item.rating || 5;
@@ -1198,22 +1198,24 @@ export const GlycopezilTemplate: React.FC = () => {
                             return (
                               <i
                                 key={starIndex}
-                                className="fa-solid fa-star cursor-pointer"
+                                className="fa-solid fa-star cursor-pointer text-warning"
                                 onClick={() => updateTestimonials(i, { rating: currentRating === fill ? fill - 0.5 : fill })}
+                                style={{ color: '#ffc107' }}
                               ></i>
                             );
                           } else if (currentRating >= fill - 0.5) {
                             return (
-                              <div key={starIndex} className="position-relative d-inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
-                                <i className="fa-solid fa-star opacity-30" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
-                                <i className="fa-solid fa-star position-absolute start-0 top-0" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)' }}></i>
+                              <div key={starIndex} className="relative inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
+                                <i className="fa-solid fa-star" style={{ position: 'absolute', left: 0, top: 0, width: '100%', color: '#e5e7eb' }}></i>
+                                <i className="fa-solid fa-star absolute left-0 top-0 text-warning" style={{ width: '100%', clipPath: 'inset(0 50% 0 0)', color: '#ffc107' }}></i>
                               </div>
                             );
                           } else {
                             return (
                               <i
                                 key={starIndex}
-                                className="fa-solid fa-star opacity-30 cursor-pointer"
+                                className="fa-solid fa-star cursor-pointer"
+                                style={{ color: '#e5e7eb' }}
                                 onClick={() => updateTestimonials(i, { rating: fill })}
                               ></i>
                             );
