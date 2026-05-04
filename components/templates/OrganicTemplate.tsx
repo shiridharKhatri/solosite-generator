@@ -856,9 +856,9 @@ export const OrganicTemplate: React.FC = () => {
                           );
                         } else if (currentRating >= fill - 0.5) {
                           return (
-                            <div key={starIndex} className="relative inline-block cursor-pointer" onClick={() => updateTestimonials(i, { rating: fill })}>
-                              <i className="fa-solid fa-star opacity-30 text-[#D4C3B2]"></i>
-                              <i className="fa-solid fa-star-half-stroke absolute left-0 top-0 text-[#D4C3B2]"></i>
+                            <div key={starIndex} className="relative inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
+                              <i className="fa-solid fa-star opacity-30 text-[#D4C3B2]" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
+                              <i className="fa-solid fa-star-half-stroke absolute left-0 top-0 text-[#D4C3B2]" style={{ width: '100%' }}></i>
                             </div>
                           );
                         } else {

@@ -1204,9 +1204,9 @@ export const GlycopezilTemplate: React.FC = () => {
                             );
                           } else if (currentRating >= fill - 0.5) {
                             return (
-                              <div key={starIndex} className="position-relative d-inline-block cursor-pointer" onClick={() => updateTestimonials(i, { rating: fill })}>
-                                <i className="fa-solid fa-star opacity-30"></i>
-                                <i className="fa-solid fa-star-half-stroke position-absolute start-0 top-0"></i>
+                              <div key={starIndex} className="position-relative d-inline-block cursor-pointer" style={{ width: '1em', height: '1em', verticalAlign: 'middle' }} onClick={() => updateTestimonials(i, { rating: fill })}>
+                                <i className="fa-solid fa-star opacity-30" style={{ position: 'absolute', left: 0, top: 0, width: '100%' }}></i>
+                                <i className="fa-solid fa-star-half-stroke position-absolute start-0 top-0" style={{ width: '100%' }}></i>
                               </div>
                             );
                           } else {

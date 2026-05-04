@@ -910,21 +910,21 @@ ${seoBlock}
                                 <span class="text-muted small">${item.role || 'Verified Buyer'}</span>
                             </div>
                         </div>
-                        <div class="mb-3 text-warning d-flex justify-content-center gap-1">
+                        <div class="mb-3 text-warning d-flex gap-1">
                             ${[...Array(5)].map((_, idx) => {
-            const fill = idx + 1;
-            if ((item.rating || 5) >= fill) {
-                return `<i class="fa-solid fa-star"></i>`;
-            } else if ((item.rating || 5) >= fill - 0.5) {
-                return `
-                                    <span style="position: relative; display: inline-block;">
-                                        <i class="fa-solid fa-star opacity-25"></i>
-                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0;"></i>
+                                const fill = idx + 1;
+                                if ((item.rating || 5) >= fill) {
+                                    return `<i class="fa-solid fa-star"></i>`;
+                                } else if ((item.rating || 5) >= fill - 0.5) {
+                                    return `
+                                    <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
+                                        <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
                                     </span>`;
-            } else {
-                return `<i class="fa-solid fa-star opacity-25"></i>`;
-            }
-        }).join('')}
+                                } else {
+                                    return `<i class="fa-solid fa-star opacity-25"></i>`;
+                                }
+                            }).join('')}
                         </div>
                         <p class="fs-6 text-dark  font-italic italic" style="line-height: 1.6;">"${item.content || ''}"</p>
                     </div>
@@ -1433,7 +1433,7 @@ ${sourcesHtml}
             <div class="row g-4">
                 ${(data.testimonials.items || []).map((t: any) => `
                 <div class="col-md-4">
-                    <div class="p-4 bg-white border border-[#E6D5C3] h-100 text-center d-flex flex-column align-items-center">
+                    <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
                         <div class="w-16 h-16 rounded-circle overflow-hidden mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
                             <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
                         </div>
@@ -1441,19 +1441,19 @@ ${sourcesHtml}
                         <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
                         <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
                             ${[...Array(5)].map((_, idx) => {
-            const fill = idx + 1;
-            if ((t.rating || 5) >= fill) {
-                return `<i class="fa-solid fa-star"></i>`;
-            } else if ((t.rating || 5) >= fill - 0.5) {
-                return `
-                                    <span style="position: relative; display: inline-block;">
-                                        <i class="fa-solid fa-star opacity-25"></i>
-                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0;"></i>
+                                const fill = idx + 1;
+                                if ((t.rating || 5) >= fill) {
+                                    return `<i class="fa-solid fa-star"></i>`;
+                                } else if ((t.rating || 5) >= fill - 0.5) {
+                                    return `
+                                    <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
+                                        <i class="fa-solid fa-star opacity-25" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
+                                        <i class="fa-solid fa-star-half-stroke" style="position: absolute; left: 0; top: 0; width: 100%;"></i>
                                     </span>`;
-            } else {
-                return `<i class="fa-solid fa-star opacity-25"></i>`;
-            }
-        }).join('')}
+                                } else {
+                                    return `<i class="fa-solid fa-star opacity-25"></i>`;
+                                }
+                            }).join('')}
                         </div>
                         <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${t.content}</p>
                     </div>
