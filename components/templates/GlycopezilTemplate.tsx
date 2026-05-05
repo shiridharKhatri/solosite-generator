@@ -221,21 +221,6 @@ export const GlycopezilTemplate: React.FC = () => {
   const [showProofSettings, setShowProofSettings] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  // Hero image height tracks content column height
-  const heroContentRef = React.useRef<HTMLDivElement>(null);
-  const [heroImgHeight, setHeroImgHeight] = useState<number>(340);
-
-  useEffect(() => {
-    const el = heroContentRef.current;
-    if (!el) return;
-    const observer = new ResizeObserver(() => {
-      const h = el.getBoundingClientRect().height;
-      if (h > 0) setHeroImgHeight(Math.min(Math.max(h, 260), 600));
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-
   useEffect(() => {
     const sp = projectData?.socialProof;
     if (!sp || !sp.enabled || !sp.items?.length) return;
@@ -594,7 +579,7 @@ export const GlycopezilTemplate: React.FC = () => {
             {/* Image Column - Left on desktop, top on mobile */}
             <div className="col-12 col-lg-5 text-center mb-3 mb-lg-0 d-flex flex-column align-items-center">
               {/* Product Image — grows to match content column height */}
-              <div className="relative group/hero d-flex align-items-center justify-content-center w-100">
+              <div className="relative group/hero flex-grow-1 d-flex align-items-center justify-content-center w-100">
                 <EditableImage
                   src={projectData.hero.image || '/image/index-img.webp'}
                   alt={projectData.hero.imageAlt}
@@ -602,8 +587,8 @@ export const GlycopezilTemplate: React.FC = () => {
                   onToggleCircular={() => updateHero({ imageIsCircular: !projectData.hero.imageIsCircular })}
                   onChange={(val) => updateHero({ image: val })}
                   onAltChange={(val) => updateHero({ imageAlt: val })}
-                  className="mx-auto d-block"
-                  style={{ objectFit: 'contain', width: 'auto', maxWidth: '100%', height: `${heroImgHeight}px`, transition: 'height 0.3s ease' }}
+                  className="mx-auto d-block img-fluid"
+                  style={{ objectFit: 'contain', width: '100%', maxWidth: '340px', height: '100%', maxHeight: '480px' }}
                 />
 
                 {/* Hero Badge Overlay */}
@@ -696,7 +681,7 @@ export const GlycopezilTemplate: React.FC = () => {
             </div>
 
             {/* Content Column - Right on desktop, bottom on mobile */}
-            <div ref={heroContentRef} className="col-12 col-lg-7 pt-1 pt-lg-2 text-dark px-3 px-lg-5 text-center text-lg-start">
+            <div className="col-12 col-lg-7 pt-1 pt-lg-2 text-dark px-3 px-lg-5 text-center text-lg-start">
               <EditableText
                 tagName="h1"
                 value={projectData.hero.title}
