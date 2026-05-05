@@ -706,40 +706,11 @@ export const useStore = create<EditorState>((set) => ({
   setProjectData: (data) => set({ projectData: data, isDirty: false, version: 0 }),
   updateProductName: (name) => set((state) => {
     if (!state.projectData) return state;
-    const oldName = state.projectData.productName;
-
-    // Always update the product name property itself
-    const updatedProjectData = { ...state.projectData, productName: name };
-
-    // Only perform global find-and-replace if the old name is substantial 
-    // to avoid replacing common characters/words during typing.
-    if (!oldName || oldName.length < 3 || !name || oldName === name) {
-      return { projectData: updatedProjectData, isDirty: true };
-    }
-
-    const replaceInObj = (obj: any): any => {
-      if (typeof obj === 'string') {
-        // Skip massive strings (like old base64 images) to avoid OOM
-        if (obj.length > 1000) return obj;
-
-        // Use regex with word boundaries to only replace the product name as a whole word
-        const escapedOldName = oldName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-        const regex = new RegExp(`\\b${escapedOldName}\\b`, 'g');
-        return obj.replace(regex, name);
-      }
-      if (Array.isArray(obj)) return obj.map(replaceInObj);
-      if (obj !== null && typeof obj === 'object') {
-        const res: any = {};
-        for (const key in obj) {
-          res[key] = replaceInObj(obj[key]);
-        }
-        return res;
-      }
-      return obj;
+    return { 
+      projectData: { ...state.projectData, productName: name }, 
+      isDirty: true, 
+      version: state.version + 1 
     };
-
-    const newData = replaceInObj(updatedProjectData);
-    return { projectData: newData, isDirty: true, version: state.version + 1 };
   }),
 
   updateHero: (hero) => set((state) => ({
