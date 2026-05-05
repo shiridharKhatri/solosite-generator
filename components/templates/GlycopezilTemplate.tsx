@@ -221,6 +221,21 @@ export const GlycopezilTemplate: React.FC = () => {
   const [showProofSettings, setShowProofSettings] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Hero image height tracks content column height
+  const heroContentRef = React.useRef<HTMLDivElement>(null);
+  const [heroImgHeight, setHeroImgHeight] = useState<number>(340);
+
+  useEffect(() => {
+    const el = heroContentRef.current;
+    if (!el) return;
+    const observer = new ResizeObserver(() => {
+      const h = el.getBoundingClientRect().height;
+      if (h > 0) setHeroImgHeight(Math.min(Math.max(h, 260), 600));
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
   useEffect(() => {
     const sp = projectData?.socialProof;
     if (!sp || !sp.enabled || !sp.items?.length) return;
@@ -573,13 +588,13 @@ export const GlycopezilTemplate: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="container-fluid py-4 py-lg-5 mb-3 bg-white overflow-hidden">
+      <section className="container-fluid pb-2 mb-2 bg-white overflow-hidden" style={{ paddingTop: '3rem' }}>
         <div className="container">
-          <div className="row align-items-center justify-content-center">
+          <div className="row align-items-stretch justify-content-center">
             {/* Image Column - Left on desktop, top on mobile */}
             <div className="col-12 col-lg-5 text-center mb-3 mb-lg-0 d-flex flex-column align-items-center">
-              {/* Product Image */}
-              <div style={{ width: '100%', maxWidth: '400px' }} className="relative mt-[-30px] group/hero">
+              {/* Product Image — grows to match content column height */}
+              <div className="relative group/hero d-flex align-items-center justify-content-center w-100">
                 <EditableImage
                   src={projectData.hero.image || '/image/index-img.webp'}
                   alt={projectData.hero.imageAlt}
@@ -587,8 +602,8 @@ export const GlycopezilTemplate: React.FC = () => {
                   onToggleCircular={() => updateHero({ imageIsCircular: !projectData.hero.imageIsCircular })}
                   onChange={(val) => updateHero({ image: val })}
                   onAltChange={(val) => updateHero({ imageAlt: val })}
-                  className="mx-auto d-block img-fluid"
-                  style={{ objectFit: 'contain', width: '100%' }}
+                  className="mx-auto d-block"
+                  style={{ objectFit: 'contain', width: 'auto', maxWidth: '100%', height: `${heroImgHeight}px`, transition: 'height 0.3s ease' }}
                 />
 
                 {/* Hero Badge Overlay */}
@@ -631,7 +646,7 @@ export const GlycopezilTemplate: React.FC = () => {
               )}
 
               {/* Certification Logos Row - fully separate */}
-              <div className="d-flex justify-content-center flex-wrap gap-3 mt-4 pt-2" style={{ width: '100%' }}>
+              <div className="d-flex justify-content-center flex-wrap gap-3 mt-2 pt-1" style={{ width: '100%' }}>
                 {(projectData.logos || []).map((logo, i) => (
                   <div key={i} className="relative group" style={{ width: '65px', height: '65px' }}>
                     <EditableImage
@@ -681,7 +696,7 @@ export const GlycopezilTemplate: React.FC = () => {
             </div>
 
             {/* Content Column - Right on desktop, bottom on mobile */}
-            <div className="col-12 col-lg-7 pt-3 pt-lg-4 text-dark px-3 px-lg-5 text-center text-lg-start">
+            <div ref={heroContentRef} className="col-12 col-lg-7 pt-1 pt-lg-2 text-dark px-3 px-lg-5 text-center text-lg-start">
               <EditableText
                 tagName="h1"
                 value={projectData.hero.title}

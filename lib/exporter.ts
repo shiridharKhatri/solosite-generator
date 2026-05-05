@@ -677,12 +677,21 @@ ${seoBlock}
         </nav>
     </header>
 
-    <section class="container-fluid py-4 py-lg-5 mb-3 bg-white overflow-hidden">
+    <style>
+        .hero-row { display: flex; flex-wrap: wrap; align-items: stretch; }
+        .hero-img-col { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .hero-img-wrap { display: flex; align-items: center; justify-content: center; width: 100%; }
+        .hero-img-wrap img { width: auto; max-width: 100%; object-fit: contain; height: 340px; }
+        @media (min-width: 992px) {
+            .hero-img-wrap img { height: clamp(320px, 55vw * 0.6, 580px); }
+        }
+    </style>
+    <section class="container-fluid bg-white overflow-hidden" style="padding-top: 3rem; padding-bottom: 3rem; margin-bottom: 0;">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0">
-                    <div class="position-relative d-inline-block hero-media" style="width: 100%; max-width: 400px; margin-top: -30px;">
-                        <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="img-fluid mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'} width: 100%;" />
+            <div class="row hero-row">
+                <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0 hero-img-col">
+                    <div class="position-relative hero-img-wrap hero-media">
+                        <img src="${data.hero?.image || ''}" alt="${data.hero?.imageAlt || 'Product Banner'}" class="mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
                         ${data.hero?.badge?.enabled ? `
                         <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
                             <img src="${data.hero.badge.image}" alt="${data.hero.badge.imageAlt || 'Badge'}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
@@ -716,12 +725,12 @@ ${seoBlock}
                         })();
                     </script>
                     ` : ''}
-                    <div class="d-flex justify-content-center flex-wrap gap-2 mt-4 pt-2">
+                    <div class="d-flex justify-content-center flex-wrap gap-2 mt-2 pt-1">
                         ${(data.logos || []).map((logo: any) => `<div style="width: 65px; height: 65px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
-                <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start pt-3 pt-lg-4">
-                    <div class="fw-bold mb-3 title-scale w-100">${data.hero?.title}</div>
+                <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start" style="padding-top: 0.25rem;" id="hero-content-col">
+                    <div class="fw-bold mb-3 title-scale w-100" style="margin-top: 0;">${data.hero?.title}</div>
                     <div class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100" style="line-height: 1.7; text-align: justify; white-space: pre-line;">${data.hero?.subtitle}</div>
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center mt-4">
                         <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
@@ -731,6 +740,26 @@ ${seoBlock}
             </div>
         </div>
     </section>
+    <script>
+        (function() {
+            function syncHeroImgHeight() {
+                var contentCol = document.getElementById('hero-content-col');
+                var heroImg = document.querySelector('.hero-img-wrap img');
+                if (!contentCol || !heroImg) return;
+                var h = contentCol.getBoundingClientRect().height;
+                if (h > 0) {
+                    var clamped = Math.min(Math.max(h, 260), 600);
+                    heroImg.style.height = clamped + 'px';
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', syncHeroImgHeight);
+            } else {
+                syncHeroImgHeight();
+            }
+            window.addEventListener('resize', syncHeroImgHeight);
+        })();
+    </script>
 
     ${renderCustomSections('hero')}
 
