@@ -680,10 +680,10 @@ ${seoBlock}
     <style>
         .hero-row { display: flex; flex-wrap: wrap; align-items: stretch; }
         .hero-img-col { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .hero-img-wrap { display: flex; align-items: center; justify-content: center; width: 100%; }
-        .hero-img-wrap img { width: auto; max-width: 100%; object-fit: contain; height: 340px; }
+        .hero-img-wrap { display: flex; align-items: center; justify-content: center; flex: 1 1 auto; width: 100%; }
+        .hero-img-wrap img { width: 100%; max-width: 340px; object-fit: contain; height: auto; min-height: 260px; }
         @media (min-width: 992px) {
-            .hero-img-wrap img { height: clamp(320px, 55vw * 0.6, 580px); }
+            .hero-img-wrap img { min-height: 320px; max-height: 520px; }
         }
     </style>
     <section class="container-fluid bg-white overflow-hidden" style="padding-top: 3rem; padding-bottom: 3rem; margin-bottom: 0;">
@@ -729,7 +729,7 @@ ${seoBlock}
                         ${(data.logos || []).map((logo: any) => `<div style="width: 65px; height: 65px;"><img src="${logo.src}" alt="${logo.alt || 'Certification Logo'}" class="img-fluid" style="${logo.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /></div>`).join('')}
                     </div>
                 </div>
-                <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start" style="padding-top: 0.25rem;" id="hero-content-col">
+                <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start" style="padding-top: 0.25rem;">
                     <div class="fw-bold mb-3 title-scale w-100" style="margin-top: 0;">${data.hero?.title}</div>
                     <div class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100" style="line-height: 1.7; text-align: justify; white-space: pre-line;">${data.hero?.subtitle}</div>
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center mt-4">
@@ -740,26 +740,6 @@ ${seoBlock}
             </div>
         </div>
     </section>
-    <script>
-        (function() {
-            function syncHeroImgHeight() {
-                var contentCol = document.getElementById('hero-content-col');
-                var heroImg = document.querySelector('.hero-img-wrap img');
-                if (!contentCol || !heroImg) return;
-                var h = contentCol.getBoundingClientRect().height;
-                if (h > 0) {
-                    var clamped = Math.min(Math.max(h, 260), 600);
-                    heroImg.style.height = clamped + 'px';
-                }
-            }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', syncHeroImgHeight);
-            } else {
-                syncHeroImgHeight();
-            }
-            window.addEventListener('resize', syncHeroImgHeight);
-        })();
-    </script>
 
     ${renderCustomSections('hero')}
 
