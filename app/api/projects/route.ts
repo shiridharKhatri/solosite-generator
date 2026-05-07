@@ -16,8 +16,9 @@ export async function GET(req: NextRequest) {
       if (!mongoose.Types.ObjectId.isValid(id)) {
         return NextResponse.json({ error: "Invalid Project ID format" }, { status: 400 });
       }
-      // Filter by both ID and userId to ensure ownership
-      const project = await Project.findOne({ _id: id, userId: session.user.id });
+      const isSuperAdmin = (session.user as any).role === 'superadmin';
+      const projectQuery = isSuperAdmin ? { _id: id } : { _id: id, userId: session.user.id };
+      const project = await Project.findOne(projectQuery).populate("userId", "name email");
       if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
       return NextResponse.json(project);
@@ -28,7 +29,8 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(req.nextUrl.searchParams.get("limit") || "12");
     const skip = (page - 1) * limit;
 
-    const query: any = { userId: session.user.id }; // Always filter by the current user
+    const isSuperAdmin = (session.user as any).role === 'superadmin';
+    const query: any = isSuperAdmin ? {} : { userId: session.user.id };
     if (status) query.status = status;
 
     // Get total count for pagination
@@ -37,6 +39,7 @@ export async function GET(req: NextRequest) {
     // Exclude 'data' field when listing projects for the dashboard to prevent OOM
     const projects = await Project.find(query)
       .select("-data")
+      .populate("userId", "name email") // Populate user info for superadmin
       .sort({ updatedAt: -1 })
       .skip(skip)
       .limit(limit);
@@ -79,8 +82,9 @@ export async function PUT(req: NextRequest) {
   await connectDB();
   const { id, data, status, name, theme, seoScore } = await req.json();
 
-  // Find project that belongs to this user
-  const project = await Project.findOne({ _id: id, userId: session.user.id });
+  const isSuperAdmin = (session.user as any).role === 'superadmin';
+  const projectQuery = isSuperAdmin ? { _id: id } : { _id: id, userId: session.user.id };
+  const project = await Project.findOne(projectQuery);
   if (!project) return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 
   if (data) {
@@ -105,13 +109,16 @@ export async function DELETE(req: NextRequest) {
   const idsParam = req.nextUrl.searchParams.get("ids");
 
   if (idsParam) {
-    const ids = idsParam.split(",");
-    const result = await Project.deleteMany({ _id: { $in: ids }, userId: session.user.id });
+    const isSuperAdmin = (session.user as any).role === 'superadmin';
+    const deleteQuery = isSuperAdmin ? { _id: { $in: ids } } : { _id: { $in: ids }, userId: session.user.id };
+    const result = await Project.deleteMany(deleteQuery);
     return NextResponse.json({ success: true, deletedCount: result.deletedCount });
   }
 
   if (id) {
-    const result = await Project.deleteOne({ _id: id, userId: session.user.id });
+    const isSuperAdmin = (session.user as any).role === 'superadmin';
+    const deleteQuery = isSuperAdmin ? { _id: id } : { _id: id, userId: session.user.id };
+    const result = await Project.deleteOne(deleteQuery);
     if (result.deletedCount === 0) {
       return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }

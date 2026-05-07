@@ -713,10 +713,10 @@ export const useStore = create<EditorState>((set) => ({
   setProjectData: (data) => set({ projectData: data, isDirty: false, version: 0 }),
   updateProductName: (name) => set((state) => {
     if (!state.projectData) return state;
-    return { 
-      projectData: { ...state.projectData, productName: name }, 
-      isDirty: true, 
-      version: state.version + 1 
+    return {
+      projectData: { ...state.projectData, productName: name },
+      isDirty: true,
+      version: state.version + 1
     };
   }),
 

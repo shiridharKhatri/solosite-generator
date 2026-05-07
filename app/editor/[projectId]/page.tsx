@@ -928,31 +928,31 @@ export default function EditorPage() {
                                 <label className="text-[10px] font-black uppercase tracking-widest text-gray-400">Cards</label>
                                 {(section.cards || []).map((card, cIdx) => (
                                   <div key={cIdx} className="p-3 border border-gray-200 bg-gray-50 space-y-3 relative group/card">
-                                    <button 
+                                    <button
                                       onClick={() => { const nc = [...(section.cards || [])]; nc.splice(cIdx, 1); useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
                                       className="absolute top-2 right-2 text-red-500 hover:text-red-700 opacity-0 group-hover/card:opacity-100 transition-opacity"
                                     >
                                       <i className="fa-solid fa-trash text-xs"></i>
                                     </button>
-                                    <input 
-                                      type="text" 
-                                      value={card.title} 
+                                    <input
+                                      type="text"
+                                      value={card.title}
                                       onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].title = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
-                                      placeholder="Card Title" 
-                                      className="w-full px-2 py-1.5 text-sm border outline-none" 
+                                      placeholder="Card Title"
+                                      className="w-full px-2 py-1.5 text-sm border outline-none"
                                     />
-                                    <textarea 
-                                      value={card.content} 
+                                    <textarea
+                                      value={card.content}
                                       onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].content = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
-                                      placeholder="Card Content" 
-                                      className="w-full px-2 py-1.5 text-sm border outline-none min-h-[60px]" 
+                                      placeholder="Card Content"
+                                      className="w-full px-2 py-1.5 text-sm border outline-none min-h-[60px]"
                                     />
-                                    <input 
-                                      type="text" 
-                                      value={card.icon || ''} 
+                                    <input
+                                      type="text"
+                                      value={card.icon || ''}
                                       onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].icon = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
-                                      placeholder="Icon (e.g. fa-solid fa-star)" 
-                                      className="w-full px-2 py-1.5 text-sm border outline-none font-mono" 
+                                      placeholder="Icon (e.g. fa-solid fa-star)"
+                                      className="w-full px-2 py-1.5 text-sm border outline-none font-mono"
                                     />
                                     <ImageUploadField
                                       label="Card Image"
@@ -960,24 +960,24 @@ export default function EditorPage() {
                                       onChange={(url) => { const nc = [...(section.cards || [])]; nc[cIdx].image = url; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
                                     />
                                     <div className="grid grid-cols-2 gap-2">
-                                      <input 
-                                        type="text" 
-                                        value={card.buttonText || ''} 
+                                      <input
+                                        type="text"
+                                        value={card.buttonText || ''}
                                         onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].buttonText = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
-                                        placeholder="Button Text" 
-                                        className="px-2 py-1.5 text-xs border outline-none" 
+                                        placeholder="Button Text"
+                                        className="px-2 py-1.5 text-xs border outline-none"
                                       />
-                                      <input 
-                                        type="text" 
-                                        value={card.buttonHref || ''} 
+                                      <input
+                                        type="text"
+                                        value={card.buttonHref || ''}
                                         onChange={(e) => { const nc = [...(section.cards || [])]; nc[cIdx].buttonHref = e.target.value; useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
-                                        placeholder="Button Link" 
-                                        className="px-2 py-1.5 text-xs border outline-none" 
+                                        placeholder="Button Link"
+                                        className="px-2 py-1.5 text-xs border outline-none"
                                       />
                                     </div>
                                   </div>
                                 ))}
-                                <button 
+                                <button
                                   onClick={() => { const nc = [...(section.cards || [])]; nc.push({ title: 'New Card', content: 'Card content goes here', icon: 'fa-solid fa-star' }); useStore.getState().updateCustomSection(section.id, { cards: nc }); }}
                                   className="w-full py-2 bg-gray-100 text-gray-600 font-bold text-[10px] uppercase tracking-widest hover:bg-gray-200"
                                 >
