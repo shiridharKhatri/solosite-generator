@@ -27,10 +27,10 @@ export async function generateProjectZip(data: any) {
                 zIndex = 100;
                 filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.12))';
             } else {
-                const x = -50 + (side * layer * 32); 
-                const y = -50 - (layer * 2); 
-                const rotate = side * (layer * 4);
-                const scale = 1.1 - (layer * 0.05); 
+                const x = -50 + (side * layer * 26);
+                const y = -50 - (layer * 2);
+                const rotate = side * (layer * 3);
+                const scale = 1.1 - (layer * 0.05);
                 transform = `translate(${x}%, ${y}%) scale(${scale}) rotate(${rotate}deg)`;
                 zIndex = 100 - layer;
                 filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))';

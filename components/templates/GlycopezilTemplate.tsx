@@ -237,11 +237,11 @@ const getBottleStyle = (idx: number, total: number) => {
   const side = bgIdx % 2 === 0 ? -1 : 1;
   const layer = Math.floor(bgIdx / 2) + 1;
 
-  // Wider horizontal offset to make side bottles more visible
-  // Increased from 14 to 32 for a better "fan" spread
-  const x = -50 + (side * layer * 32); 
+  // Tighter horizontal offset for a more clustered "bundle" look
+  // Reduced from 32 to 26 based on user feedback
+  const x = -50 + (side * layer * 26); 
   const y = -50 - (layer * 2); 
-  const rotate = side * (layer * 4);
+  const rotate = side * (layer * 3);
   const scale = 1.1 - (layer * 0.05); 
   const zIndex = 100 - layer;
 
