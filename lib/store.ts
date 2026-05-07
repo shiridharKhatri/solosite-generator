@@ -254,6 +254,8 @@ export interface ProjectData {
       imageAlt?: string;
       icon?: string;
       iconColor?: string;
+      buttonText?: string;
+      buttonHref?: string;
     }[];
   }[];
 }
