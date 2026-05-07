@@ -109,6 +109,7 @@ export async function DELETE(req: NextRequest) {
   const idsParam = req.nextUrl.searchParams.get("ids");
 
   if (idsParam) {
+    const ids = idsParam.split(",");
     const isSuperAdmin = (session.user as any).role === 'superadmin';
     const deleteQuery = isSuperAdmin ? { _id: { $in: ids } } : { _id: { $in: ids }, userId: session.user.id };
     const result = await Project.deleteMany(deleteQuery);
