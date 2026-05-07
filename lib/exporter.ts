@@ -922,7 +922,7 @@ ${seoBlock}
                 <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 220px; display: inline-block;">
                     ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                     <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
-                        <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier || 'X1'}</div>
+                        <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 16px; border: 3px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 6px 18px; letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; min-width: 55px;">${plan.multiplier || 'X1'}</div>
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
@@ -1461,7 +1461,7 @@ ${sourcesHtml}
                                 ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                                 ${plan.multiplier ? `
                                 <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
-                                    <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier}</div>
+                                    <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 16px; border: 3px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); padding: 6px 18px; letter-spacing: 0.05em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; min-width: 55px;">${plan.multiplier}</div>
                                 </div>` : ''}
                             </div>
                             <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
