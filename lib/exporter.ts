@@ -11,7 +11,10 @@ export async function generateProjectZip(data: any) {
     const renderBottleStack = (multiplier: string, image: string, title: string, height: string = '160px') => {
         const total = parseInt(multiplier.replace(/[^0-9]/g, '')) || 1;
         if (total <= 1) {
-            return `<img src="${image || '/image/default.png'}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain;" />`;
+            return `
+            <div style="position: relative; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center;">
+                <img src="${image || '/image/default.png'}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain; transform: scale(1.15); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));" />
+            </div>`;
         }
 
         const bottles = Array.from({ length: Math.min(total, 10) });
@@ -39,7 +42,7 @@ export async function generateProjectZip(data: any) {
             return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
         }).join('');
 
-        return `<div style="position: relative; height: 220px; width: 100%; perspective: 1200px; overflow: visible; display: flex; align-items: center; justify-content: center;">${stackHtml}</div>`;
+        return `<div style="position: relative; height: 200px; width: 100%; perspective: 1200px; overflow: visible; display: flex; align-items: center; justify-content: center;">${stackHtml}</div>`;
     };
 
     // Helper to render custom sections
@@ -919,7 +922,7 @@ ${seoBlock}
                 <div class="h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-none fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">BEST VALUE BUNDLE</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${plan.title}</h3>
-                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 220px; display: inline-block;">
+                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 200px; display: inline-block;">
                     ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                     <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
                         <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 14px; border: 3px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 8px 24px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; width: fit-content; line-height: 1;">${plan.multiplier || 'X1'}</div>
@@ -1457,7 +1460,7 @@ ${sourcesHtml}
                         ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
                         <div class="p-5 flex-grow-1 text-center">
                             <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
-                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 220px; display: inline-block;">
+                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
                                 ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                                 ${plan.multiplier ? `
                                 <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">

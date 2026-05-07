@@ -26,9 +26,9 @@ const Portal = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Helper for Icon Selection and Styling
-const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: { 
-  value?: string; 
-  color?: string; 
+const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
+  value?: string;
+  color?: string;
   onChange: (val: string) => void;
   onColorChange?: (val: string) => void;
   className?: string;
@@ -64,7 +64,7 @@ const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
           title="Click to customize icon"
         />
       ) : (
-        <button 
+        <button
           onClick={handleOpen}
           className="bg-stone-100 hover:bg-stone-200 text-[8px] px-1.5 py-0.5 rounded border border-stone-200 text-stone-600 uppercase font-bold tracking-widest transition-all"
         >
@@ -122,9 +122,9 @@ const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
                       {!c.value && <i className="fa-solid fa-droplet-slash text-[8px] text-stone-400"></i>}
                     </button>
                   ))}
-                  <input 
-                    type="color" 
-                    value={color || '#000000'} 
+                  <input
+                    type="color"
+                    value={color || '#000000'}
                     onChange={(e) => onColorChange?.(e.target.value)}
                     className="w-6 h-6 p-0 border-none rounded-full cursor-pointer overflow-hidden"
                   />
@@ -212,10 +212,10 @@ const getBottleStyle = (idx: number, total: number) => {
 
   // Tighter horizontal offset for a more clustered "bundle" look
   // Reduced from 32 to 26 based on user feedback
-  const x = -50 + (side * layer * 26); 
-  const y = -50 - (layer * 2); 
+  const x = -50 + (side * layer * 26);
+  const y = -50 - (layer * 2);
   const rotate = side * (layer * 3);
-  const scale = 1.1 - (layer * 0.05); 
+  const scale = 1.1 - (layer * 0.05);
   const zIndex = 100 - layer;
 
   return {
@@ -237,7 +237,7 @@ const BottleStack = ({ src, alt, multiplier, onChange, onAltChange }: {
   const indices = Array.from({ length: safeCount }, (_, i) => i);
 
   return (
-    <div className="relative h-[220px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
+    <div className="relative h-[200px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
       {indices.map((idx) => {
         const isMain = idx === indices.length - 1;
         const style = getBottleStyle(idx, indices.length);
@@ -523,10 +523,10 @@ export const OrganicTemplate: React.FC = () => {
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
                   <div className="organic-btn organic-btn-primary cursor-pointer">
                     <EditableText tagName="span" value={projectData.hero.buttonText} onChange={(val) => updateHero({ buttonText: val })} />
-                    <IconEditor 
-                      value={projectData.hero.icon} 
+                    <IconEditor
+                      value={projectData.hero.icon}
                       color={projectData.hero.iconColor}
-                      onChange={(val) => updateHero({ icon: val })} 
+                      onChange={(val) => updateHero({ icon: val })}
                       onColorChange={(val) => updateHero({ iconColor: val })}
                     />
                   </div>
@@ -890,15 +890,15 @@ export const OrganicTemplate: React.FC = () => {
                             <i className="fa-solid fa-check text-green-700"></i>
                             <EditableText tagName="span" className="flex-grow-1" value={f} onChange={(val) => { const nf = [...plan.features]; nf[fi] = val; updatePricing(i, { features: nf }); }} />
                             <button
-                                onClick={() => {
-                                  const nf = [...plan.features];
-                                  nf.splice(fi, 1);
-                                  updatePricing(i, { features: nf });
-                                }}
-                                className="border-0 bg-transparent text-red-300 p-0 opacity-0 group-hover/feat:opacity-100 hover:text-red-500 transition-all flex-shrink-0"
-                                title="Remove point"
-                              >
-                                <i className="fa-solid fa-times text-[10px]"></i>
+                              onClick={() => {
+                                const nf = [...plan.features];
+                                nf.splice(fi, 1);
+                                updatePricing(i, { features: nf });
+                              }}
+                              className="border-0 bg-transparent text-red-300 p-0 opacity-0 group-hover/feat:opacity-100 hover:text-red-500 transition-all flex-shrink-0"
+                              title="Remove point"
+                            >
+                              <i className="fa-solid fa-times text-[10px]"></i>
                             </button>
                           </div>
                         ))}
@@ -918,8 +918,8 @@ export const OrganicTemplate: React.FC = () => {
                         <div className={`organic-btn w-100 justify-content-center cursor-pointer ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
                           <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
                           {plan.icon && (
-                            <IconEditor 
-                              value={plan.icon} 
+                            <IconEditor
+                              value={plan.icon}
                               color={plan.iconColor}
                               onChange={(val) => updatePricing(i, { icon: val })}
                               onColorChange={(val) => updatePricing(i, { iconColor: val })}
@@ -928,10 +928,10 @@ export const OrganicTemplate: React.FC = () => {
                         </div>
                       </Linkable>
                       <div className="mt-4 flex items-center justify-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
-                        <IconEditor 
-                          className="text-xs" 
-                          value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon} 
-                          onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })} 
+                        <IconEditor
+                          className="text-xs"
+                          value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon}
+                          onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })}
                         />
                         <EditableText tagName="span" value={plan.guaranteeBadge?.text || projectData.guaranteeBadge?.text || "60-DAY PROMISE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), text: val } })} />
                       </div>
@@ -979,7 +979,7 @@ export const OrganicTemplate: React.FC = () => {
                       {[...Array(5)].map((_, starIndex) => {
                         const fill = starIndex + 1;
                         const currentRating = item.rating || 5;
-                        
+
                         if (currentRating >= fill) {
                           return (
                             <i

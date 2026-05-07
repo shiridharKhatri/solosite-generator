@@ -239,10 +239,10 @@ const getBottleStyle = (idx: number, total: number) => {
 
   // Tighter horizontal offset for a more clustered "bundle" look
   // Reduced from 32 to 26 based on user feedback
-  const x = -50 + (side * layer * 26); 
-  const y = -50 - (layer * 2); 
+  const x = -50 + (side * layer * 26);
+  const y = -50 - (layer * 2);
   const rotate = side * (layer * 3);
-  const scale = 1.1 - (layer * 0.05); 
+  const scale = 1.1 - (layer * 0.05);
   const zIndex = 100 - layer;
 
   return {
@@ -264,7 +264,7 @@ const BottleStack = ({ src, alt, multiplier, onChange, onAltChange }: {
   const indices = Array.from({ length: safeCount }, (_, i) => i);
 
   return (
-    <div className="relative h-[220px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
+    <div className="relative h-[200px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
       {indices.map((idx) => {
         const isMain = idx === indices.length - 1;
         const style = getBottleStyle(idx, indices.length);
