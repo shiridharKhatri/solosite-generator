@@ -1278,7 +1278,7 @@ ${sourcesHtml}
 
             ${data.timer?.enabled ? `
             <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
-                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white px-4 px-md-5 py-2 w-100 shadow-lg" style="max-width: 500px; border-radius: 2rem; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; padding: 0.65rem 2rem !important;">
+                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white w-100 shadow-lg" style="max-width: 500px; border-radius: 2rem; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; padding: 0.65rem 0.65rem 0.65rem 2rem !important;">
                     <div class="d-flex flex-column align-items-start">
                         <div class="text-[15px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 15px; font-weight: 900;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
                         <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>

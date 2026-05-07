@@ -36,7 +36,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
   };
 
   return (
-    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-[2rem] px-8 py-2.5 w-full max-w-lg shadow-2xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
+    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-[2rem] pl-8 pr-2.5 py-2.5 w-full max-w-lg shadow-2xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
       <button
         onClick={(e) => { e.stopPropagation(); onUpdate({ enabled: false }); }}
         className="absolute -top-2 -right-2 bg-gray-800 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/timer:opacity-100 transition-all z-20 hover:bg-red-500 border-none shadow-lg"
