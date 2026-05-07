@@ -19,17 +19,20 @@ interface ProjectInfo {
   };
 }
 
+const ITEMS_PER_PAGE = 15;
+
 export default function SuperAdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [projects, setProjects] = useState<ProjectInfo[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Filters & UI State
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'published' | 'draft'>('all');
   const [viewMode, setViewMode] = useState<'list' | 'grouped'>('list');
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -42,10 +45,15 @@ export default function SuperAdminPage() {
     }
   }, [session, status, router]);
 
+  // Reset page on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, statusFilter, viewMode]);
+
   const fetchProjects = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/projects?limit=500'); // Higher limit for admin
+      const res = await fetch('/api/projects?limit=1000'); // Higher limit for admin search
       const data = await res.json();
       if (res.ok) {
         setProjects(data.projects);
@@ -76,16 +84,23 @@ export default function SuperAdminPage() {
   // Memoized Filtered Projects
   const filteredProjects = useMemo(() => {
     return projects.filter(p => {
-      const matchesSearch = 
+      const matchesSearch =
         p.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.userId?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         p.userId?.email?.toLowerCase().includes(searchQuery.toLowerCase());
-      
+
       const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
-      
+
       return matchesSearch && matchesStatus;
     });
   }, [projects, searchQuery, statusFilter]);
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredProjects.length / ITEMS_PER_PAGE);
+  const paginatedProjects = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredProjects.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredProjects, currentPage]);
 
   // Memoized Grouped Projects
   const groupedProjects = useMemo(() => {
@@ -138,7 +153,7 @@ export default function SuperAdminPage() {
   return (
     <div className="min-h-screen bg-[#F8FAFC] py-12 px-6 lg:px-12">
       <div className="max-w-[1600px] mx-auto">
-        
+
         {/* Header Section */}
         <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-8 mb-16">
           <div className="space-y-2">
@@ -147,7 +162,13 @@ export default function SuperAdminPage() {
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
             </div>
             <h1 className="text-5xl font-black text-gray-900 tracking-tighter uppercase leading-none">Control Panel</h1>
-            <p className="text-gray-400 font-medium text-lg">Centralized oversight for all platform assets and users.</p>
+            <div className="flex items-center gap-4 mt-4">
+              <p className="text-gray-400 font-medium text-lg">Centralized oversight for all platform assets and users.</p>
+              <Link href="/dashboard" className="px-4 py-2 bg-gray-100 text-gray-600 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-gray-200 transition-all flex items-center gap-2">
+                <i className="fa-solid fa-arrow-left text-[10px]"></i>
+                Dashboard
+              </Link>
+            </div>
           </div>
 
           {/* Quick Stats */}
@@ -172,9 +193,9 @@ export default function SuperAdminPage() {
         <div className="bg-white p-4 rounded-[2rem] border border-gray-100 shadow-sm flex flex-col md:flex-row items-center gap-4 mb-8">
           <div className="relative flex-1 group">
             <i className="fa-solid fa-magnifying-glass absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
-            <input 
-              type="text" 
-              placeholder="Search by project name, user name, or email..." 
+            <input
+              type="text"
+              placeholder="Search by project name, user name, or email..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-14 pr-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all"
@@ -182,7 +203,7 @@ export default function SuperAdminPage() {
           </div>
           <div className="flex items-center gap-3 p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
             {(['all', 'published', 'draft'] as const).map(s => (
-              <button 
+              <button
                 key={s}
                 onClick={() => setStatusFilter(s)}
                 className={`px-6 py-2.5 rounded-xl text-[11px] font-black uppercase tracking-widest transition-all ${statusFilter === s ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
@@ -192,14 +213,14 @@ export default function SuperAdminPage() {
             ))}
           </div>
           <div className="flex items-center gap-2 p-1.5 bg-gray-50 rounded-2xl border border-gray-100">
-            <button 
+            <button
               onClick={() => setViewMode('list')}
               className={`w-12 h-10 flex items-center justify-center rounded-xl transition-all ${viewMode === 'list' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
               title="List View"
             >
               <i className="fa-solid fa-list-ul"></i>
             </button>
-            <button 
+            <button
               onClick={() => setViewMode('grouped')}
               className={`w-12 h-10 flex items-center justify-center rounded-xl transition-all ${viewMode === 'grouped' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-400 hover:text-gray-600'}`}
               title="Group by User"
@@ -207,7 +228,7 @@ export default function SuperAdminPage() {
               <i className="fa-solid fa-user-group text-xs"></i>
             </button>
           </div>
-          <button 
+          <button
             onClick={fetchProjects}
             disabled={loading}
             className="w-12 h-12 flex items-center justify-center bg-gray-900 text-white rounded-2xl hover:bg-black transition-all active:scale-95 disabled:opacity-50"
@@ -219,83 +240,129 @@ export default function SuperAdminPage() {
         {/* Content Area */}
         <div className="space-y-6">
           {viewMode === 'list' ? (
-            <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-gray-50/50 border-b border-gray-50">
-                    <th className="pl-10 pr-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Project Information</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Authorized Owner</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Deployment Status</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Design Theme</th>
-                    <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Mod Date</th>
-                    <th className="pl-6 pr-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {filteredProjects.map((project) => (
-                    <tr key={project._id} className="hover:bg-blue-50/20 transition-all group">
-                      <td className="pl-10 pr-6 py-7">
-                        <div className="flex flex-col">
-                          <span className="font-black text-gray-900 text-lg tracking-tight group-hover:text-blue-600 transition-colors" dangerouslySetInnerHTML={{ __html: project.name }}></span>
-                          <span className="text-[10px] text-gray-300 font-mono mt-1.5 uppercase tracking-widest">{project._id}</span>
-                        </div>
-                      </td>
-                      <td className="px-6 py-7">
-                        <div className="flex items-center gap-4">
-                          <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
-                            {project.userId?.name?.[0]?.toUpperCase() || '?'}
-                          </div>
-                          <div className="flex flex-col">
-                            <span className="font-bold text-gray-800 leading-tight">{project.userId?.name || 'Unknown User'}</span>
-                            <span className="text-xs text-gray-400 mt-0.5">{project.userId?.email || 'no-email@system'}</span>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-7">
-                        <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] ${
-                          project.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
-                        }`}>
-                          <div className={`w-1.5 h-1.5 rounded-full ${project.status === 'published' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></div>
-                          {project.status}
-                        </div>
-                      </td>
-                      <td className="px-6 py-7">
-                        <span className="text-xs font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
-                          {project.theme}
-                        </span>
-                      </td>
-                      <td className="px-6 py-7 text-xs font-bold text-gray-400">
-                        {new Date(project.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                      </td>
-                      <td className="pl-6 pr-10 py-7 text-right">
-                        <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
-                          <Link 
-                            href={`/editor/${project._id}`} 
-                            className="w-10 h-10 bg-white border border-gray-100 text-gray-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm hover:shadow-lg"
-                            title="Master Edit"
-                          >
-                            <i className="fa-solid fa-pen-nib text-sm"></i>
-                          </Link>
-                          <button 
-                            onClick={() => handleDelete(project._id)} 
-                            className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm hover:shadow-lg"
-                            title="Delete Permanently"
-                          >
-                            <i className="fa-solid fa-trash-can text-sm"></i>
-                          </button>
-                        </div>
-                      </td>
+            <div className="space-y-6">
+              <div className="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50/50 border-b border-gray-50">
+                      <th className="pl-10 pr-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Project Information</th>
+                      <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Authorized Owner</th>
+                      <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Deployment Status</th>
+                      <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Design Theme</th>
+                      <th className="px-6 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em]">Mod Date</th>
+                      <th className="pl-6 pr-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.25em] text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filteredProjects.length === 0 && (
-                <div className="py-32 text-center">
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-200">
-                    <i className="fa-solid fa-magnifying-glass text-3xl"></i>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {paginatedProjects.map((project) => (
+                      <tr key={project._id} className="hover:bg-blue-50/20 transition-all group">
+                        <td className="pl-10 pr-6 py-7">
+                          <div className="flex flex-col">
+                            <span className="font-black text-gray-900 text-lg tracking-tight group-hover:text-blue-600 transition-colors" dangerouslySetInnerHTML={{ __html: project.name }}></span>
+                            <span className="text-[10px] text-gray-300 font-mono mt-1.5 uppercase tracking-widest">{project._id}</span>
+                          </div>
+                        </td>
+                        <td className="px-6 py-7">
+                          <div className="flex items-center gap-4">
+                            <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-black text-xs">
+                              {project.userId?.name?.[0]?.toUpperCase() || '?'}
+                            </div>
+                            <div className="flex flex-col">
+                              <span className="font-bold text-gray-800 leading-tight">{project.userId?.name || 'Unknown User'}</span>
+                              <span className="text-xs text-gray-400 mt-0.5">{project.userId?.email || 'no-email@system'}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-7">
+                          <div className={`inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-[0.15em] ${project.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-gray-100 text-gray-500'
+                            }`}>
+                            <div className={`w-1.5 h-1.5 rounded-full ${project.status === 'published' ? 'bg-emerald-500 animate-pulse' : 'bg-gray-400'}`}></div>
+                            {project.status}
+                          </div>
+                        </td>
+                        <td className="px-6 py-7">
+                          <span className="text-xs font-black text-gray-400 uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg border border-gray-100">
+                            {project.theme}
+                          </span>
+                        </td>
+                        <td className="px-6 py-7 text-xs font-bold text-gray-400">
+                          {new Date(project.updatedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </td>
+                        <td className="pl-6 pr-10 py-7 text-right">
+                          <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all translate-x-4 group-hover:translate-x-0">
+                            <Link
+                              href={`/editor/${project._id}`}
+                              className="w-10 h-10 bg-white border border-gray-100 text-gray-600 rounded-xl flex items-center justify-center hover:bg-blue-600 hover:text-white hover:border-blue-600 transition-all shadow-sm hover:shadow-lg"
+                              title="Master Edit"
+                            >
+                              <i className="fa-solid fa-pen-nib text-sm"></i>
+                            </Link>
+                            <button
+                              onClick={() => handleDelete(project._id)}
+                              className="w-10 h-10 bg-white border border-gray-100 text-gray-400 rounded-xl flex items-center justify-center hover:bg-red-500 hover:text-white hover:border-red-500 transition-all shadow-sm hover:shadow-lg"
+                              title="Delete Permanently"
+                            >
+                              <i className="fa-solid fa-trash-can text-sm"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {filteredProjects.length === 0 && (
+                  <div className="py-32 text-center">
+                    <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-200">
+                      <i className="fa-solid fa-magnifying-glass text-3xl"></i>
+                    </div>
+                    <h3 className="text-gray-900 font-black text-xl uppercase tracking-tight">No results found</h3>
+                    <p className="text-gray-400 mt-2">Try adjusting your filters or search query.</p>
                   </div>
-                  <h3 className="text-gray-900 font-black text-xl uppercase tracking-tight">No results found</h3>
-                  <p className="text-gray-400 mt-2">Try adjusting your filters or search query.</p>
+                )}
+              </div>
+
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex items-center justify-between px-10 py-8 bg-white rounded-[2rem] border border-gray-100 shadow-sm">
+                  <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                    Showing <span className="text-gray-900">{((currentPage - 1) * ITEMS_PER_PAGE) + 1}</span> to <span className="text-gray-900">{Math.min(currentPage * ITEMS_PER_PAGE, filteredProjects.length)}</span> of <span className="text-gray-900">{filteredProjects.length}</span> assets
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      disabled={currentPage === 1}
+                      className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <i className="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <div className="flex items-center gap-1 px-2">
+                      {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                        let pageNum = currentPage;
+                        if (currentPage <= 3) pageNum = i + 1;
+                        else if (currentPage >= totalPages - 2) pageNum = totalPages - 4 + i;
+                        else pageNum = currentPage - 2 + i;
+
+                        if (pageNum <= 0 || pageNum > totalPages) return null;
+
+                        return (
+                          <button
+                            key={pageNum}
+                            onClick={() => setCurrentPage(pageNum)}
+                            className={`w-12 h-12 rounded-2xl text-xs font-black transition-all ${currentPage === pageNum ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'bg-white text-gray-400 hover:bg-gray-50'}`}
+                          >
+                            {pageNum}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <button
+                      onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                      disabled={currentPage === totalPages}
+                      className="w-12 h-12 flex items-center justify-center rounded-2xl bg-gray-50 text-gray-400 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed transition-all"
+                    >
+                      <i className="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -317,7 +384,7 @@ export default function SuperAdminPage() {
                     <h3 className="text-xl font-black text-gray-900 truncate tracking-tight">{group.user?.name || 'Unknown User'}</h3>
                     <p className="text-sm text-gray-400 truncate mt-1">{group.user?.email || 'no-email@system'}</p>
                   </div>
-                  
+
                   {/* User Projects List */}
                   <div className="flex-1 p-6 space-y-3 overflow-y-auto max-h-[400px] custom-scrollbar">
                     {group.projects.map(p => (
