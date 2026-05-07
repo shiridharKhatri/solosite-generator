@@ -134,6 +134,16 @@ export function SEOChecker() {
       { word: `${productName} sale`, target: 2 },
       { word: `${productName} price`, target: 3 },
       { word: `${productName} discount`, target: 3 },
+      // User Requested Stand-alone Keywords
+      { word: 'Price', target: 2 },
+      { word: 'Official site', target: 2 },
+      { word: 'Specification', target: 2 },
+      { word: 'Discount', target: 2 },
+      { word: 'Offer', target: 2 },
+      { word: 'Reviews', target: 2 },
+      { word: 'Material and Build quality', target: 1 },
+      { word: 'Scam', target: 1 },
+      { word: 'Test', target: 1 },
       // Additional high-value variants
       { word: `where to buy ${productName}`, target: 2 },
       { word: `${productName} ingredients`, target: 3 },
