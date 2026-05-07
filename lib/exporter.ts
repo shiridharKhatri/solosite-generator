@@ -705,13 +705,13 @@ ${seoBlock}
                     </div>
                     ${data.timer?.enabled ? `
                     <div class="my-3 d-flex justify-content-center w-100 px-3">
-                        <div class="d-flex align-items-center justify-content-between text-white rounded-4 px-4 py-3 w-100 shadow-lg" style="background-color: #cc1d1d; max-width: 500px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
+                        <div class="d-flex align-items-center justify-content-between text-white w-100 shadow-lg" style="background-color: #cc1d1d; max-width: 500px; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; border-radius: 2rem; padding: 0.65rem 0.65rem 0.65rem 2rem !important;">
                             <div class="d-flex flex-column align-items-start gap-1">
-                                <div class="fw-black text-uppercase lh-1" style="font-size: 16px; letter-spacing: 0.025em; font-family: sans-serif;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
-                                <div class="fw-medium fst-italic opacity-75" style="font-size: 13px; font-family: sans-serif;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
+                                <div class="fw-black text-uppercase lh-1" style="font-size: 15px; letter-spacing: 0.05em; font-family: sans-serif; font-weight: 900;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
+                                <div class="fw-medium fst-italic opacity-75" style="font-size: 11px; font-family: sans-serif;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
                             </div>
-                            <div class="bg-white text-dark rounded-3 px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="min-width: 90px;">
-                                <div id="countdown-timer-display" class="fw-black tabular-nums" style="font-size: 24px; letter-spacing: -0.05em; font-family: sans-serif;">
+                            <div class="bg-white text-dark d-flex align-items-center justify-content-center shadow-xl" style="min-width: 95px; border-radius: 9999px; background-color: white; color: black; padding: 0.4rem 1.2rem;">
+                                <div id="countdown-timer-display" class="fw-black tabular-nums" style="font-size: 22px; letter-spacing: -0.05em; font-family: sans-serif; font-weight: 900;">
                                     ${String(data.timer.minutes || 3).padStart(2, '0')}:00
                                 </div>
                             </div>
