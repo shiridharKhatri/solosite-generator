@@ -5,6 +5,126 @@ import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { RichTextEditor } from '../editor/RichTextEditor';
 import { useStore } from '@/lib/store';
+import { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+
+// Portal helper for floating UI to prevent flickering/clipping
+const Portal = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+};
+
+// Helper for Icon Selection and Styling
+const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: { 
+  value?: string; 
+  color?: string; 
+  onChange: (val: string) => void;
+  onColorChange?: (val: string) => void;
+  className?: string;
+}) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const icons = ["fa-solid fa-star", "fa-solid fa-bolt", "fa-solid fa-check", "fa-solid fa-heart", "fa-solid fa-shield", "fa-solid fa-leaf", "fa-solid fa-lightbulb", "fa-solid fa-gear", "fa-solid fa-cart-shopping"];
+  const colors = [
+    { name: 'Default', value: '' },
+    { name: 'Amber', value: '#fbbf24' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Emerald', value: '#10b981' },
+    { name: 'Rose', value: '#f43f5e' },
+    { name: 'Black', value: '#000000' }
+  ];
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPos({ x: e.clientX, y: e.clientY });
+    setShowMenu(true);
+  };
+
+  return (
+    <>
+      {value ? (
+        <i
+          className={`${value} cursor-pointer hover:scale-110 transition-all ${className}`}
+          style={{ color: color || 'inherit' }}
+          onClick={handleOpen}
+          onContextMenu={handleOpen}
+        />
+      ) : (
+        <button 
+          onClick={handleOpen}
+          className="bg-gray-100 hover:bg-gray-200 text-[9px] px-2 py-1 rounded border border-gray-200 text-gray-500 uppercase font-bold tracking-widest transition-all mb-3 mx-auto block"
+        >
+          + Add Icon
+        </button>
+      )}
+
+      {showMenu && (
+        <Portal>
+          <div className="fixed inset-0 z-[99998]" onClick={() => setShowMenu(false)} />
+          <div
+            className="fixed bg-white rounded shadow-2xl border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200 text-left"
+            style={{ left: Math.min(pos.x, typeof window !== 'undefined' ? window.innerWidth - 270 : pos.x), top: Math.min(pos.y, typeof window !== 'undefined' ? window.innerHeight - 350 : pos.y) }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4 border-b pb-2">
+              <span className="text-[10px] font-bold uppercase text-gray-400">Card Icon Settings</span>
+              <button onClick={() => setShowMenu(false)} className="text-gray-300 hover:text-dark border-none bg-transparent p-0"><i className="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Choose Icon</label>
+              <div className="grid grid-cols-5 gap-2">
+                {icons.map((icon) => (
+                  <button
+                    key={icon}
+                    onClick={() => { onChange(icon); }}
+                    className={`w-8 h-8 flex items-center justify-center rounded border transition-all ${value === icon ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-100 hover:bg-gray-50 text-gray-400'}`}
+                  >
+                    <i className={icon}></i>
+                  </button>
+                ))}
+                <button
+                  onClick={() => { onChange(''); setShowMenu(false); }}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-red-100 text-red-400 hover:bg-red-50 transition-all"
+                >
+                  <i className="fa-solid fa-slash"></i>
+                </button>
+              </div>
+            </div>
+
+            {onColorChange && (
+              <div className="mb-2">
+                <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Color</label>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => onColorChange?.(c.value)}
+                      className={`w-6 h-6 rounded-full border-2 transition-all ${color === c.value ? 'border-blue-500 scale-110' : 'border-gray-200 hover:scale-105'}`}
+                      style={{ backgroundColor: c.value || 'transparent' }}
+                    >
+                      {!c.value && <i className="fa-solid fa-droplet-slash text-[8px] text-gray-400"></i>}
+                    </button>
+                  ))}
+                  <input 
+                    type="color" 
+                    value={color || '#000000'} 
+                    onChange={(e) => onColorChange?.(e.target.value)}
+                    className="w-6 h-6 p-0 border-none rounded-full cursor-pointer overflow-hidden"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </Portal>
+      )}
+    </>
+  );
+};
 
 // Linkable wrapper for buttons
 const Linkable = React.memo(({ link, onLinkChange, children }: { link: string; onLinkChange: (val: string) => void; children: React.ReactNode }) => (
@@ -91,7 +211,7 @@ const CardItem = React.memo(({ card, idx, section, isOrganic, primaryColor, upda
         </button>
         {/* Card Image */}
         {card.image && (
-          <div className="mb-3 rounded-2 overflow-hidden" style={{ maxHeight: '180px' }}>
+          <div className="mb-3 rounded-2" style={{ maxHeight: '180px' }}>
             <EditableImage
               src={card.image}
               alt={card.title}
@@ -101,8 +221,18 @@ const CardItem = React.memo(({ card, idx, section, isOrganic, primaryColor, upda
             />
           </div>
         )}
-        {/* Card Icon (shows when no image) */}
-        {!card.image && card.icon && <i className={`${card.icon} fs-1 mb-3 d-block`} style={{ color: primaryColor }}></i>}
+        {/* Card Icon (shows when no image or explicitly chosen) */}
+        {!card.image && (
+          <div className="mb-3">
+            <IconEditor 
+              value={card.icon} 
+              color={card.iconColor}
+              onChange={(val) => handleFieldUpdate('icon', val)}
+              onColorChange={(val) => handleFieldUpdate('iconColor', val)}
+              className="fs-1 d-block"
+            />
+          </div>
+        )}
         {/* Upload image button (when no image set) */}
         {!card.image && (
           <button

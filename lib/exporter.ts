@@ -19,26 +19,27 @@ export async function generateProjectZip(data: any) {
             const isMain = idx === bottles.length - 1;
             const bgIdx = bottles.length - 2 - idx;
             const side = bgIdx % 2 === 0 ? -1 : 1;
-            const pairIndex = Math.floor(bgIdx / 2) + 1;
+            const layer = Math.floor(bgIdx / 2) + 1;
 
             let transform, zIndex, filter;
             if (isMain) {
                 transform = 'translate(-50%, -50%) scale(1.15)';
                 zIndex = 100;
-                filter = 'drop-shadow(0 15px 30px rgba(0,0,0,0.12))';
+                filter = 'drop-shadow(0 20px 40px rgba(0,0,0,0.12))';
             } else {
-                const x = side * (pairIndex * 38) - 50;
-                const y = -50;
-                const scale = 0.95;
-                transform = `translate(${x}%, ${y}%) scale(${scale})`;
-                zIndex = 50 - pairIndex;
+                const x = -50 + (side * layer * 32); 
+                const y = -50 - (layer * 2); 
+                const rotate = side * (layer * 4);
+                const scale = 1.1 - (layer * 0.05); 
+                transform = `translate(${x}%, ${y}%) scale(${scale}) rotate(${rotate}deg)`;
+                zIndex = 100 - layer;
                 filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))';
             }
 
             return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
         }).join('');
 
-        return `<div style="position: relative; height: ${height}; width: 100%; perspective: 1200px; overflow: visible;">${stackHtml}</div>`;
+        return `<div style="position: relative; height: 220px; width: 100%; perspective: 1200px; overflow: visible; display: flex; align-items: center; justify-content: center;">${stackHtml}</div>`;
     };
 
     // Helper to render custom sections
@@ -61,6 +62,7 @@ export async function generateProjectZip(data: any) {
                 <div class="mt-4 ${section.type === 'text' || section.type === 'cards' ? 'text-center mt-5' : ''}">
                     <a href="${section.buttonHref || '#order'}" class="d-inline-block fw-bold ${isOrganic ? 'organic-btn organic-btn-primary' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${secondaryColor}; color: #000; font-size: 1.1rem; padding: 1rem 2.5rem; text-decoration: none; border-radius: 50px;` : ''}">
                         ${section.buttonText}
+                        ${section.icon ? `<i class="${section.icon}" style="color: ${section.iconColor || 'inherit'};"></i>` : ''}
                     </a>
                 </div>
             ` : '';
@@ -90,8 +92,8 @@ export async function generateProjectZip(data: any) {
             } else if (section.type === 'cards') {
                 const cardsHtml = (section.cards || []).map((card: any) => {
                     const cardImageHtml = card.image ? `<div class="mb-3 rounded-2 overflow-hidden" style="max-height: 180px;"><img src="${card.image}" alt="${card.title}" class="img-fluid w-100" style="object-fit: cover; max-height: 180px;" /></div>` : '';
-                    const cardIconHtml = !card.image && card.icon ? `<i class="${card.icon} fs-1 mb-3 d-block" style="color: ${primaryColor};"></i>` : '';
-                    const cardButtonHtml = card.buttonText ? `<div class="mt-3 pt-3 border-top"><a href="${card.buttonHref || '#'}" class="d-inline-block fw-bold text-decoration-none ${isOrganic ? 'organic-btn organic-btn-outline' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${primaryColor}; color: #fff; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 50px;` : ''}">${card.buttonText}</a></div>` : '';
+                    const cardIconHtml = !card.image && card.icon ? `<i class="${card.icon} fs-1 mb-3 d-block" style="color: ${card.iconColor || primaryColor};"></i>` : '';
+                    const cardButtonHtml = card.buttonText ? `<div class="mt-3 pt-3 border-top"><a href="${card.buttonHref || '#'}" class="d-inline-block fw-bold text-decoration-none ${isOrganic ? 'organic-btn organic-btn-outline' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${primaryColor}; color: #fff; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 50px;` : ''}">${card.buttonText} ${card.icon ? `<i class="${card.icon}" style="color: ${card.iconColor || 'inherit'};"></i>` : ''}</a></div>` : '';
                     return `
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="h-100 p-4 border rounded-3 bg-white text-dark shadow-sm text-center d-flex flex-column">
@@ -309,7 +311,7 @@ Sitemap: ${baseUrl}/sitemap.xml`);
     <style>
       .purchase-proof { position: fixed; bottom: 30px; left: 30px; background: #111; border-radius: 12px; padding: 16px; border: 1px solid #333; font-size: 13px; max-width: 320px; z-index: 9999; transform: translateX(-150%); transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55); display: flex; align-items: center; gap: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.3); color: #fff; line-height: 1.4; font-family: sans-serif; }
       .purchase-proof.active { transform: translateX(0); }
-      .proof-image { width: 60px; height: 60px; flex-shrink: 0; border-radius: 10px; overflow: hidden; background: #222; border: 1px solid #333; }
+      .proof-image { width: 60px; height: 60px; flex-shrink: 0; border-radius: 10px; background: #222; border: 1px solid #333; }
       .proof-image img { width: 100%; height: 100%; object-fit: contain; }
       .proof-stars { color: #fbbf24; font-size: 10px; margin-bottom: 4px; }
       .proof-time { font-size: 10px; color: #aaa; margin-top: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
@@ -632,12 +634,12 @@ ${seoBlock}
             .sectioncolor1 { background-color: #f8f9fa; }
       .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
       .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
-      .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; overflow: hidden; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+      .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
       .pricing-card { border-radius: 2rem; transition: all 0.3s; }
       .pricing-card.primary { border: 4px solid ${secondaryColor} !important; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
             .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s; }
       .testimonial-card:hover { transform: translateY(-5px); }
-      .avatar-frame { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; border: 2px solid ${secondaryColor}; }
+      .avatar-frame { width: 64px; height: 64px; border-radius: 50%; border: 2px solid ${secondaryColor}; }
       .accordion-button:not(.collapsed) { background-color: ${primaryColor}10; color: ${primaryColor}; }
       .accordion-button:focus { box-shadow: none; }
       .btn-custom-pill { box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; }
@@ -733,8 +735,8 @@ ${seoBlock}
                     <div class="fw-bold mb-3 title-scale w-100" style="margin-top: 0;">${data.hero?.title}</div>
                     <div class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100" style="line-height: 1.7; text-align: justify; white-space: pre-line;">${data.hero?.subtitle}</div>
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center mt-4">
-                        <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> <i class="${data.hero?.icon || 'fa-solid fa-cart-shopping'}"></i></a>
-                        <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span><i class="${data.hero?.secondaryIcon || 'fa-solid fa-arrow-right'}"></i></a>
+                        <a href="${data.hero?.buttonHref}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${data.hero?.buttonText}</span> ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}</a>
+                        <a href="${data.hero?.secondaryButtonHref || '#'}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${data.hero?.secondaryButtonText || 'Learn More'}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>
                     </div>
                 </div>
             </div>
@@ -917,9 +919,9 @@ ${seoBlock}
                 <div class="h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-none fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">BEST VALUE BUNDLE</div>` : ''}
                 <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${plan.title}</h3>
-                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 180px; display: inline-block;">
-                    ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '160px')}
-                    <div style="position: absolute; left: 50%; bottom: -12px; z-index: 20; transform: translateX(35px) rotate(8deg);">
+                <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 220px; display: inline-block;">
+                    ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
+                    <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
                         <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier || 'X1'}</div>
                     </div>
                 </div>
@@ -932,7 +934,7 @@ ${seoBlock}
                         ${plan.features.map((f: string) => `<li class="mb-2 small fw-medium d-flex align-items-center gap-2"><i class="fa-solid fa-check-circle fs-6" style="color: ${primaryColor};"></i><span>${f}</span></li>`).join('')}
                     </ul>
                 </div>
-                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3.5 fs-6 fw-bold text-decoration-none d-flex align-items-center justify-content-center" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;">${plan.buttonText}</a>
+                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3.5 fs-6 fw-bold text-decoration-none d-flex align-items-center justify-content-center" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'}; margin-left: 8px;"></i>` : ''}</a>
                 <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
             </div></div>
             `).join('')}
@@ -1221,7 +1223,7 @@ ${sourcesHtml}
             }
             return true;
         }).map((link: any) => `<a href="${link.href}" class="nav-link fw-medium p-0 text-stone-700 hover:text-green-900 text-xs uppercase tracking-widest no-underline">${link.label}</a>`).join('')}
-                    <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary py-2 px-4">Shop Collection</a>
+                    <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary py-2 px-4">${data.hero?.buttonText || 'Shop Collection'} ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}</a>
                 </div>
             </div>
         </div>
@@ -1237,9 +1239,9 @@ ${sourcesHtml}
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center">
                         <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
                             <span>${data.hero?.buttonText}</span>
-                            <i class="${data.hero?.icon || 'fa-solid fa-seedling'}"></i>
+                            ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}
                         </a>
-                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span></a>` : ''}
+                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>` : ''}
                     </div>
                 </div>
                 <div class="col-12 col-lg-5">
@@ -1319,7 +1321,7 @@ ${sourcesHtml}
                 ${(data.ingredients?.items || []).map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="organic-card p-4 h-100 text-center bg-white">
-                        <div class="mx-auto mb-4 organic-blob overflow-hidden" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
+                        <div class="mx-auto mb-4 organic-blob" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
                             <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" />
                         </div>
                         <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${item.title}</h4>
@@ -1455,10 +1457,10 @@ ${sourcesHtml}
                         ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
                         <div class="p-5 flex-grow-1 text-center">
                             <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
-                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
+                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 220px; display: inline-block;">
                                 ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                                 ${plan.multiplier ? `
-                                <div style="position: absolute; left: 50%; bottom: -12px; z-index: 20; transform: translateX(35px) rotate(8deg);">
+                                <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
                                     <div style="background-color: #dc2626; color: white; border-radius: 50%; font-weight: 900; font-size: 18px; border: 4px solid white; box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); width: 62px; height: 62px; letter-spacing: -0.02em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap;">${plan.multiplier}</div>
                                 </div>` : ''}
                             </div>
@@ -1470,7 +1472,7 @@ ${sourcesHtml}
                                     <span>${f}</span>
                                 </div>`).join('')}
                             </div>
-                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}">${plan.buttonText}</a>
+                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'};"></i>` : ''}</a>
                             ${plan.guaranteeBadge ? `
                             <div class="mt-4 d-flex align-items-center justify-content-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
                                 <i class="${plan.guaranteeBadge.icon || 'fa-solid fa-shield-halved'}"></i>
@@ -1497,7 +1499,7 @@ ${sourcesHtml}
                 ${(data.testimonials.items || []).map((t: any) => `
                 <div class="col-md-4">
                     <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
-                        <div class="w-16 h-16 rounded-circle overflow-hidden mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
+                        <div class="w-16 h-16 rounded-circle mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
                             <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
                         </div>
                         <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>

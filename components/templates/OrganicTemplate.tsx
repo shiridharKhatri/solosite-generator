@@ -2,6 +2,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
@@ -16,10 +17,125 @@ const RemoveButton = ({ onClick }: { onClick: () => void }) => (
   </button>
 );
 
-const IconEditor = ({ value, onChange, className = "" }: { value: string; onChange: (val: string) => void, className?: string }) => {
-  const icons = ["fa-solid fa-leaf", "fa-solid fa-seedling", "fa-solid fa-tree", "fa-solid fa-sun", "fa-solid fa-droplet", "fa-solid fa-flask"];
-  const cycleIcon = () => { const idx = icons.indexOf(value || icons[0]); onChange(icons[(idx + 1) % icons.length]); };
-  return <i className={`${value || icons[0]} cursor-pointer hover:scale-110 transition-transform text-current ${className}`} onClick={(e) => { e.stopPropagation(); cycleIcon(); }} title="Click to toggle icon" />;
+// Portal helper for floating UI
+const Portal = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+};
+
+// Helper for Icon Selection and Styling
+const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: { 
+  value?: string; 
+  color?: string; 
+  onChange: (val: string) => void;
+  onColorChange?: (val: string) => void;
+  className?: string;
+}) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const icons = ["fa-solid fa-leaf", "fa-solid fa-seedling", "fa-solid fa-tree", "fa-solid fa-sun", "fa-solid fa-droplet", "fa-solid fa-flask", "fa-solid fa-cart-shopping", "fa-solid fa-arrow-right", "fa-solid fa-check", "fa-solid fa-bolt", "fa-solid fa-star"];
+  const colors = [
+    { name: 'Default', value: '' },
+    { name: 'Forest', value: '#1e3932' },
+    { name: 'Sage', value: '#8fb0a1' },
+    { name: 'Amber', value: '#fbbf24' },
+    { name: 'White', value: '#ffffff' },
+    { name: 'Black', value: '#000000' }
+  ];
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPos({ x: e.clientX, y: e.clientY });
+    setShowMenu(true);
+  };
+
+  return (
+    <>
+      {value ? (
+        <i
+          className={`${value} cursor-pointer hover:scale-125 transition-all ${className}`}
+          style={{ color: color || 'inherit' }}
+          onClick={handleOpen}
+          onContextMenu={handleOpen}
+          title="Click to customize icon"
+        />
+      ) : (
+        <button 
+          onClick={handleOpen}
+          className="bg-stone-100 hover:bg-stone-200 text-[8px] px-1.5 py-0.5 rounded border border-stone-200 text-stone-600 uppercase font-bold tracking-widest transition-all"
+        >
+          + Icon
+        </button>
+      )}
+
+      {showMenu && (
+        <Portal>
+          <div className="fixed inset-0 z-[99998]" onClick={() => setShowMenu(false)} />
+          <div
+            className="fixed bg-white rounded-none shadow-2xl border border-stone-200 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200"
+            style={{ left: Math.min(pos.x, typeof window !== 'undefined' ? window.innerWidth - 270 : pos.x), top: Math.min(pos.y, typeof window !== 'undefined' ? window.innerHeight - 350 : pos.y) }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4 border-b border-stone-100 pb-2">
+              <span className="text-[10px] font-bold uppercase text-stone-400 tracking-widest">Botanical Icons</span>
+              <button onClick={() => setShowMenu(false)} className="text-stone-300 hover:text-stone-600 border-none bg-transparent p-0"><i className="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-[9px] font-bold text-stone-500 uppercase mb-2 block tracking-widest">Choose Icon</label>
+              <div className="grid grid-cols-5 gap-2">
+                {icons.map((icon) => (
+                  <button
+                    key={icon}
+                    onClick={() => { onChange(icon); }}
+                    className={`w-8 h-8 flex items-center justify-center rounded border transition-all ${value === icon ? 'border-green-800 bg-green-50 text-green-800' : 'border-stone-100 hover:bg-stone-50 text-stone-400'}`}
+                  >
+                    <i className={icon}></i>
+                  </button>
+                ))}
+                <button
+                  onClick={() => { onChange(''); setShowMenu(false); }}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-red-100 text-red-400 hover:bg-red-50 transition-all"
+                  title="Remove Icon"
+                >
+                  <i className="fa-solid fa-slash"></i>
+                </button>
+              </div>
+            </div>
+
+            {onColorChange && (
+              <div>
+                <label className="text-[9px] font-bold text-stone-500 uppercase mb-2 block tracking-widest">Icon Color</label>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => onColorChange?.(c.value)}
+                      className={`w-6 h-6 rounded-full border-2 transition-all ${color === c.value ? 'border-green-800 scale-110' : 'border-stone-200 hover:scale-105'}`}
+                      style={{ backgroundColor: c.value || 'transparent' }}
+                      title={c.name}
+                    >
+                      {!c.value && <i className="fa-solid fa-droplet-slash text-[8px] text-stone-400"></i>}
+                    </button>
+                  ))}
+                  <input 
+                    type="color" 
+                    value={color || '#000000'} 
+                    onChange={(e) => onColorChange?.(e.target.value)}
+                    className="w-6 h-6 p-0 border-none rounded-full cursor-pointer overflow-hidden"
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </Portal>
+      )}
+    </>
+  );
 };
 
 const LinkSettings = ({ link, onChange, onClose, x, y }: { link: string; onChange: (val: string) => void, onClose: () => void, x: number, y: number }) => (
@@ -92,19 +208,19 @@ const getBottleStyle = (idx: number, total: number) => {
 
   const bgIdx = total - 2 - idx;
   const side = bgIdx % 2 === 0 ? -1 : 1;
-  const pairIndex = Math.floor(bgIdx / 2) + 1;
+  const layer = Math.floor(bgIdx / 2) + 1;
 
-  // Slightly wider horizontal alignment for a cleaner, less attached look
-  const x = side * (pairIndex * 44) - 50;
-  const y = -50;
-  const rotate = 0;
-  const scale = 0.95;
-  const zIndex = 50 - pairIndex;
+  // Wider horizontal offset to make side bottles more visible
+  const x = -50 + (side * layer * 32); 
+  const y = -50 - (layer * 2); 
+  const rotate = side * (layer * 4);
+  const scale = 1.1 - (layer * 0.05); 
+  const zIndex = 100 - layer;
 
   return {
-    transform: `translate(${x}%, ${y}%) rotate(${rotate}deg) scale(${scale})`,
+    transform: `translate(${x}%, ${y}%) scale(${scale}) rotate(${rotate}deg)`,
     zIndex,
-    filter: `drop-shadow(0 15px 30px rgba(0,0,0,0.12))`
+    filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.12))`
   };
 };
 
@@ -120,7 +236,7 @@ const BottleStack = ({ src, alt, multiplier, onChange, onAltChange }: {
   const indices = Array.from({ length: safeCount }, (_, i) => i);
 
   return (
-    <div className="relative h-[200px] w-full overflow-visible perspective-[1200px]">
+    <div className="relative h-[220px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
       {indices.map((idx) => {
         const isMain = idx === indices.length - 1;
         const style = getBottleStyle(idx, indices.length);
@@ -396,7 +512,7 @@ export const OrganicTemplate: React.FC = () => {
       </nav>
 
       {/* Hero - Elegant Serenity Layout */}
-      <section className="py-5 overflow-hidden section-reveal">
+      <section className="py-5 section-reveal">
         <div className="container">
           <div className="row align-items-center g-5">
             <div className="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
@@ -404,10 +520,15 @@ export const OrganicTemplate: React.FC = () => {
               <EditableText tagName="p" value={projectData.hero.subtitle} onChange={(val) => updateHero({ subtitle: val })} className="fs-6 text-stone-700 mb-4 italic font-serif w-100" style={{ lineHeight: 1.6 }} />
               <div className="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center">
                 <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
-                  <button className="organic-btn organic-btn-primary">
+                  <div className="organic-btn organic-btn-primary cursor-pointer">
                     <EditableText tagName="span" value={projectData.hero.buttonText} onChange={(val) => updateHero({ buttonText: val })} />
-                    <IconEditor value={projectData.hero.icon || "fa-solid fa-seedling"} onChange={(val) => updateHero({ icon: val })} />
-                  </button>
+                    <IconEditor 
+                      value={projectData.hero.icon} 
+                      color={projectData.hero.iconColor}
+                      onChange={(val) => updateHero({ icon: val })} 
+                      onColorChange={(val) => updateHero({ iconColor: val })}
+                    />
+                  </div>
                 </Linkable>
                 <Linkable link={projectData.hero.secondaryButtonHref || ''} onLinkChange={(val) => updateHero({ secondaryButtonHref: val })}>
                   <button className="organic-btn organic-btn-outline">
@@ -536,7 +657,7 @@ export const OrganicTemplate: React.FC = () => {
                 <div key={i} className="col-12 col-md-6 col-lg-4">
                   <div className="organic-card p-4 h-100 text-center relative bg-white">
                     <RemoveButton onClick={() => removeIngredient(i)} />
-                    <div className="mx-auto mb-4 organic-blob overflow-hidden" style={{ width: '130px', height: '130px', border: `4px solid ${bgLight}` }}>
+                    <div className="mx-auto mb-4 organic-blob" style={{ width: '130px', height: '130px', border: `4px solid ${bgLight}` }}>
                       <EditableImage
                         src={item.image || '/image/ingredient-schisandra.png'}
                         alt={item.imageAlt}
@@ -753,7 +874,7 @@ export const OrganicTemplate: React.FC = () => {
                           onAltChange={(val) => updatePricing(i, { imageAlt: val })}
                         />
                         {/* Premium Red Multiplier Badge on Bottles */}
-                        <div className="absolute -bottom-4 right-1/4 z-20 pointer-events-auto rotate-[5deg]">
+                        <div className="absolute bottom-6 right-2 z-20 pointer-events-auto rotate-[5deg]">
                           <EditableText
                             className="bg-red-600 text-white px-4 py-1.5 rounded-full fw-black text-sm border-[3px] border-white shadow-xl min-w-[50px] tracking-widest uppercase flex items-center justify-center hover:scale-110 transition-transform duration-300"
                             value={plan.multiplier || "X1"}
@@ -793,12 +914,24 @@ export const OrganicTemplate: React.FC = () => {
                         </div>
                       </div>
                       <Linkable link={plan.buttonHref} onLinkChange={() => { }}>
-                        <button className={`organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
+                        <div className={`organic-btn w-100 justify-content-center cursor-pointer ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}`}>
                           <EditableText tagName="span" value={plan.buttonText} onChange={(val) => updatePricing(i, { buttonText: val })} />
-                        </button>
+                          {plan.icon && (
+                            <IconEditor 
+                              value={plan.icon} 
+                              color={plan.iconColor}
+                              onChange={(val) => updatePricing(i, { icon: val })}
+                              onColorChange={(val) => updatePricing(i, { iconColor: val })}
+                            />
+                          )}
+                        </div>
                       </Linkable>
                       <div className="mt-4 flex items-center justify-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
-                        <IconEditor className="text-xs" value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon || "fa-solid fa-shield-halved"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })} />
+                        <IconEditor 
+                          className="text-xs" 
+                          value={plan.guaranteeBadge?.icon || projectData.guaranteeBadge?.icon} 
+                          onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), icon: val } })} 
+                        />
                         <EditableText tagName="span" value={plan.guaranteeBadge?.text || projectData.guaranteeBadge?.text || "60-DAY PROMISE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || projectData.guaranteeBadge || { text: '60-DAY PROMISE', icon: 'fa-solid fa-shield-halved' }), text: val } })} />
                       </div>
                     </div>
@@ -830,7 +963,7 @@ export const OrganicTemplate: React.FC = () => {
                 <div key={i} className="col-md-4 relative group/test">
                   <div className="p-4 bg-white border border-[#E6D5C3] h-100 text-center flex flex-column align-items-center">
                     <RemoveButton onClick={() => removeTestimonial(i)} />
-                    <div className="w-16 h-16 rounded-full overflow-hidden mb-3 border-2 border-stone-50">
+                    <div className="w-16 h-16 rounded-full mb-3 border-2 border-stone-50">
                       <EditableImage
                         src={item.image || "https://i.pravatar.cc/150"}
                         alt={item.imageAlt}

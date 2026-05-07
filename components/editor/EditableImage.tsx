@@ -84,7 +84,7 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
   return (
     <div
-      className={`relative group cursor-pointer flex justify-center items-center overflow-hidden transition-all duration-300 z-10 ${isCircular ? 'rounded-full aspect-square' : ''} ${className}`}
+      className={`relative group cursor-pointer flex justify-center items-center transition-all duration-300 z-10 ${isCircular ? 'rounded-full aspect-square' : ''} ${className}`}
       style={style}
     >
       <div onClick={handleClick} className="w-full h-full flex justify-center items-center">

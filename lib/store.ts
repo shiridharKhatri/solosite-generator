@@ -8,9 +8,11 @@ export interface ProjectData {
     buttonText: string;
     buttonHref: string;
     icon?: string;
+    iconColor?: string;
     secondaryButtonText?: string;
     secondaryButtonHref?: string;
     secondaryIcon?: string;
+    secondaryIconColor?: string;
     image: string;
     imageAlt?: string;
     logoImage?: string;
@@ -86,6 +88,7 @@ export interface ProjectData {
     };
     buttonText: string;
     icon?: string;
+    iconColor?: string;
     buttonHref: string;
     gtin?: string;
     category?: string;
@@ -242,13 +245,15 @@ export interface ProjectData {
     padding?: string;
     buttonText?: string;
     buttonHref?: string;
+    icon?: string;
+    iconColor?: string;
     cards?: {
       title: string;
       content: string;
       image?: string;
+      imageAlt?: string;
       icon?: string;
-      buttonText?: string;
-      buttonHref?: string;
+      iconColor?: string;
     }[];
   }[];
 }

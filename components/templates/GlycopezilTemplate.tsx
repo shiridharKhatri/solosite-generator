@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { EditableText } from '../editor/EditableText';
 import { EditableImage } from '../editor/EditableImage';
 import { useStore, type ProjectData } from '@/lib/store';
@@ -78,20 +79,140 @@ const Linkable = ({ children, link, onLinkChange, className = "" }: { children: 
   );
 };
 
-// Helper for icon toggle
-const IconEditor = ({ value, onChange, className = "" }: { value: string; onChange: (val: string) => void, className?: string }) => {
-  const icons = ["fa-solid fa-cart-shopping", "fa-solid fa-arrow-right", "fa-solid fa-check", "fa-solid fa-bolt", "fa-solid fa-star", "fa-solid fa-circle-play", "fa-solid fa-cart-arrow-down"];
-  const cycleIcon = () => {
-    const currentIndex = icons.indexOf(value || icons[0]);
-    const nextIndex = (currentIndex + 1) % icons.length;
-    onChange(icons[nextIndex]);
+// Portal helper for floating UI
+const Portal = ({ children }: { children: React.ReactNode }) => {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(children, document.body);
+};
+
+// Helper for Icon Selection and Styling
+const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
+  value?: string;
+  color?: string;
+  onChange: (val: string) => void;
+  onColorChange?: (val: string) => void;
+  className?: string;
+}) => {
+  const [showMenu, setShowMenu] = useState(false);
+  const [pos, setPos] = useState({ x: 0, y: 0 });
+
+  const icons = [
+    "fa-solid fa-cart-shopping",
+    "fa-solid fa-arrow-right",
+    "fa-solid fa-check",
+    "fa-solid fa-bolt",
+    "fa-solid fa-star",
+    "fa-solid fa-circle-play",
+    "fa-solid fa-cart-arrow-down",
+    "fa-solid fa-leaf",
+    "fa-solid fa-shield-halved",
+    "fa-solid fa-certificate",
+    "fa-solid fa-truck-fast"
+  ];
+
+  const colors = [
+    { name: 'Default', value: '' },
+    { name: 'Amber', value: '#fbbf24' },
+    { name: 'Blue', value: '#3b82f6' },
+    { name: 'Emerald', value: '#10b981' },
+    { name: 'Rose', value: '#f43f5e' },
+    { name: 'White', value: '#ffffff' },
+    { name: 'Black', value: '#000000' }
+  ];
+
+  const handleOpen = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setPos({ x: e.clientX, y: e.clientY });
+    setShowMenu(true);
   };
+
   return (
-    <i
-      className={`${value || icons[1]} cursor-pointer hover:scale-125 transition-transform text-current ${className}`}
-      onClick={(e) => { e.stopPropagation(); cycleIcon(); }}
-      title="Click to toggle icon"
-    />
+    <>
+      {value ? (
+        <i
+          className={`${value} cursor-pointer hover:scale-125 transition-all ${className}`}
+          style={{ color: color || 'inherit' }}
+          onClick={handleOpen}
+          onContextMenu={handleOpen}
+          title="Click to customize icon"
+        />
+      ) : (
+        <button
+          onClick={handleOpen}
+          className="bg-white/20 hover:bg-white/40 text-[9px] px-2 py-1 rounded border-none text-white uppercase font-bold tracking-tighter transition-all"
+        >
+          + Add Icon
+        </button>
+      )}
+
+      {showMenu && (
+        <Portal>
+          <div className="fixed inset-0 z-[99998]" onClick={() => setShowMenu(false)} />
+          <div
+            className="fixed bg-white rounded-none shadow-2xl border border-gray-100 p-4 z-[99999] w-64 animate-in fade-in zoom-in duration-200"
+            style={{ left: Math.min(pos.x, typeof window !== 'undefined' ? window.innerWidth - 270 : pos.x), top: Math.min(pos.y, typeof window !== 'undefined' ? window.innerHeight - 350 : pos.y) }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4 border-b pb-2">
+              <span className="text-[10px] font-bold uppercase text-gray-400">Icon Customizer</span>
+              <button onClick={() => setShowMenu(false)} className="text-gray-300 hover:text-dark border-none bg-transparent p-0"><i className="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <div className="mb-4">
+              <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Choose Icon</label>
+              <div className="grid grid-cols-5 gap-2">
+                {icons.map((icon) => (
+                  <button
+                    key={icon}
+                    onClick={() => { onChange(icon); }}
+                    className={`w-8 h-8 flex items-center justify-center rounded border transition-all ${value === icon ? 'border-blue-500 bg-blue-50 text-blue-600' : 'border-gray-100 hover:bg-gray-50 text-gray-400'}`}
+                  >
+                    <i className={icon}></i>
+                  </button>
+                ))}
+                <button
+                  onClick={() => { onChange(''); setShowMenu(false); }}
+                  className="w-8 h-8 flex items-center justify-center rounded border border-red-100 text-red-400 hover:bg-red-50 transition-all"
+                  title="Remove Icon"
+                >
+                  <i className="fa-solid fa-slash"></i>
+                </button>
+              </div>
+            </div>
+
+            {onColorChange && (
+              <div>
+                <label className="text-[9px] font-bold text-gray-500 uppercase mb-2 block">Icon Color</label>
+                <div className="flex flex-wrap gap-2">
+                  {colors.map((c) => (
+                    <button
+                      key={c.value}
+                      onClick={() => onColorChange?.(c.value)}
+                      className={`w-6 h-6 rounded-full border-2 transition-all ${color === c.value ? 'border-blue-500 scale-110' : 'border-gray-200 hover:scale-105'}`}
+                      style={{ backgroundColor: c.value || 'transparent' }}
+                      title={c.name}
+                    >
+                      {!c.value && <i className="fa-solid fa-droplet-slash text-[8px] text-gray-400"></i>}
+                    </button>
+                  ))}
+                  <input
+                    type="color"
+                    value={color || '#000000'}
+                    onChange={(e) => onColorChange?.(e.target.value)}
+                    className="w-6 h-6 p-0 border-none rounded-full cursor-pointer overflow-hidden"
+                  />
+                </div>
+              </div>
+            )}
+
+            <p className="mt-4 text-[9px] text-gray-400 italic">Settings apply to this button icon only.</p>
+          </div>
+        </Portal>
+      )}
+    </>
   );
 };
 
@@ -114,19 +235,20 @@ const getBottleStyle = (idx: number, total: number) => {
 
   const bgIdx = total - 2 - idx;
   const side = bgIdx % 2 === 0 ? -1 : 1;
-  const pairIndex = Math.floor(bgIdx / 2) + 1;
+  const layer = Math.floor(bgIdx / 2) + 1;
 
-  // Slightly wider horizontal alignment for a cleaner, less attached look
-  const x = side * (pairIndex * 44) - 50;
-  const y = -50;
-  const rotate = 0;
-  const scale = 0.95;
-  const zIndex = 50 - pairIndex;
+  // Wider horizontal offset to make side bottles more visible
+  // Increased from 14 to 32 for a better "fan" spread
+  const x = -50 + (side * layer * 32); 
+  const y = -50 - (layer * 2); 
+  const rotate = side * (layer * 4);
+  const scale = 1.1 - (layer * 0.05); 
+  const zIndex = 100 - layer;
 
   return {
-    transform: `translate(${x}%, ${y}%) rotate(${rotate}deg) scale(${scale})`,
+    transform: `translate(${x}%, ${y}%) scale(${scale}) rotate(${rotate}deg)`,
     zIndex,
-    filter: `drop-shadow(0 15px 30px rgba(0,0,0,0.12))`
+    filter: `drop-shadow(0 20px 40px rgba(0,0,0,0.12))`
   };
 };
 
@@ -142,7 +264,7 @@ const BottleStack = ({ src, alt, multiplier, onChange, onAltChange }: {
   const indices = Array.from({ length: safeCount }, (_, i) => i);
 
   return (
-    <div className="relative h-[180px] w-full overflow-visible perspective-[1200px]">
+    <div className="relative h-[220px] w-full overflow-visible perspective-[1200px] flex items-center justify-center">
       {indices.map((idx) => {
         const isMain = idx === indices.length - 1;
         const style = getBottleStyle(idx, indices.length);
@@ -536,10 +658,15 @@ export const GlycopezilTemplate: React.FC = () => {
                 updateNavbar({ links: nl });
               }} label="Link" />
               <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
-                <button className="btn-custom-pill">
+                <div className="btn-custom-pill cursor-pointer">
                   <EditableText tagName="span" value="Order Now" onChange={() => { }} />
-                  <IconEditor value={projectData.hero.icon || "fa-solid fa-arrow-right"} onChange={(val) => updateHero({ icon: val })} />
-                </button>
+                  <IconEditor
+                    value={projectData.hero.icon}
+                    color={projectData.hero.iconColor}
+                    onChange={(val) => updateHero({ icon: val })}
+                    onColorChange={(val) => updateHero({ iconColor: val })}
+                  />
+                </div>
               </Linkable>
             </div>
             <div className="d-flex align-items-center gap-2 d-lg-none ms-auto">
@@ -562,10 +689,15 @@ export const GlycopezilTemplate: React.FC = () => {
                 <a key={i} href={link.href} className="fs-5 fw-bold text-dark no-underline cursor-pointer" onClick={() => setIsMenuOpen(false)}>{link.label}</a>
               ))}
               <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
-                <button className="btn-custom-pill w-100">
+                <div className="btn-custom-pill w-100 cursor-pointer">
                   <EditableText tagName="span" value="Order Now" onChange={() => { }} />
-                  <IconEditor value={projectData.hero.icon || "fa-solid fa-arrow-right"} onChange={(val) => updateHero({ icon: val })} />
-                </button>
+                  <IconEditor
+                    value={projectData.hero.icon}
+                    color={projectData.hero.iconColor}
+                    onChange={(val) => updateHero({ icon: val })}
+                    onColorChange={(val) => updateHero({ iconColor: val })}
+                  />
+                </div>
               </Linkable>
             </div>
           )}
@@ -573,7 +705,7 @@ export const GlycopezilTemplate: React.FC = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="container-fluid pb-2 mb-2 bg-white overflow-hidden" style={{ paddingTop: '3rem' }}>
+      <section className="container-fluid pb-2 mb-2 bg-white" style={{ paddingTop: '3rem' }}>
         <div className="container">
           <div className="row align-items-stretch justify-content-center">
             {/* Image Column - Left on desktop, top on mobile */}
@@ -699,15 +831,26 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="mt-4">
                 <div className="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center">
                   <Linkable link={projectData.hero.buttonHref} onLinkChange={(val) => updateHero({ buttonHref: val })}>
-                    <div className="btn-custom-pill px-5 py-2.5 fs-6">
+                    <div className="btn-custom-pill px-5 py-2.5 fs-6 cursor-pointer">
                       <EditableText tagName="span" value={projectData.hero.buttonText} onChange={(val) => updateHero({ buttonText: val })} />
-                      <IconEditor value={projectData.hero.icon || "fa-solid fa-cart-shopping"} onChange={(val) => updateHero({ icon: val })} />
+                      <IconEditor
+                        value={projectData.hero.icon}
+                        color={projectData.hero.iconColor}
+                        onChange={(val) => updateHero({ icon: val })}
+                        onColorChange={(val) => updateHero({ iconColor: val })}
+                      />
                     </div>
                   </Linkable>
                   <Linkable link={projectData.hero.secondaryButtonHref || ''} onLinkChange={(val) => updateHero({ secondaryButtonHref: val })}>
-                    <div className="btn-custom-pill px-5 py-2.5 fs-6" style={{ backgroundColor: 'transparent', border: '2px solid #ddd' }}>
+                    <div className="btn-custom-pill px-5 py-2.5 fs-6 cursor-pointer" style={{ backgroundColor: 'transparent', border: '2px solid #ddd' }}>
                       <EditableText tagName="span" value={projectData.hero.secondaryButtonText || 'Visit Official Site Now!'} onChange={(val) => updateHero({ secondaryButtonText: val })} />
-                      <IconEditor className="text-dark" value={projectData.hero.secondaryIcon || "fa-solid fa-arrow-right"} onChange={(val) => updateHero({ secondaryIcon: val })} />
+                      <IconEditor
+                        className="text-dark"
+                        value={projectData.hero.secondaryIcon}
+                        color={projectData.hero.secondaryIconColor}
+                        onChange={(val) => updateHero({ secondaryIcon: val })}
+                        onColorChange={(val) => updateHero({ secondaryIconColor: val })}
+                      />
                     </div>
                   </Linkable>
                 </div>
@@ -1038,10 +1181,15 @@ export const GlycopezilTemplate: React.FC = () => {
                       onChange={(val) => useStore.getState().updateProjectData({ guaranteeDescription: val })}
                     />
                     <Linkable link={projectData.hero.buttonHref} onLinkChange={() => { }}>
-                      <button className="btn-custom-pill mt-4 px-8 py-3 fs-5 w-full md:w-auto">
+                      <div className="btn-custom-pill mt-4 px-8 py-3 fs-5 w-full md:w-auto cursor-pointer d-inline-flex align-items-center justify-content-center gap-2">
                         Grab Your Risk-Free Package
-                        <IconEditor value="fa-solid fa-cart-arrow-down" onChange={() => { }} />
-                      </button>
+                        <IconEditor
+                          value={projectData.hero.icon}
+                          color={projectData.hero.iconColor}
+                          onChange={(val) => updateHero({ icon: val })}
+                          onColorChange={(val) => updateHero({ iconColor: val })}
+                        />
+                      </div>
                     </Linkable>
                   </div>
                 </div>
@@ -1085,7 +1233,7 @@ export const GlycopezilTemplate: React.FC = () => {
                     <div className="card h-100 border-0 shadow-sm bg-white hover:-translate-y-2 transition-all duration-300 rounded-[2.5rem] p-4 group">
                       <div className="relative">
                         <RemoveButton onClick={() => removeIngredient(i)} />
-                        <div className={`w-40 h-40 ${item.isCircular ? 'rounded-full' : 'rounded-none'} overflow-hidden border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner`} style={{ borderColor: '#fcfcfc', boxShadow: `0 0 0 2px ${projectData.theme?.secondary || '#fbbf24'}` }}>
+                        <div className={`w-40 h-40 ${item.isCircular ? 'rounded-full' : 'rounded-none'} border-[10px] mx-auto mb-4 bg-gray-50 shadow-inner`} style={{ borderColor: '#fcfcfc', boxShadow: `0 0 0 2px ${projectData.theme?.secondary || '#fbbf24'}` }}>
                           <EditableImage
                             src={item.image || '/image/ingredient-schisandra.png'}
                             alt={item.imageAlt || item.title}
@@ -1158,10 +1306,10 @@ export const GlycopezilTemplate: React.FC = () => {
               <div className="row g-4 justify-content-center">
                 {projectData.testimonials.items.map((item, i) => (
                   <div key={i} className="col-12 col-md-6 col-lg-4">
-                    <div className="card h-100 border-0 shadow-sm bg-white rounded-[2rem] p-4 group relative overflow-hidden">
+                    <div className="card h-100 border-0 shadow-sm bg-white rounded-[2rem] p-4 group relative">
                       <RemoveButton onClick={() => removeTestimonial(i)} />
                       <div className="d-flex align-items-center gap-3 mb-4">
-                        <div className={`w-16 h-16 ${item.isCircular ? 'rounded-full' : 'rounded-none'} overflow-hidden border-2 border-warning shadow-sm`}>
+                        <div className={`w-16 h-16 ${item.isCircular ? 'rounded-full' : 'rounded-none'} border-2 border-warning shadow-sm`}>
                           <EditableImage
                             src={item.image || "https://i.pravatar.cc/150"}
                             alt={item.imageAlt || item.name}
@@ -1310,7 +1458,7 @@ export const GlycopezilTemplate: React.FC = () => {
                           />
 
                           {/* Premium Red Multiplier Badge on Bottles */}
-                          <div className="absolute -bottom-4 right-1/4 z-20 pointer-events-auto rotate-[5deg]">
+                          <div className="absolute bottom-6 right-2 z-20 pointer-events-auto rotate-[5deg]">
                             <EditableText
                               className="bg-red-600 text-white px-4 py-1.5 rounded-full fw-black text-sm border-[3px] border-white shadow-xl min-w-[50px] tracking-widest uppercase flex items-center justify-center hover:scale-110 transition-transform duration-300"
                               value={plan.multiplier || "X1"}
@@ -1380,7 +1528,10 @@ export const GlycopezilTemplate: React.FC = () => {
                       </Linkable>
 
                       <div className="mt-3 flex items-center justify-center gap-1 opacity-50 font-bold text-[10px]">
-                        <IconEditor value={plan.guaranteeBadge?.icon || "fa-solid fa-lock"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })} />
+                        <IconEditor
+                          value={plan.guaranteeBadge?.icon}
+                          onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), icon: val } })}
+                        />
                         <EditableText tagName="span" value={plan.guaranteeBadge?.text || "60-DAY MONEY-BACK GUARANTEE"} onChange={(val) => updatePricing(i, { guaranteeBadge: { ...(plan.guaranteeBadge || { text: '60-DAY MONEY-BACK GUARANTEE', icon: 'fa-solid fa-lock' }), text: val } })} />
                       </div>
                     </div>
