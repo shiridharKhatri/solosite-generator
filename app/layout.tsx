@@ -28,6 +28,9 @@ export default function RootLayout({
       lang="en"
       className={`${manrope.variable} ${inter.variable} h-full antialiased`}
     >
+      <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+      </head>
       <body className="min-h-full">
         <Providers>{children}</Providers>
       </body>
