@@ -417,14 +417,39 @@ Sitemap: ${baseUrl}/sitemap.xml`);
         transform: translateY(-5px);
         background: #fff;
       }
+      .navbar {
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        border-bottom: 1px solid rgba(0,0,0,0.05) !important;
+      }
+      .navbar-scrolled {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.9) !important;
+        backdrop-filter: blur(12px) saturate(180%);
+        -webkit-backdrop-filter: blur(12px) saturate(180%);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08) !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        z-index: 9999 !important;
+        animation: navSlideDown 0.4s ease-out;
+      }
+      @keyframes navSlideDown {
+        from { transform: translateY(-100%); }
+        to { transform: translateY(0); }
+      }
     </style>
     <script>
       window.addEventListener('scroll', function() {
         const btn = document.getElementById('scroll-to-top');
+        const nav = document.querySelector('.navbar');
         if (window.pageYOffset > 300) {
           btn.classList.add('visible');
+          nav.classList.add('navbar-scrolled');
         } else {
           btn.classList.remove('visible');
+          nav.classList.remove('navbar-scrolled');
         }
       });
     </script>
@@ -653,7 +678,7 @@ ${seoBlock}
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg sticky-top border-bottom bg-white py-2">
+        <nav class="navbar navbar-expand-lg border-bottom bg-white py-2">
             <div class="container px-3 d-flex justify-content-between align-items-center mx-auto">
                 <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
                     ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
