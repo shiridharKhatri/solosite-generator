@@ -36,17 +36,17 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
   };
 
   return (
-    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-xl px-5 py-3 w-full max-w-lg shadow-xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
+    <div className={`relative group/timer flex items-center justify-between bg-[#cc1d1d] text-white rounded-[2rem] px-8 py-4 w-full max-w-lg shadow-2xl animate-pulse transition-all hover:scale-[1.01] cursor-default ${className}`}>
       <button
         onClick={(e) => { e.stopPropagation(); onUpdate({ enabled: false }); }}
-        className="absolute -top-2 -right-2 bg-gray-800 text-white w-5 h-5 rounded-full flex items-center justify-center opacity-0 group-hover/timer:opacity-100 transition-all z-20 hover:bg-red-500 border-none shadow-lg"
+        className="absolute -top-2 -right-2 bg-gray-800 text-white w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover/timer:opacity-100 transition-all z-20 hover:bg-red-500 border-none shadow-lg"
       >
-        <i className="fa-solid fa-xmark text-[10px]"></i>
+        <i className="fa-solid fa-xmark text-[11px]"></i>
       </button>
 
       <div className="flex flex-col items-start gap-0.5">
         <EditableText
-          className="text-[14px] font-black uppercase leading-tight tracking-wider font-serif"
+          className="text-[15px] font-black uppercase leading-tight tracking-wider font-serif"
           value={title}
           onChange={(val) => onUpdate({ title: val })}
         />
@@ -58,7 +58,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
       </div>
 
       <div
-        className="bg-white text-black rounded-lg px-3 py-1.5 min-w-[85px] flex items-center justify-center shadow-inner cursor-pointer hover:bg-gray-100 transition-colors"
+        className="bg-white text-black rounded-full px-6 py-2.5 min-w-[100px] flex items-center justify-center shadow-xl cursor-pointer hover:bg-gray-100 transition-colors"
         onClick={(e) => {
           e.stopPropagation();
           const newMins = prompt('Enter timer minutes:', minutes.toString());
@@ -68,7 +68,7 @@ export const CountdownTimer: React.FC<CountdownTimerProps> = ({ minutes, text, o
         }}
         title="Click to edit timer duration"
       >
-        <div className="text-[22px] font-black tabular-nums tracking-tighter">
+        <div className="text-[24px] font-black tabular-nums tracking-tighter">
           {formatTime(timeLeft)}
         </div>
       </div>

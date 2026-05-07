@@ -1278,13 +1278,13 @@ ${sourcesHtml}
 
             ${data.timer?.enabled ? `
             <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
-                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white px-4 py-3 w-100 shadow-lg" style="max-width: 500px; border-radius: 12px; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;">
+                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white px-5 px-md-5 py-3 w-100 shadow-lg" style="max-width: 500px; border-radius: 2rem; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; padding: 1rem 2rem !important;">
                     <div class="d-flex flex-column align-items-start">
-                        <div class="text-[14px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 14px; font-weight: 800;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
+                        <div class="text-[15px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 15px; font-weight: 900;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
                         <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
                     </div>
-                    <div class="bg-white text-black px-3 py-2 d-flex align-items-center justify-content-center shadow-inner" style="background-color: white; color: black; border-radius: 8px; min-width: 80px;">
-                        <div class="fs-4 fw-bold tabular-nums tracking-tighter" id="timer-display" style="font-size: 20px; font-weight: 800;">00:00</div>
+                    <div class="bg-white text-black px-4 py-2 d-flex align-items-center justify-content-center shadow-xl" style="background-color: white; color: black; border-radius: 9999px; min-width: 100px;">
+                        <div class="fs-3 fw-bold tabular-nums tracking-tighter" id="timer-display" style="font-size: 24px; font-weight: 900;">00:00</div>
                     </div>
                 </div>
             </div>
