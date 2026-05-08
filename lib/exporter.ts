@@ -187,7 +187,7 @@ export async function generateProjectZip(data: any) {
 
     const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map(page => `  <url>
+${pages.map((page: any) => `  <url>
     <loc>${baseUrl}/${page.loc}</loc>
     <lastmod>${lastMod}</lastmod>
     <changefreq>${page.changefreq}</changefreq>
@@ -196,29 +196,14 @@ ${pages.map(page => `  <url>
 </urlset>`;
     zip.file("sitemap.xml", sitemap);
 
-    // DYNAMIC SITEMAP (PHP) - Auto-detects domain for Hostinger/PHP hosts
-    const sitemapPhp = `<?php
-header('Content-Type: application/xml; charset=utf-8');
-$protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http");
-$host = $_SERVER['HTTP_HOST'];
-$domain = $protocol . "://" . $host;
-$lastMod = "${lastMod}";
-echo '<?xml version="1.0" encoding="UTF-8"?>';
-?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${pages.map(page => `  <url>
-    <loc><?php echo $domain; ?>/${page.loc}</loc>
-    <lastmod><?php echo $lastMod; ?></lastmod>
-    <changefreq>${page.changefreq}</changefreq>
-    <priority>${page.priority}</priority>
-  </url>`).join('\n')}
-</urlset>`;
-    zip.file("sitemap.php", sitemapPhp);
-
     zip.file("robots.txt", `User-agent: *
 Allow: /
 
+# Sitemap Location
 Sitemap: ${baseUrl}/sitemap.xml`);
+
+    const primaryColor = data.theme?.primary || '#2C0D67';
+    const secondaryColor = data.theme?.secondary || '#fbbf24';
 
     // Order Page (order.html) - Professional high-trust redirect
     const orderLink = data.orderLink || 'https://example.com';
@@ -226,54 +211,88 @@ Sitemap: ${baseUrl}/sitemap.xml`);
 <html lang="en-US">
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
-    <meta http-equiv="Refresh" content="1.5; URL=${orderLink}" />
-    <title>Redirecting to Checkout | ${data.productName}</title>
+    <meta http-equiv="Refresh" content="2.0; URL=${orderLink}" />
+    <title>Securing Connection | ${data.productName}</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
+        body { font-family: 'Inter', sans-serif; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        .spinner { border: 3px solid rgba(0,0,0,0.1); border-top-color: #3b82f6; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
-        .fade-in { animation: fadeIn 0.5s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .spinner { 
+            border: 2px solid rgba(0,0,0,0.05); 
+            border-top-color: ${primaryColor}; 
+            border-radius: 50%; 
+            width: 32px; 
+            height: 32px; 
+            animation: spin 0.8s linear infinite; 
+        }
+        .fade-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .progress-line {
+            height: 2px;
+            width: 100%;
+            background: #f1f5f9;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            width: 0;
+            background: ${primaryColor};
+            transition: width 2s cubic-bezier(0.65, 0, 0.35, 1);
+        }
     </style>
 </head>
-<body class="bg-slate-50 flex items-center justify-center min-h-screen font-sans antialiased text-slate-900">
-    <div class="max-w-sm w-full mx-auto p-8 text-center fade-in">
-        <div class="mb-8 flex justify-center">
-            <div class="spinner"></div>
+<body class="bg-[#fcfcf9] flex items-center justify-center min-h-screen antialiased text-slate-900">
+    <div class="max-w-[400px] w-full mx-auto px-6 py-12 text-center fade-in">
+        <div class="mb-10 flex justify-center">
+            <div class="relative">
+                <div class="spinner"></div>
+                <div class="absolute inset-0 flex items-center justify-center">
+                    <div class="w-1 h-1 rounded-full" style="background-color: ${primaryColor};"></div>
+                </div>
+            </div>
         </div>
         
-        <h1 class="text-xl font-bold mb-2 tracking-tight">Securing Your Connection</h1>
-        <p class="text-slate-500 text-sm leading-relaxed mb-6">
-            Please wait while we securely transfer you to the official checkout page for <strong>${data.productName}</strong>.
+        <h1 class="text-2xl font-bold mb-3 tracking-tight text-slate-800">Securing Your Connection</h1>
+        <p class="text-slate-500 text-[15px] leading-relaxed mb-10">
+            Please wait while we securely transfer you to the official checkout page for <span class="font-semibold text-slate-800">${data.productName}</span>.
         </p>
 
-        <div class="space-y-4">
-            <div class="h-1 w-full bg-slate-200 rounded-full overflow-hidden">
-                <div class="h-full bg-blue-600 rounded-full transition-all duration-[1500ms] w-0" id="progress-bar"></div>
+        <div class="space-y-8">
+            <div class="progress-line">
+                <div class="progress-bar" id="progress-bar"></div>
             </div>
             
-            <a href="${orderLink}" class="text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-blue-600 transition-colors">
+            <a href="${orderLink}" class="inline-block text-[11px] font-bold uppercase tracking-[0.1em] text-slate-400 hover:text-slate-900 transition-colors duration-300">
                 Click here if not redirected automatically
             </a>
+        </div>
+        
+        <div class="mt-20 flex items-center justify-center gap-4 opacity-30 grayscale">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-3" />
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-5" />
         </div>
     </div>
 
     <script>
-        setTimeout(() => {
-            document.getElementById('progress-bar').style.width = '100%';
-        }, 50);
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('progress-bar').style.width = '100%';
+            }, 100);
+        });
         
-        // Fallback redirect if meta fails
+        // Final fallback
         setTimeout(() => {
             window.location.href = "${orderLink}";
-        }, 3000);
+        }, 3500);
     </script>
 </body>
 </html>`;
     zip.file("order.html", orderHtml);
-
-    const primaryColor = data.theme?.primary || '#2C0D67';
-    const secondaryColor = data.theme?.secondary || '#fbbf24';
     const layoutStyle = data.layoutStyle || 'default';
     const customCss = '';
 
@@ -600,7 +619,7 @@ ${customTagsHtml}
     ${seo.headerScripts ? `<!-- Header Scripts -->\n    ${seo.headerScripts}` : ''}
     `;
 
-    if (layoutStyle === 'default' || layoutStyle === 'glycopezil') {
+    if (layoutStyle !== 'organic') {
         cssContent = `
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 html, body { overflow-x: hidden; overflow-y: auto; scroll-behavior: smooth; margin: 0; padding: 0; }
@@ -648,65 +667,9 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
 [style*="text-align: justify"] { text-align: justify !important; }
 
 `;
-        htmlContent = `<!DOCTYPE html>
-<html lang="en-US">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-${seoBlock}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css" />
-    <style>
-      .sectioncolor { background-color: ${primaryColor}; color: white; }
-            .sectioncolor1 { background-color: #f8f9fa; }
-      .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
-      .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
-      .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
-      .pricing-card { border-radius: 2rem; transition: all 0.3s; }
-      .pricing-card.primary { border: 4px solid ${secondaryColor} !important; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
-            .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s; }
-      .testimonial-card:hover { transform: translateY(-5px); }
-      .avatar-frame { width: 64px; height: 64px; border-radius: 50%; border: 2px solid ${secondaryColor}; }
-      .accordion-button:not(.collapsed) { background-color: ${primaryColor}10; color: ${primaryColor}; }
-      .accordion-button:focus { box-shadow: none; }
-      .btn-custom-pill { box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; }
-      .opacity-25 { opacity: 0.25; }
-      .opacity-50 { opacity: 0.5; }
-      .opacity-75 { opacity: 0.75; }
-    </style>
-</head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-lg border-bottom bg-white py-2">
-            <div class="container px-3 d-flex justify-content-between align-items-center mx-auto">
-                <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
-                    <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
-                </a>
-                <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
-                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Order Now</a>
-                    <button class="navbar-toggler border-0 shadow-none px-2 ms-2 flex-shrink-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                        <i class="fa-solid fa-bars fs-3 text-dark"></i>
-                    </button>
-                </div>
 
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
-                        ${(data.navbar?.links || []).filter((link: any) => {
-            if (link.href?.startsWith('#')) {
-                const sectionName = link.href.substring(1);
-                if ((data.sections as any)?.[sectionName] === false) return false;
-            }
-            return true;
-        }).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
-                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
-                    </div>
-                </div>
-            </div>
-        </nav>
-    </header>
-
+        const sections: Record<string, string> = {
+            hero: `
     <style>
         .hero-row { display: flex; flex-wrap: wrap; align-items: stretch; }
         .hero-img-col { display: flex; flex-direction: column; align-items: center; justify-content: center; }
@@ -769,12 +732,8 @@ ${seoBlock}
                 </div>
             </div>
         </div>
-    </section>
-
-    ${renderCustomSections('hero')}
-
-    <!-- Features -->
-    ${(data.sections?.features !== false) ? `
+    </section>`,
+            features: (data.sections?.features !== false) ? `
     <section id="features" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.featuresTitle || 'Features'}</h2>
@@ -790,12 +749,8 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('features')}
-
-    <!-- About -->
-    ${(data.sections?.about !== false) ? `
+    </section>` : '',
+            about: (data.sections?.about !== false) ? `
     <section id="about" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.about?.title || 'About'}</h2>
@@ -816,12 +771,8 @@ ${seoBlock}
                 <div class="fs-5 text-muted about-description" style="line-height: 1.7; text-align: justify; color: #444 !important;">${data.about?.description}</div>
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('about')}
-
-    <!-- Research -->
-    ${(data.sections?.research !== false && data.research) ? `
+    </section>` : '',
+            research: (data.sections?.research !== false && data.research) ? `
     <section id="research" class="container-fluid text-center sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.research.title}</h2>
@@ -849,12 +800,8 @@ ${seoBlock}
                 </div>
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('research')}
-
-    <!-- Benefits -->
-    ${(data.sections?.benefits !== false) ? `
+    </section>` : '',
+            benefits: (data.sections?.benefits !== false) ? `
     <section id="benefits" class="container-fluid text-center sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.benefits?.title || 'Benefits'}</h2>
@@ -870,12 +817,8 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('benefits')}
-
-    <!-- Ingredients -->
-    ${(data.sections?.ingredients !== false) ? `
+    </section>` : '',
+            ingredients: (data.sections?.ingredients !== false) ? `
     <section id="ingredients" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.ingredients?.title || 'Ingredients'}</h2>
@@ -899,11 +842,8 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('ingredients')}
-
-    <!-- Money Back -->
+    </section>` : '',
+            guarantee: `
     <section id="guarantee" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.guaranteeTitle || 'Guarantee'}</h2>
@@ -926,12 +866,8 @@ ${seoBlock}
                 </div>
             </div>
         </div>
-    </section>
-
-    ${renderCustomSections('guarantee')}
-
-    <!-- Pricing -->
-    ${(data.sections?.pricing !== false) ? `
+    </section>`,
+            pricing: (data.sections?.pricing !== false) ? `
     <section id="pricing" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.pricingTitle || 'Pricing'}</h2>
@@ -967,12 +903,8 @@ ${seoBlock}
             </div></div>
             `).join('')}
         </div></div>
-    </section>` : ''}
-
-    ${renderCustomSections('pricing')}
-
-    <!-- Testimonials -->
-    ${(data.sections?.testimonials !== false && data.testimonials) ? `
+    </section>` : '',
+            testimonials: (data.sections?.testimonials !== false && data.testimonials) ? `
     <section id="testimonials" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.testimonials.title}</h2>
@@ -1001,20 +933,20 @@ ${seoBlock}
                         </div>
                         <div class="mb-3 text-warning d-flex gap-1">
                             ${[...Array(5)].map((_, idx) => {
-            const fill = idx + 1;
-            const rating = Number(item.rating || 5);
-            if (rating >= fill) {
-                return `<i class="fa-solid fa-star"></i>`;
-            } else if (rating >= fill - 0.5) {
-                return `
+                const fill = idx + 1;
+                const rating = Number(item.rating || 5);
+                if (rating >= fill) {
+                    return `<i class="fa-solid fa-star"></i>`;
+                } else if (rating >= fill - 0.5) {
+                    return `
                                     <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
                                         <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; opacity: 0.25;"></i>
                                         <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
                                     </span>`;
-            } else {
-                return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
-            }
-        }).join('')}
+                } else {
+                    return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
+                }
+            }).join('')}
                         </div>
                         <div style="position: relative;">
                             <i class="fa-solid fa-quote-left" style="position: absolute; top: -10px; left: -10px; opacity: 0.1; font-size: 2rem;"></i>
@@ -1025,12 +957,8 @@ ${seoBlock}
                 `).join('')}
             </div>
         </div>
-    </section>` : ''}
-
-    ${renderCustomSections('testimonials')}
-
-    <!-- FAQ -->
-    ${(data.sections?.faq !== false && data.faq?.length) ? `
+    </section>` : '',
+            faq: (data.sections?.faq !== false && data.faq?.length) ? `
     <section id="faq" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
             <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.faqTitle || 'FAQ'}</h2>
@@ -1055,11 +983,78 @@ ${seoBlock}
                 </div>
             </div>
         </div>
-    </section>` : ''}
+    </section>` : '',
+            sources: sourcesHtml
+        };
 
-    ${renderCustomSections('faq')}
+        const sectionOrder = data.sectionOrder || ['hero', 'features', 'about', 'research', 'benefits', 'guarantee', 'ingredients', 'testimonials', 'pricing', 'faq', 'sources'];
 
-${sourcesHtml}
+        htmlContent = `<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+${seoBlock}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css" />
+    <style>
+      .sectioncolor { background-color: ${primaryColor}; color: white; }
+            .sectioncolor1 { background-color: #f8f9fa; }
+      .ingredient-card { background: white; border-radius: 2.5rem; padding: 2rem; height: 100%; transition: all 0.3s; display: flex; flex-direction: column; align-items: center; text-align: center; position: relative; border: none !important; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+      .ingredient-card:hover { transform: translateY(-8px); box-shadow: 0 15px 45px rgba(0,0,0,0.1); }
+      .ingredient-img-frame { width: 160px; height: 160px; border: 10px solid #fcfcfc; background: #f9fafb; margin-bottom: 1.5rem; box-shadow: inset 0 2px 4px rgba(0,0,0,0.05); }
+      .pricing-card { border-radius: 2rem; transition: all 0.3s; }
+      .pricing-card.primary { border: 4px solid ${secondaryColor} !important; transform: scale(1.05); z-index: 10; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+            .testimonial-card { border-radius: 2rem; border: none; box-shadow: 0 10px 30px rgba(0,0,0,0.05); transition: all 0.3s; }
+      .testimonial-card:hover { transform: translateY(-5px); }
+      .avatar-frame { width: 64px; height: 64px; border-radius: 50%; border: 2px solid ${secondaryColor}; }
+      .accordion-button:not(.collapsed) { background-color: ${primaryColor}10; color: ${primaryColor}; }
+      .accordion-button:focus { box-shadow: none; }
+      .btn-custom-pill { box-shadow: 0 4px 15px rgba(0,0,0,0.1); transition: all 0.3s; }
+      .opacity-25 { opacity: 0.25; }
+      .opacity-50 { opacity: 0.5; }
+      .opacity-75 { opacity: 0.75; }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg border-bottom bg-white py-2">
+            <div class="container px-3 d-flex justify-content-between align-items-center mx-auto">
+                <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
+                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" style="height: 40px; width: auto;" alt="${data.hero?.logoImageAlt || 'Logo'}" />` : ''}
+                    <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
+                </a>
+                <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
+                    <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill py-2 px-3 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700; font-family: 'Outfit', sans-serif; max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Order Now</a>
+                    <button class="navbar-toggler border-0 shadow-none px-2 ms-2 flex-shrink-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                        <i class="fa-solid fa-bars fs-3 text-dark"></i>
+                    </button>
+                </div>
+
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <div class="navbar-nav ms-auto align-items-center gap-4 mt-3 mt-lg-0 pb-3 pb-lg-0 text-center">
+                        ${(data.navbar?.links || []).filter((link: any) => {
+            if (link.href?.startsWith('#')) {
+                const sectionName = link.href.substring(1);
+                if ((data.sections as any)?.[sectionName] === false) return false;
+            }
+            return true;
+        }).map((link: any) => `<a href="${link.href}" class="nav-link text-dark fs-5 fw-bold text-decoration-none w-100">${link.label}</a>`).join('')}
+                        <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill text-decoration-none d-none d-lg-inline-block" style="background-color: ${secondaryColor} !important; color: #000 !important;">Order Now <i class="${data.hero?.icon || 'fa-solid fa-arrow-right'}"></i></a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="d-flex flex-column">
+        ${renderCustomSections('top')}
+        ${sectionOrder.map((key: string) => `
+            ${sections[key] || ''}
+            ${renderCustomSections(key)}
+        `).join('')}
+    </div>
 
     <!-- Footer -->
     <footer class="navcolor text-white py-5 text-center">
@@ -1074,11 +1069,322 @@ ${sourcesHtml}
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     ${socialProofBlock}
+    ${scrollToTopBlock}
     ${seo.footerScripts ? `<!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}
 </body>
 </html>`;
     }
     else if (layoutStyle === 'organic') {
+        const sections: Record<string, string> = {
+            hero: `
+    <section class="py-5 overflow-hidden section-reveal">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
+                    <h1 class="display-3 fw-bold mb-3" style="line-height: 0.9;">${data.hero?.title}</h1>
+                    <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${data.hero?.subtitle}</p>
+                    <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center">
+                        <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
+                            <span>${data.hero?.buttonText}</span>
+                            ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}
+                        </a>
+                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>` : ''}
+                    </div>
+                </div>
+                <div class="col-12 col-lg-5">
+                    <div class="position-relative">
+                        <div class="position-absolute organic-blob bg-stone-100 rotate-12" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(12deg) translateX(20px);"></div>
+                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]" style="position: relative; z-index: 10;">
+                            <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                        </div>
+                        ${data.hero?.badge?.enabled ? `
+                        <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
+                            <img src="${data.hero.badge.image}" alt="${data.hero.badge.imageAlt || 'Badge'}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>`,
+            logos: `
+    <section class="py-4 border-top border-bottom" style="background-color: white;">
+        <div class="container">
+            <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
+                ${(data.logos || []).map((logo: any) => `
+                <div style="width: 80px;">
+                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" />
+                </div>`).join('')}
+            </div>
+
+            ${data.timer?.enabled ? `
+            <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
+                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white w-100 shadow-lg" style="max-width: 500px; border-radius: 2rem; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; padding: 0.65rem 0.65rem 0.65rem 2rem !important;">
+                    <div class="d-flex flex-column align-items-start">
+                        <div class="text-[15px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 15px; font-weight: 900;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
+                        <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
+                    </div>
+                    <div class="bg-white text-black px-4 py-1.5 d-flex align-items-center justify-content-center shadow-xl" style="background-color: white; color: black; border-radius: 9999px; min-width: 95px;">
+                        <div class="fs-3 fw-bold tabular-nums tracking-tighter" id="timer-display" style="font-size: 22px; font-weight: 900;">00:00</div>
+                    </div>
+                </div>
+            </div>
+            <script>
+                (function() {
+                    let time = ${data.timer.minutes || 3} * 60;
+                    const display = document.getElementById('timer-display');
+                    function update() {
+                        const m = Math.floor(time / 60);
+                        const s = time % 60;
+                        display.innerText = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
+                        if (time > 0) { 
+                            time--; 
+                        } else {
+                            time = ${data.timer.minutes || 3} * 60;
+                        }
+                        setTimeout(update, 1000);
+                    }
+                    update();
+                })();
+            </script>` : ''}
+        </div>
+    </section>`,
+            ingredients: data.sections?.ingredients !== false ? `
+    <section id="ingredients" class="py-5 section-reveal" style="background-color: var(--org-accent);">
+        <div class="container py-lg-5 text-center">
+            <i class="fa-solid fa-leaf mb-3 text-2xl" style="color: var(--org-secondary);"></i>
+            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2.5rem;">${data.ingredients?.title || 'From the Earth'}</h2>
+            ${data.ingredients?.subtitle ? `<p class="text-[#4A3B2E] font-serif text-lg mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p>` : ''}
+            
+            <div class="row g-4 mt-4">
+                ${(data.ingredients?.items || []).map((item: any) => `
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="organic-card p-4 h-100 text-center bg-white">
+                        <div class="mx-auto mb-4 organic-blob" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
+                            <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" />
+                        </div>
+                        <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${item.title}</h4>
+                        <p class="mb-0 text-[#4A3B2E] small">${item.description}</p>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : '',
+            features: data.sections?.features !== false ? `
+    <section id="features" class="py-5 bg-white section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-2" style="color: var(--org-primary); font-size: 2.2rem;">${data.featuresTitle || 'Our Philosophy'}</h2>
+                <div class="w-12 h-0.5 bg-green-800 mx-auto mt-3" style="width: 50px; height: 2px; background: #1e3932;"></div>
+            </div>
+            <div class="row g-0 border border-[#E6D5C3]">
+                ${(data.features || []).map((f: any) => `
+                <div class="col-12 col-md-3 border-end border-bottom border-[#E6D5C3] p-5 text-center transition-colors hover:bg-stone-50">
+                    <img src="${f.image}" alt="${f.title}" class="w-12 h-12 mx-auto mb-4" style="width: 48px; height: 48px;" />
+                    <h4 class="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest">${f.title}</h4>
+                    <p class="mb-0 text-stone-700 text-xs">${f.description}</p>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : '',
+            research: data.research && data.sections?.research !== false ? `
+    <section id="research" class="py-5 bg-[#F9F7F2] section-reveal">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-6">
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-3 d-block">Scientific Verification</span>
+                    <h2 class="fw-bold mb-4 font-serif" style="color: var(--org-primary); font-size: 2.5rem;">${data.research.title}</h2>
+                    <p class="fs-5 text-stone-700 mb-4 italic">${data.research.subtitle}</p>
+                    <div class="text-stone-700 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
+                    <div class="row g-4 pt-4 border-top border-[#E6D5C3]">
+                        ${(data.research.stats || []).map((stat: any) => `
+                        <div class="col-4">
+                            <div class="fw-bold fs-3 text-stone-800">${stat.value}</div>
+                            <div class="text-stone-600 small uppercase tracking-tighter" style="font-size: 10px;">${stat.label}</div>
+                        </div>`).join('')}
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="position-relative">
+                        <div class="position-absolute organic-blob bg-stone-100 -rotate-6" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(-6deg) translateX(20px);"></div>
+                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
+                            <img src="${data.research.image}" alt="Research Data" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : '',
+            about: data.sections?.about !== false && data.about ? `
+    <section id="about" class="py-5 bg-white section-reveal">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h2 class="display-5 fw-bold mb-4" style="color: var(--org-primary);">${data.about.title || 'The Botanical Journal'}</h2>
+            </div>
+            <div class="row g-5 align-items-center">
+                <div class="col-lg-5 text-center">
+                    <div class="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
+                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" />
+                    </div>
+                </div>
+                <div class="col-lg-7">
+                    <div class="ps-lg-4 border-start border-4 border-success border-opacity-25" style="border-left: 4px solid rgba(25, 135, 84, 0.25) !important;">
+                        <div class="text-stone-600 font-serif" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about.description}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : '',
+            benefits: data.sections?.benefits !== false && data.benefits ? `
+    <section id="benefits" class="py-5 bg-accent section-reveal" style="background-color: var(--org-accent);">
+        <div class="container py-lg-4">
+            <div class="row justify-content-center">
+                <div class="col-lg-10">
+                    <div class="bg-white p-5 border border-[#E6D5C3]">
+                        <div class="text-center mb-5">
+                            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2rem;">${data.benefits.title || 'Holistic Rewards'}</h2>
+                            <p class="text-stone-700 italic mx-auto font-serif" style="max-width: 600px;">${data.benefits.description}</p>
+                        </div>
+                        <div class="row g-4">
+                            ${(data.benefits.items || []).map((b: any) => `
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-start gap-4 p-3 hover:bg-stone-50 transition-colors">
+                                    <div class="text-success pt-1"><i class="fa-solid fa-leaf text-xs"></i></div>
+                                    <div>
+                                        <h4 class="fw-bold mb-1 text-sm uppercase tracking-wider">${b.title}</h4>
+                                        <p class="mb-0 text-stone-700 text-xs">${b.description}</p>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>` : '',
+            pricing: data.sections?.pricing !== false ? `
+    <section id="pricing" class="py-5 bg-white section-reveal">
+        <div class="container py-lg-5">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 2.8rem;">${data.pricingTitle || 'Select Your Batch'}</h2>
+                <div class="w-16 h-px bg-stone-200 mx-auto mt-4" style="width: 64px; height: 1px; background: #e7e5e4;"></div>
+            </div>
+            <div class="row g-4 justify-content-center">
+                ${(data.pricing || []).map((plan: any) => `
+                <div class="col-12 col-md-4">
+                    <div class="organic-card h-100 d-flex flex-column bg-white ${plan.isPrimary ? 'border-success' : ''}" style="${plan.isPrimary ? 'border-color: #1e3932 !important; border-width: 2px !important;' : ''}">
+                        ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
+                        <div class="p-5 flex-grow-1 text-center">
+                            <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
+                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
+                                ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
+                                ${plan.multiplier ? `
+                                <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
+                                    <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 14px; border: 3px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 8px 24px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; width: fit-content; line-height: 1;">${plan.multiplier}</div>
+                                </div>` : ''}
+                            </div>
+                            <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
+                            <div class="mb-5 text-start ps-4 border-start border-stone-100">
+                                ${plan.features.map((f: string) => `
+                                <div class="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
+                                    <i class="fa-solid fa-check" style="color: var(--org-primary);"></i>
+                                    <span>${f}</span>
+                                </div>`).join('')}
+                            </div>
+                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'};"></i>` : ''}</a>
+                            ${plan.guaranteeBadge ? `
+                            <div class="mt-4 d-flex align-items-center justify-content-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
+                                <i class="${plan.guaranteeBadge.icon || 'fa-solid fa-shield-halved'}"></i>
+                                <span>${plan.guaranteeBadge.text}</span>
+                            </div>` : ''}
+                        </div>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : '',
+            testimonials: data.sections?.testimonials !== false && data.testimonials ? `
+    <section id="testimonials" class="py-5 bg-[#F9F7F2] section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">The Community Voice</span>
+                <h2 class="fw-bold font-serif mb-4" style="color: var(--org-primary); font-size: 2.5rem;">${data.testimonials.title || 'Community Stories'}</h2>
+            </div>
+            <div class="row g-4">
+                ${(data.testimonials.items || []).map((t: any) => `
+                <div class="col-md-4">
+                    <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
+                        <div class="w-16 h-16 rounded-circle mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
+                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
+                        </div>
+                        <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>
+                        <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
+                        <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
+                            ${[...Array(5)].map((_, idx) => {
+                const fill = idx + 1;
+                const rating = Number(t.rating || 5);
+                if (rating >= fill) {
+                    return `<i class="fa-solid fa-star"></i>`;
+                } else if (rating >= fill - 0.5) {
+                    return `
+                                    <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; opacity: 0.25;"></i>
+                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
+                                    </span>`;
+                } else {
+                    return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
+                }
+            }).join('')}
+                        </div>
+                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${(t.content || '').trim()}</p>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+    </section>` : '',
+            guarantee: `
+    <section class="py-5 bg-white border-top border-[#E6D5C3]">
+        <div class="container">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-4 text-center">
+                    <img src="${data.footer?.trustImage || 'https://via.placeholder.com/220x100?text=Guarantee'}" alt="Guarantee" class="img-fluid mb-3 mx-auto" style="max-width: 220px;" />
+                </div>
+                <div class="col-lg-8">
+                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">Our Pure Promise</span>
+                    <h3 class="fw-bold mb-3 font-serif" style="color: var(--org-primary); font-size: 2rem;">${data.guaranteeHeadline || '60-Day Botanical Promise'}</h3>
+                    <p class="text-stone-700" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || `Your path to wellness is protected. Every bottle of ${data.productName} is covered by our 60-day satisfaction protocol. If you don't feel the difference, we will honor a full refund.`}</p>
+                </div>
+            </div>
+        </div>
+    </section>`,
+            faq: data.sections?.faq !== false && data.faq ? `
+    <section id="faq" class="py-5 bg-[#F9F7F2] section-reveal">
+        <div class="container py-lg-4">
+            <div class="text-center mb-5">
+                <h2 class="fw-bold font-serif mb-3" style="color: var(--org-primary); font-size: 2.3rem;">${data.faqTitle || 'Inquiries & Insights'}</h2>
+            </div>
+            <div class="mx-auto" style="max-width: 800px;">
+                ${data.faq.map((item: any, i: number) => `
+                <div class="bg-white border border-[#E6D5C3] mb-3">
+                    <div class="p-4 cursor-pointer d-flex justify-content-between align-items-center" onclick="const ans = document.getElementById('faq-ans-${i}'); const icon = document.getElementById('faq-icon-${i}'); ans.classList.toggle('d-none'); icon.classList.toggle('rotate-45');">
+                        <span class="fw-bold text-stone-800 text-sm font-serif">${item.question}</span>
+                        <i id="faq-icon-${i}" class="fa-solid fa-plus text-[10px] text-stone-300 transition-transform"></i>
+                    </div>
+                    <div id="faq-ans-${i}" class="px-4 pb-4 d-none">
+                        <p class="mb-0 text-stone-700 text-xs" style="line-height: 1.8;">${item.answer}</p>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+        <style>
+            .rotate-45 { transform: rotate(45deg); }
+        </style>
+    </section>` : '',
+            sources: sourcesHtml
+        };
+
+        const sectionOrder = data.sectionOrder || ['hero', 'features', 'about', 'research', 'benefits', 'guarantee', 'ingredients', 'testimonials', 'pricing', 'faq', 'sources'];
+
         htmlContent = `<!DOCTYPE html>
 <html lang="en-US">
 <head>
@@ -1257,353 +1563,14 @@ ${sourcesHtml}
         </div>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="py-5 overflow-hidden section-reveal">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
-                    <h1 class="display-3 fw-bold mb-3" style="line-height: 0.9;">${data.hero?.title}</h1>
-                    <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${data.hero?.subtitle}</p>
-                    <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center">
-                        <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
-                            <span>${data.hero?.buttonText}</span>
-                            ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}
-                        </a>
-                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>` : ''}
-                    </div>
-                </div>
-                <div class="col-12 col-lg-5">
-                    <div class="position-relative">
-                        <div class="position-absolute organic-blob bg-stone-100 rotate-12" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(12deg) translateX(20px);"></div>
-                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]" style="position: relative; z-index: 10;">
-                            <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
-                        </div>
-                        ${data.hero?.badge?.enabled ? `
-                        <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
-                            <img src="${data.hero.badge.image}" alt="${data.hero.badge.imageAlt || 'Badge'}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    ${renderCustomSections('hero')}
-
-    <!-- Logos & Timer -->
-    <section class="py-4 border-top border-bottom" style="background-color: white;">
-        <div class="container">
-            <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
-                ${(data.logos || []).map((logo: any) => `
-                <div style="width: 80px;">
-                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" />
-                </div>`).join('')}
-            </div>
-
-            ${data.timer?.enabled ? `
-            <div class="mt-5 mb-4 d-flex justify-content-center w-100 px-4">
-                <div id="countdown-timer" class="d-flex align-items-center justify-content-between text-white w-100 shadow-lg" style="max-width: 500px; border-radius: 2rem; background-color: #cc1d1d; animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; padding: 0.65rem 0.65rem 0.65rem 2rem !important;">
-                    <div class="d-flex flex-column align-items-start">
-                        <div class="text-[15px] fw-bold uppercase leading-tight tracking-wide" style="font-size: 15px; font-weight: 900;">${data.timer.title || 'LIMITED TIME OFFER'}</div>
-                        <div class="text-[11px] opacity-90 italic" style="font-size: 11px;">${data.timer.text || 'Hurry, Stock Running Low!'}</div>
-                    </div>
-                    <div class="bg-white text-black px-4 py-1.5 d-flex align-items-center justify-content-center shadow-xl" style="background-color: white; color: black; border-radius: 9999px; min-width: 95px;">
-                        <div class="fs-3 fw-bold tabular-nums tracking-tighter" id="timer-display" style="font-size: 22px; font-weight: 900;">00:00</div>
-                    </div>
-                </div>
-            </div>
-            <style>
-                @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .8; } }
-            </style>
-            <script>
-                (function() {
-                    let time = ${data.timer.minutes || 3} * 60;
-                    const display = document.getElementById('timer-display');
-                    function update() {
-                        const m = Math.floor(time / 60);
-                        const s = time % 60;
-                        display.innerText = (m < 10 ? '0' + m : m) + ':' + (s < 10 ? '0' + s : s);
-                        if (time > 0) { 
-                            time--; 
-                        } else {
-                            time = ${data.timer.minutes || 3} * 60;
-                        }
-                        setTimeout(update, 1000);
-                    }
-                    update();
-                })();
-            </script>` : ''}
-        </div>
-    </section>
-
-    <!-- Ingredients -->
-    ${data.sections?.ingredients !== false ? `
-    <section id="ingredients" class="py-5 section-reveal" style="background-color: var(--org-accent);">
-        <div class="container py-lg-5 text-center">
-            <i class="fa-solid fa-leaf mb-3 text-2xl" style="color: var(--org-secondary);"></i>
-            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2.5rem;">${data.ingredients?.title || 'From the Earth'}</h2>
-            ${data.ingredients?.subtitle ? `<p class="text-[#4A3B2E] font-serif text-lg mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p>` : ''}
-            
-            <div class="row g-4 mt-4">
-                ${(data.ingredients?.items || []).map((item: any) => `
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="organic-card p-4 h-100 text-center bg-white">
-                        <div class="mx-auto mb-4 organic-blob" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
-                            <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" />
-                        </div>
-                        <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${item.title}</h4>
-                        <p class="mb-0 text-[#4A3B2E] small">${item.description}</p>
-                    </div>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('ingredients')}
-
-    <!-- Features -->
-    ${data.sections?.features !== false ? `
-    <section id="features" class="py-5 bg-white section-reveal">
-        <div class="container py-lg-4">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold mb-2" style="color: var(--org-primary); font-size: 2.2rem;">${data.featuresTitle || 'Our Philosophy'}</h2>
-                <div class="w-12 h-0.5 bg-green-800 mx-auto mt-3" style="width: 50px; height: 2px; background: #1e3932;"></div>
-            </div>
-            <div class="row g-0 border border-[#E6D5C3]">
-                ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-md-3 border-end border-bottom border-[#E6D5C3] p-5 text-center transition-colors hover:bg-stone-50">
-                    <img src="${f.image}" alt="${f.title}" class="w-12 h-12 mx-auto mb-4" style="width: 48px; height: 48px;" />
-                    <h4 class="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest">${f.title}</h4>
-                    <p class="mb-0 text-stone-700 text-xs">${f.description}</p>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('features')}
-
-    <!-- Research -->
-    ${data.research && data.sections?.research !== false ? `
-    <section id="research" class="py-5 bg-[#F9F7F2] section-reveal">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-6">
-                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-3 d-block">Scientific Verification</span>
-                    <h2 class="fw-bold mb-4 font-serif" style="color: var(--org-primary); font-size: 2.5rem;">${data.research.title}</h2>
-                    <p class="fs-5 text-stone-700 mb-4 italic">${data.research.subtitle}</p>
-                    <div class="text-stone-700 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
-                    <div class="row g-4 pt-4 border-top border-[#E6D5C3]">
-                        ${(data.research.stats || []).map((stat: any) => `
-                        <div class="col-4">
-                            <div class="fw-bold fs-3 text-stone-800">${stat.value}</div>
-                            <div class="text-stone-600 small uppercase tracking-tighter" style="font-size: 10px;">${stat.label}</div>
-                        </div>`).join('')}
-                    </div>
-                </div>
-                <div class="col-lg-6">
-                    <div class="position-relative">
-                        <div class="position-absolute organic-blob bg-stone-100 -rotate-6" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(-6deg) translateX(20px);"></div>
-                        <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
-                            <img src="${data.research.image}" alt="Research Data" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('research')}
-
-    <!-- About Section -->
-    ${data.sections?.about !== false && data.about ? `
-    <section id="about" class="py-5 bg-white section-reveal">
-        <div class="container">
-            <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4" style="color: var(--org-primary);">${data.about.title || 'The Botanical Journal'}</h2>
-            </div>
-            <div class="row g-5 align-items-center">
-                <div class="col-lg-5 text-center">
-                    <div class="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
-                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" />
-                    </div>
-                </div>
-                <div class="col-lg-7">
-                    <div class="ps-lg-4 border-start border-4 border-success border-opacity-25" style="border-left: 4px solid rgba(25, 135, 84, 0.25) !important;">
-                        <div class="text-stone-600 font-serif" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about.description}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('about')}
-
-    <!-- Benefits -->
-    ${data.sections?.benefits !== false && data.benefits ? `
-    <section id="benefits" class="py-5 bg-accent section-reveal" style="background-color: var(--org-accent);">
-        <div class="container py-lg-4">
-            <div class="row justify-content-center">
-                <div class="col-lg-10">
-                    <div class="bg-white p-5 border border-[#E6D5C3]">
-                        <div class="text-center mb-5">
-                            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2rem;">${data.benefits.title || 'Holistic Rewards'}</h2>
-                            <p class="text-stone-700 italic mx-auto font-serif" style="max-width: 600px;">${data.benefits.description}</p>
-                        </div>
-                        <div class="row g-4">
-                            ${(data.benefits.items || []).map((b: any) => `
-                            <div class="col-md-6">
-                                <div class="d-flex align-items-start gap-4 p-3 hover:bg-stone-50 transition-colors">
-                                    <div class="text-success pt-1"><i class="fa-solid fa-leaf text-xs"></i></div>
-                                    <div>
-                                        <h4 class="fw-bold mb-1 text-sm uppercase tracking-wider">${b.title}</h4>
-                                        <p class="mb-0 text-stone-700 text-xs">${b.description}</p>
-                                    </div>
-                                </div>
-                            </div>`).join('')}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('benefits')}
-
-    <!-- Pricing -->
-    ${data.sections?.pricing !== false ? `
-    <section id="pricing" class="py-5 bg-white section-reveal">
-        <div class="container py-lg-5">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 2.8rem;">${data.pricingTitle || 'Select Your Batch'}</h2>
-                <div class="w-16 h-px bg-stone-200 mx-auto mt-4" style="width: 64px; height: 1px; background: #e7e5e4;"></div>
-            </div>
-            <div class="row g-4 justify-content-center">
-                ${(data.pricing || []).map((plan: any) => `
-                <div class="col-12 col-md-4">
-                    <div class="organic-card h-100 d-flex flex-column bg-white ${plan.isPrimary ? 'border-success' : ''}" style="${plan.isPrimary ? 'border-color: #1e3932 !important; border-width: 2px !important;' : ''}">
-                        ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
-                        <div class="p-5 flex-grow-1 text-center">
-                            <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
-                            <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
-                                ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
-                                ${plan.multiplier ? `
-                                <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
-                                    <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 14px; border: 3px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 8px 24px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; width: fit-content; line-height: 1;">${plan.multiplier}</div>
-                                </div>` : ''}
-                            </div>
-                            <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
-                            <div class="mb-5 text-start ps-4 border-start border-stone-100">
-                                ${plan.features.map((f: string) => `
-                                <div class="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
-                                    <i class="fa-solid fa-check" style="color: var(--org-primary);"></i>
-                                    <span>${f}</span>
-                                </div>`).join('')}
-                            </div>
-                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'};"></i>` : ''}</a>
-                            ${plan.guaranteeBadge ? `
-                            <div class="mt-4 d-flex align-items-center justify-content-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
-                                <i class="${plan.guaranteeBadge.icon || 'fa-solid fa-shield-halved'}"></i>
-                                <span>${plan.guaranteeBadge.text}</span>
-                            </div>` : ''}
-                        </div>
-                    </div>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('pricing')}
-
-    <!-- Testimonials -->
-    ${data.sections?.testimonials !== false && data.testimonials ? `
-    <section id="testimonials" class="py-5 bg-[#F9F7F2] section-reveal">
-        <div class="container py-lg-4">
-            <div class="text-center mb-5">
-                <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">The Community Voice</span>
-                <h2 class="fw-bold font-serif mb-4" style="color: var(--org-primary); font-size: 2.5rem;">${data.testimonials.title || 'Community Stories'}</h2>
-            </div>
-            <div class="row g-4">
-                ${(data.testimonials.items || []).map((t: any) => `
-                <div class="col-md-4">
-                    <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
-                        <div class="w-16 h-16 rounded-circle mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
-                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
-                        </div>
-                        <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>
-                        <p class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${t.role || ''}</p>
-                        <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
-                            ${[...Array(5)].map((_, idx) => {
-            const fill = idx + 1;
-            const rating = Number(t.rating || 5);
-            if (rating >= fill) {
-                return `<i class="fa-solid fa-star"></i>`;
-            } else if (rating >= fill - 0.5) {
-                return `
-                                    <span style="position: relative; display: inline-block; width: 1em; height: 1em; vertical-align: middle;">
-                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; opacity: 0.25;"></i>
-                                        <i class="fa-solid fa-star" style="position: absolute; left: 0; top: 0; width: 100%; clip-path: inset(0 50% 0 0);"></i>
-                                    </span>`;
-            } else {
-                return `<i class="fa-solid fa-star" style="opacity: 0.25;"></i>`;
-            }
-        }).join('')}
-                        </div>
-                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${(t.content || '').trim()}</p>
-                    </div>
-                </div>`).join('')}
-            </div>
-        </div>
-    </section>` : ''}
-
-    ${renderCustomSections('testimonials')}
-
-    <!-- Satisfaction Promise -->
-    <section class="py-5 bg-white border-top border-[#E6D5C3]">
-        <div class="container">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-4 text-center">
-                    <img src="${data.footer?.trustImage || 'https://via.placeholder.com/220x100?text=Guarantee'}" alt="Guarantee" class="img-fluid mb-3 mx-auto" style="max-width: 220px;" />
-                </div>
-                <div class="col-lg-8">
-                    <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">Our Pure Promise</span>
-                    <h3 class="fw-bold mb-3 font-serif" style="color: var(--org-primary); font-size: 2rem;">${data.guaranteeHeadline || '60-Day Botanical Promise'}</h3>
-                    <p class="text-stone-700" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || `Your path to wellness is protected. Every bottle of ${data.productName} is covered by our 60-day satisfaction protocol. If you don't feel the difference, we will honor a full refund.`}</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    ${renderCustomSections('guarantee')}
-
-    <!-- FAQ -->
-    ${data.sections?.faq !== false && data.faq ? `
-    <section id="faq" class="py-5 bg-[#F9F7F2] section-reveal">
-        <div class="container py-lg-4">
-            <div class="text-center mb-5">
-                <h2 class="fw-bold font-serif mb-3" style="color: var(--org-primary); font-size: 2.3rem;">${data.faqTitle || 'Inquiries & Insights'}</h2>
-            </div>
-            <div class="mx-auto" style="max-width: 800px;">
-                ${data.faq.map((item: any, i: number) => `
-                <div class="bg-white border border-[#E6D5C3] mb-3">
-                    <div class="p-4 cursor-pointer d-flex justify-content-between align-items-center" onclick="const ans = document.getElementById('faq-ans-${i}'); const icon = document.getElementById('faq-icon-${i}'); ans.classList.toggle('d-none'); icon.classList.toggle('rotate-45');">
-                        <span class="fw-bold text-stone-800 text-sm font-serif">${item.question}</span>
-                        <i id="faq-icon-${i}" class="fa-solid fa-plus text-[10px] text-stone-300 transition-transform"></i>
-                    </div>
-                    <div id="faq-ans-${i}" class="px-4 pb-4 d-none">
-                        <p class="mb-0 text-stone-700 text-xs" style="line-height: 1.8;">${item.answer}</p>
-                    </div>
-                </div>`).join('')}
-            </div>
-        </div>
-        <style>
-            .rotate-45 { transform: rotate(45deg); }
-        </style>
-    </section>` : ''}
-
-    ${renderCustomSections('faq')}
-
-${sourcesHtml}
+    <div class="d-flex flex-column">
+        ${renderCustomSections('top')}
+        ${sections.logos}
+        ${sectionOrder.map((key: string) => `
+            ${sections[key] || ''}
+            ${renderCustomSections(key)}
+        `).join('')}
+    </div>
 
     <!-- Footer -->
     <footer class="py-5 text-center" style="background-color: #1e3932; color: rgba(249, 247, 242, 0.6); font-family: 'Fraunces', serif;">
@@ -1619,6 +1586,8 @@ ${sourcesHtml}
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     ${socialProofBlock}
+    ${scrollToTopBlock}
+    ${seo.footerScripts ? `<!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}
 </body>
 </html>`;
     }

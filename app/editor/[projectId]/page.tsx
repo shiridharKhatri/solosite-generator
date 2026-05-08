@@ -20,6 +20,8 @@ import { EditableImage } from '@/components/editor/EditableImage';
 import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { ImageUploadField } from '@/components/editor/ImageUploadField';
 import { SEOChecker } from '@/components/editor/SEOChecker';
+import { SectionReorderPanel } from '@/components/editor/SectionReorderPanel';
+
 
 
 const IconMonitor = () => <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>;
@@ -115,7 +117,8 @@ export default function EditorPage() {
     updateFooter, updateTestimonials, addTestimonial, removeTestimonial,
     updateResearch, updateNavbar, updateProjectData,
     showLegalModal, setShowLegalModal, updateOrderLink, updateLegalPage,
-    isDirty, setDirty, version
+    isDirty, setDirty, version,
+    undo, redo, canUndo, canRedo,
   } = useStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -129,7 +132,9 @@ export default function EditorPage() {
   const [isContentModalOpen, setIsContentModalOpen] = useState(false);
   const [activeContentTab, setActiveContentTab] = useState('hero');
   const [isLoading, setIsLoading] = useState(projectId !== 'new');
+  const [isReorderPanelOpen, setIsReorderPanelOpen] = useState(false);
   const [jsonSyncStatus, setJsonSyncStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
   const [jsonSyncError, setJsonSyncError] = useState('');
   const [isSyncing, startSyncTransition] = useTransition();
 
@@ -357,6 +362,25 @@ export default function EditorPage() {
       setIsExporting(false);
     }
   }, [projectData]);
+
+  // Keyboard shortcuts: Ctrl+Z = Undo, Ctrl+Y / Ctrl+Shift+Z = Redo
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName?.toLowerCase();
+      // Don't intercept inside text inputs / editable divs
+      if (tag === 'input' || tag === 'textarea' || (e.target as HTMLElement)?.isContentEditable) return;
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undo();
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))) {
+        e.preventDefault();
+        redo();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [undo, redo]);
 
   if (!projectData) return (
     <div className="fixed inset-0 bg-white flex items-center justify-center">
@@ -605,6 +629,37 @@ export default function EditorPage() {
           </div>
 
           <div className="h-8 w-px bg-gray-100 mx-1"></div>
+
+          {/* Undo / Redo */}
+          <div className="flex items-center gap-0.5">
+            <button
+              onClick={undo}
+              disabled={!canUndo}
+              title="Undo (Ctrl+Z)"
+              className="w-7 h-7 flex items-center justify-center rounded transition-all text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <i className="fa-solid fa-rotate-left text-[11px]"></i>
+            </button>
+            <button
+              onClick={redo}
+              disabled={!canRedo}
+              title="Redo (Ctrl+Y)"
+              className="w-7 h-7 flex items-center justify-center rounded transition-all text-gray-400 hover:text-gray-700 hover:bg-gray-100 disabled:opacity-30 disabled:cursor-not-allowed"
+            >
+              <i className="fa-solid fa-rotate-right text-[11px]"></i>
+            </button>
+          </div>
+
+          <div className="h-8 w-px bg-gray-100 mx-1"></div>
+
+          {/* Section Reorder */}
+          <button
+            onClick={() => setIsReorderPanelOpen(true)}
+            title="Reorder Sections"
+            className="w-7 h-7 flex items-center justify-center rounded transition-all text-gray-400 hover:text-purple-600 hover:bg-purple-50"
+          >
+            <i className="fa-solid fa-bars-staggered text-[11px]"></i>
+          </button>
 
           <SEOChecker />
 
@@ -1847,6 +1902,9 @@ export default function EditorPage() {
         </div>
       )}
       <ImageCompressionDialog />
+      {isReorderPanelOpen && (
+        <SectionReorderPanel onClose={() => setIsReorderPanelOpen(false)} />
+      )}
     </div>
   );
 }

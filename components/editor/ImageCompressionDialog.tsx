@@ -68,7 +68,7 @@ export const ImageCompressionDialog: React.FC = () => {
         <div className="p-6 pb-2">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white shadow-lg shadow-amber-200">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 flex items-center justify-center text-white">
                 <i className="fa-solid fa-weight-hanging"></i>
               </div>
               <div>
@@ -133,31 +133,31 @@ export const ImageCompressionDialog: React.FC = () => {
             </div>
         </div>
 
-        {/* Footer Actions - Compacted */}
-        <div className="px-6 pb-6 pt-2 flex flex-col gap-2">
+        {/* Footer Actions - Refined Size */}
+        <div className="px-6 pb-8 pt-2 flex flex-col gap-3">
           <button
             onClick={handleCompress}
             disabled={isCompressing}
-            className="w-full py-3.5 bg-purple-600 text-white rounded-xl font-black text-xs hover:bg-purple-700 transition-all shadow-lg shadow-purple-100 flex items-center justify-center gap-2 uppercase tracking-widest"
+            className="w-full py-3 bg-slate-900 text-white rounded-[14px] font-bold text-[13px] hover:bg-black transition-all flex items-center justify-center gap-2 tracking-wide disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isCompressing ? (
-              <i className="fa-solid fa-circle-notch animate-spin"></i>
+              <i className="fa-solid fa-circle-notch animate-spin text-sm"></i>
             ) : (
-              <i className="fa-solid fa-wand-magic-sparkles"></i>
+              <i className="fa-solid fa-wand-magic-sparkles text-sm text-amber-400"></i>
             )}
-            Optimize & Save
+            {isCompressing ? 'Optimizing...' : 'Optimize & Save'}
           </button>
           
-          <div className="grid grid-cols-2 gap-2 mt-1">
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={handleKeepOriginal}
-              className="py-2.5 bg-slate-50 text-slate-500 rounded-xl font-black text-[10px] hover:bg-slate-100 transition-all uppercase tracking-widest"
+              className="py-2.5 bg-slate-100 text-slate-700 rounded-[14px] font-bold text-[12px] hover:bg-slate-200 transition-all text-center"
             >
               Keep Original
             </button>
             <button
               onClick={handleClose}
-              className="py-2.5 text-slate-300 font-black text-[10px] hover:text-slate-400 transition-all uppercase tracking-widest"
+              className="py-2.5 bg-white border border-slate-200 text-slate-500 rounded-[14px] font-bold text-[12px] hover:bg-slate-50 transition-all text-center"
             >
               Cancel
             </button>

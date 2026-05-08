@@ -220,6 +220,7 @@ export interface ProjectData {
     pricing: boolean;
     sources: boolean;
   };
+  sectionOrder?: string[];
   legalPages?: {
     privacyPolicy: string;
     termsAndConditions: string;
@@ -315,6 +316,14 @@ interface EditorState {
   addCustomSection: (afterSection: string) => void;
   updateCustomSection: (id: string, data: Partial<NonNullable<ProjectData['customSections']>[0]>) => void;
   removeCustomSection: (id: string) => void;
+  reorderSections: (order: string[]) => void;
+  // Undo / Redo
+  _history: ProjectData[];
+  _historyIndex: number;
+  undo: () => void;
+  redo: () => void;
+  canUndo: boolean;
+  canRedo: boolean;
 }
 
 export const initialProjectData: ProjectData = {
@@ -707,326 +716,378 @@ export const initialProjectData: ProjectData = {
     text: "HURRY! OFFER ENDS IN:",
     title: "LIMITED TIME OFFER"
   },
-  customSections: []
+  customSections: [],
+  sectionOrder: ['hero', 'features', 'about', 'research', 'benefits', 'guarantee', 'ingredients', 'testimonials', 'pricing', 'faq', 'sources'],
 };
 
-export const useStore = create<EditorState>((set) => ({
-  projectData: initialProjectData,
-  projectId: null,
-  setProjectId: (id) => set({ projectId: id }),
-  isDirty: false,
-  version: 0,
-  setDirty: (dirty) => set({ isDirty: dirty }),
-  setProjectData: (data) => set({ projectData: data, isDirty: false, version: 0 }),
-  updateProductName: (name) => set((state) => {
-    if (!state.projectData) return state;
+export const useStore = create<EditorState>((set, get) => {
+  // Helper: push projectData into history before any mutation
+  const withHistory = (newData: ProjectData): Partial<EditorState> => {
+    const { _history, _historyIndex, projectData } = get();
+    if (!projectData) return { projectData: newData, isDirty: true, version: get().version + 1 };
+    const newHistory = [..._history.slice(0, _historyIndex + 1), projectData];
+    // Keep max 50 undo steps
+    if (newHistory.length > 50) newHistory.shift();
     return {
-      projectData: { ...state.projectData, productName: name },
+      projectData: newData,
+      _history: newHistory,
+      _historyIndex: newHistory.length - 1,
+      canUndo: newHistory.length > 0,
+      canRedo: false,
       isDirty: true,
-      version: state.version + 1
+      version: get().version + 1,
     };
-  }),
+  };
 
-  updateHero: (hero) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, hero: { ...state.projectData.hero, ...hero } } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
+  return ({
+    projectData: initialProjectData,
+    projectId: null,
+    setProjectId: (id) => set({ projectId: id }),
+    _history: [],
+    _historyIndex: -1,
+    canUndo: false,
+    canRedo: false,
+    undo: () => set((state) => {
+      if (!state.canUndo || state._historyIndex < 0) return state;
+      const index = state._historyIndex;
+      const prev = state._history[index];
+      if (!prev) return state;
+      // Push current state into a "redo" buffer by moving pointer back
+      return {
+        projectData: prev,
+        _historyIndex: index - 1,
+        canUndo: index - 1 >= 0,
+        canRedo: true,
+        isDirty: true,
+        version: state.version + 1,
+      };
+    }),
+    redo: () => set((state) => {
+      // Redo: go forward in history
+      const nextIndex = state._historyIndex + 1;
+      if (nextIndex >= state._history.length) return state;
+      // The "future" states are stored after the current index in _history
+      // Since we only shift the pointer back during undo, the array still has those states
+      const next = state._history[nextIndex + 1];
+      if (!next) return state;
+      return {
+        projectData: state._history[nextIndex],
+        _historyIndex: nextIndex,
+        canUndo: true,
+        canRedo: nextIndex + 1 < state._history.length - 1,
+        isDirty: true,
+        version: state.version + 1,
+      };
+    }),
+    isDirty: false,
+    version: 0,
+    setDirty: (dirty) => set({ isDirty: dirty }),
+    setProjectData: (data) => set({ projectData: data, isDirty: false, version: 0, _history: [], _historyIndex: -1, canUndo: false, canRedo: false }),
+    updateProductName: (name) => set((state) => {
+      if (!state.projectData) return state;
+      return withHistory({ ...state.projectData, productName: name });
+    }),
 
-  updateAbout: (about) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, about: { ...state.projectData.about, ...about } } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
+    updateHero: (hero) => set((state) => {
+      if (!state.projectData) return state;
+      return withHistory({ ...state.projectData, hero: { ...state.projectData.hero, ...hero } });
+    }),
 
-  updateFeature: (index, feature) => set((state) => {
-    if (!state.projectData) return state;
-    const newFeatures = [...state.projectData.features];
-    newFeatures[index] = { ...newFeatures[index], ...feature };
-    return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
-  }),
+    updateAbout: (about) => set((state) => {
+      if (!state.projectData) return state;
+      return withHistory({ ...state.projectData, about: { ...state.projectData.about, ...about } });
+    }),
 
-  addFeature: () => set((state) => {
-    if (!state.projectData) return state;
-    const newFeatures = [...state.projectData.features, { title: 'New Feature', description: 'Description', image: '' }];
-    return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
-  }),
+    updateFeature: (index, feature) => set((state) => {
+      if (!state.projectData) return state;
+      const newFeatures = [...state.projectData.features];
+      newFeatures[index] = { ...newFeatures[index], ...feature };
+      return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
+    }),
 
-  removeFeature: (index) => set((state) => {
-    if (!state.projectData) return state;
-    const newFeatures = state.projectData.features.filter((_, i) => i !== index);
-    return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
-  }),
+    addFeature: () => set((state) => {
+      if (!state.projectData) return state;
+      const newFeatures = [...state.projectData.features, { title: 'New Feature', description: 'Description', image: '' }];
+      return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
+    }),
 
-  updateIngredient: (index, item) => set((state) => {
-    if (!state.projectData || !state.projectData.ingredients) return state;
-    if (index === -1) {
-      return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, ...item } }, isDirty: true, version: state.version + 1 };
-    }
-    const newItems = [...state.projectData.ingredients.items];
-    newItems[index] = { ...newItems[index], ...item };
-    return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    removeFeature: (index) => set((state) => {
+      if (!state.projectData) return state;
+      const newFeatures = state.projectData.features.filter((_, i) => i !== index);
+      return { projectData: { ...state.projectData, features: newFeatures }, isDirty: true, version: state.version + 1 };
+    }),
 
-  addIngredient: () => set((state) => {
-    if (!state.projectData || !state.projectData.ingredients) return state;
-    const newItems = [...state.projectData.ingredients.items, { title: 'New Ingredient', description: 'Description', image: '' }];
-    return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    updateIngredient: (index, item) => set((state) => {
+      if (!state.projectData || !state.projectData.ingredients) return state;
+      if (index === -1) {
+        return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, ...item } }, isDirty: true, version: state.version + 1 };
+      }
+      const newItems = [...state.projectData.ingredients.items];
+      newItems[index] = { ...newItems[index], ...item };
+      return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  removeIngredient: (index) => set((state) => {
-    if (!state.projectData || !state.projectData.ingredients) return state;
-    const newItems = state.projectData.ingredients.items.filter((_, i) => i !== index);
-    return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    addIngredient: () => set((state) => {
+      if (!state.projectData || !state.projectData.ingredients) return state;
+      const newItems = [...state.projectData.ingredients.items, { title: 'New Ingredient', description: 'Description', image: '' }];
+      return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  updateBenefit: (index, item) => set((state) => {
-    if (!state.projectData || !state.projectData.benefits) return state;
-    if (index === -1) {
-      return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, ...item } }, isDirty: true, version: state.version + 1 };
-    }
-    const newItems = [...state.projectData.benefits.items];
-    newItems[index] = { ...newItems[index], ...item };
-    return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    removeIngredient: (index) => set((state) => {
+      if (!state.projectData || !state.projectData.ingredients) return state;
+      const newItems = state.projectData.ingredients.items.filter((_, i) => i !== index);
+      return { projectData: { ...state.projectData, ingredients: { ...state.projectData.ingredients, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  addBenefit: () => set((state) => {
-    if (!state.projectData || !state.projectData.benefits) return state;
-    const newItems = [...state.projectData.benefits.items, { title: 'New Benefit', description: 'Description' }];
-    return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    updateBenefit: (index, item) => set((state) => {
+      if (!state.projectData || !state.projectData.benefits) return state;
+      if (index === -1) {
+        return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, ...item } }, isDirty: true, version: state.version + 1 };
+      }
+      const newItems = [...state.projectData.benefits.items];
+      newItems[index] = { ...newItems[index], ...item };
+      return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  removeBenefit: (index) => set((state) => {
-    if (!state.projectData || !state.projectData.benefits) return state;
-    const newItems = state.projectData.benefits.items.filter((_, i) => i !== index);
-    return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
-  }),
+    addBenefit: () => set((state) => {
+      if (!state.projectData || !state.projectData.benefits) return state;
+      const newItems = [...state.projectData.benefits.items, { title: 'New Benefit', description: 'Description' }];
+      return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  updatePricing: (index, plan) => set((state) => {
-    if (!state.projectData) return state;
-    const newPricing = [...state.projectData.pricing];
-    newPricing[index] = { ...newPricing[index], ...plan };
-    return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
-  }),
+    removeBenefit: (index) => set((state) => {
+      if (!state.projectData || !state.projectData.benefits) return state;
+      const newItems = state.projectData.benefits.items.filter((_, i) => i !== index);
+      return { projectData: { ...state.projectData, benefits: { ...state.projectData.benefits, items: newItems } }, isDirty: true, version: state.version + 1 };
+    }),
 
-  addPricing: () => set((state) => {
-    if (!state.projectData) return state;
-    const newPricing = [...state.projectData.pricing, { title: 'New Plan', multiplier: 'X1', price: '49', features: [], buttonText: 'Buy Now', buttonHref: '#' }];
-    return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
-  }),
+    updatePricing: (index, plan) => set((state) => {
+      if (!state.projectData) return state;
+      const newPricing = [...state.projectData.pricing];
+      newPricing[index] = { ...newPricing[index], ...plan };
+      return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
+    }),
 
-  removePricing: (index) => set((state) => {
-    if (!state.projectData) return state;
-    const newPricing = state.projectData.pricing.filter((_, i) => i !== index);
-    return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
-  }),
+    addPricing: () => set((state) => {
+      if (!state.projectData) return state;
+      const newPricing = [...state.projectData.pricing, { title: 'New Plan', multiplier: 'X1', price: '49', features: [], buttonText: 'Buy Now', buttonHref: '#' }];
+      return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
+    }),
 
-  addCustomSection: (afterSection) => set((state) => {
-    if (!state.projectData) return state;
-    const newSection = {
-      id: Math.random().toString(36).substr(2, 9),
-      afterSection,
-      type: 'text' as const,
-      title: 'New Custom Section',
-      content: 'Write your custom content here...',
-      bgColor: '#ffffff',
-      textColor: '#333333',
-      padding: 'py-5',
-      buttonText: '',
-      buttonHref: '',
-      cards: [] as { title: string; content: string; image?: string; icon?: string }[]
-    };
-    return {
-      projectData: {
-        ...state.projectData,
-        customSections: [...(state.projectData.customSections || []), newSection]
-      },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
+    removePricing: (index) => set((state) => {
+      if (!state.projectData) return state;
+      const newPricing = state.projectData.pricing.filter((_, i) => i !== index);
+      return { projectData: { ...state.projectData, pricing: newPricing }, isDirty: true, version: state.version + 1 };
+    }),
 
-  updateCustomSection: (id, data) => set((state) => {
-    if (!state.projectData) return state;
-    const sections = state.projectData.customSections || [];
-    const newSections = sections.map(s => s.id === id ? { ...s, ...data } : s);
-    return {
-      projectData: { ...state.projectData, customSections: newSections },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
-
-  removeCustomSection: (id) => set((state) => {
-    if (!state.projectData) return state;
-    const sections = state.projectData.customSections || [];
-    const newSections = sections.filter(s => s.id !== id);
-    return {
-      projectData: { ...state.projectData, customSections: newSections },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
-
-  updateFAQ: (index, faq) => set((state) => {
-    if (!state.projectData) return state;
-    const newFAQ = [...state.projectData.faq];
-    newFAQ[index] = { ...newFAQ[index], ...faq };
-    return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
-  }),
-
-  addFAQ: () => set((state) => {
-    if (!state.projectData) return state;
-    const newFAQ = [...state.projectData.faq, { question: 'New Question', answer: 'New Answer' }];
-    return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
-  }),
-
-  removeFAQ: (index) => set((state) => {
-    if (!state.projectData) return state;
-    const newFAQ = state.projectData.faq.filter((_, i) => i !== index);
-    return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
-  }),
-
-  updateTheme: (theme) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, theme: { ...state.projectData.theme, ...theme } } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-
-  updateLayoutStyle: (style) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, layoutStyle: style } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-
-  updateFooter: (footer) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, footer: { ...state.projectData.footer, ...footer } } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateSEO: (seo) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, seo: { ...state.projectData.seo, ...seo } as any } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateProjectData: (data) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, ...data } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateTimer: (timer) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, timer: { ...state.projectData.timer, ...timer } as any } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateTestimonials: (index: number, testimonial: Partial<ProjectData['testimonials'] & ProjectData['testimonials']['items'][0]>) => set((state) => {
-    if (!state.projectData || !state.projectData.testimonials) return state;
-    const newItems = [...state.projectData.testimonials.items];
-    if (index === -1) {
-      // Update title/subtitle
+    addCustomSection: (afterSection) => set((state) => {
+      if (!state.projectData) return state;
+      const newSection = {
+        id: Math.random().toString(36).substr(2, 9),
+        afterSection,
+        type: 'text' as const,
+        title: 'New Custom Section',
+        content: 'Write your custom content here...',
+        bgColor: '#ffffff',
+        textColor: '#333333',
+        padding: 'py-5',
+        buttonText: '',
+        buttonHref: '',
+        cards: [] as { title: string; content: string; image?: string; icon?: string }[]
+      };
       return {
         projectData: {
           ...state.projectData,
-          testimonials: { ...state.projectData.testimonials, ...testimonial as any }
+          customSections: [...(state.projectData.customSections || []), newSection]
         },
         isDirty: true,
         version: state.version + 1
       };
-    }
-    newItems[index] = { ...newItems[index], ...testimonial };
-    return {
-      projectData: {
-        ...state.projectData,
-        testimonials: { ...state.projectData.testimonials, items: newItems }
-      },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
-  addTestimonial: () => set((state) => {
-    if (!state.projectData) return state;
-    const current = state.projectData.testimonials || { title: "Testimonials", items: [] };
-    return {
-      projectData: {
-        ...state.projectData,
-        testimonials: {
-          ...current,
-          items: [...current.items, { name: "New User", role: "Verified Buyer", content: "Write your review here...", rating: 5, image: "https://i.pravatar.cc/150" }]
-        }
-      },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
-  removeTestimonial: (index) => set((state) => {
-    if (!state.projectData || !state.projectData.testimonials) return state;
-    const newItems = state.projectData.testimonials.items.filter((_, i) => i !== index);
-    return {
-      projectData: {
-        ...state.projectData,
-        testimonials: { ...state.projectData.testimonials, items: newItems }
-      },
-      isDirty: true,
-      version: state.version + 1
-    };
-  }),
+    }),
 
-  updateResearch: (research) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, research: { ...state.projectData.research, ...research } as any } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
+    updateCustomSection: (id, data) => set((state) => {
+      if (!state.projectData) return state;
+      const sections = state.projectData.customSections || [];
+      const newSections = sections.map(s => s.id === id ? { ...s, ...data } : s);
+      return {
+        projectData: { ...state.projectData, customSections: newSections },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
 
-  updateNavbar: (navbar) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, navbar: { ...state.projectData.navbar, ...navbar } } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateSocialProof: (proof) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, socialProof: { ...state.projectData.socialProof, ...proof } as any } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  updateSectionVisibility: (section, visible) => set((state) => {
-    if (!state.projectData) return state;
-    const currentSections = state.projectData.sections || {
-      features: true, about: true, research: true, benefits: true, guarantee: true,
-      ingredients: true, testimonials: true, faq: true, pricing: true, sources: true
-    };
-    return {
-      projectData: {
-        ...state.projectData,
-        sections: { ...currentSections, [section]: visible }
-      },
+    removeCustomSection: (id) => set((state) => {
+      if (!state.projectData) return state;
+      const sections = state.projectData.customSections || [];
+      const newSections = sections.filter(s => s.id !== id);
+      return {
+        projectData: { ...state.projectData, customSections: newSections },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+
+    updateFAQ: (index, faq) => set((state) => {
+      if (!state.projectData) return state;
+      const newFAQ = [...state.projectData.faq];
+      newFAQ[index] = { ...newFAQ[index], ...faq };
+      return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
+    }),
+
+    addFAQ: () => set((state) => {
+      if (!state.projectData) return state;
+      const newFAQ = [...state.projectData.faq, { question: 'New Question', answer: 'New Answer' }];
+      return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
+    }),
+
+    removeFAQ: (index) => set((state) => {
+      if (!state.projectData) return state;
+      const newFAQ = state.projectData.faq.filter((_, i) => i !== index);
+      return { projectData: { ...state.projectData, faq: newFAQ }, isDirty: true, version: state.version + 1 };
+    }),
+
+    updateTheme: (theme) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, theme: { ...state.projectData.theme, ...theme } } : null,
       isDirty: true,
       version: state.version + 1
-    };
-  }),
-  updateLegalPage: (page, content) => set((state) => {
-    if (!state.projectData) return state;
-    return {
-      projectData: {
-        ...state.projectData,
-        legalPages: { ...state.projectData.legalPages, [page]: content } as any
-      },
+    })),
+
+    updateLayoutStyle: (style) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, layoutStyle: style } : null,
       isDirty: true,
       version: state.version + 1
-    };
-  }),
-  updateOrderLink: (link) => set((state) => ({
-    projectData: state.projectData ? { ...state.projectData, orderLink: link } : null,
-    isDirty: true,
-    version: state.version + 1
-  })),
-  showLegalModal: false,
-  setShowLegalModal: (show: boolean) => set({ showLegalModal: show }),
-  compressionState: {
-    isOpen: false,
-    file: null,
-    onConfirm: () => {},
-    onKeepOriginal: () => {},
-  },
-  setCompressionState: (state) => set((s) => ({
-    compressionState: { ...s.compressionState, ...state }
-  })),
-}));
+    })),
+
+    updateFooter: (footer) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, footer: { ...state.projectData.footer, ...footer } } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateSEO: (seo) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, seo: { ...state.projectData.seo, ...seo } as any } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateProjectData: (data) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, ...data } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateTimer: (timer) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, timer: { ...state.projectData.timer, ...timer } as any } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateTestimonials: (index: number, testimonial: Partial<ProjectData['testimonials'] & ProjectData['testimonials']['items'][0]>) => set((state) => {
+      if (!state.projectData || !state.projectData.testimonials) return state;
+      const newItems = [...state.projectData.testimonials.items];
+      if (index === -1) {
+        // Update title/subtitle
+        return {
+          projectData: {
+            ...state.projectData,
+            testimonials: { ...state.projectData.testimonials, ...testimonial as any }
+          },
+          isDirty: true,
+          version: state.version + 1
+        };
+      }
+      newItems[index] = { ...newItems[index], ...testimonial };
+      return {
+        projectData: {
+          ...state.projectData,
+          testimonials: { ...state.projectData.testimonials, items: newItems }
+        },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+    addTestimonial: () => set((state) => {
+      if (!state.projectData) return state;
+      const current = state.projectData.testimonials || { title: "Testimonials", items: [] };
+      return {
+        projectData: {
+          ...state.projectData,
+          testimonials: {
+            ...current,
+            items: [...current.items, { name: "New User", role: "Verified Buyer", content: "Write your review here...", rating: 5, image: "https://i.pravatar.cc/150" }]
+          }
+        },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+    removeTestimonial: (index) => set((state) => {
+      if (!state.projectData || !state.projectData.testimonials) return state;
+      const newItems = state.projectData.testimonials.items.filter((_, i) => i !== index);
+      return {
+        projectData: {
+          ...state.projectData,
+          testimonials: { ...state.projectData.testimonials, items: newItems }
+        },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+
+    updateResearch: (research) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, research: { ...state.projectData.research, ...research } as any } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+
+    updateNavbar: (navbar) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, navbar: { ...state.projectData.navbar, ...navbar } } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateSocialProof: (proof) => set((state) => ({
+      projectData: state.projectData ? { ...state.projectData, socialProof: { ...state.projectData.socialProof, ...proof } as any } : null,
+      isDirty: true,
+      version: state.version + 1
+    })),
+    updateSectionVisibility: (section, visible) => set((state) => {
+      if (!state.projectData) return state;
+      const currentSections = state.projectData.sections || {
+        features: true, about: true, research: true, benefits: true, guarantee: true,
+        ingredients: true, testimonials: true, faq: true, pricing: true, sources: true
+      };
+      return {
+        projectData: {
+          ...state.projectData,
+          sections: { ...currentSections, [section]: visible }
+        },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+    updateLegalPage: (page, content) => set((state) => {
+      if (!state.projectData) return state;
+      return {
+        projectData: {
+          ...state.projectData,
+          legalPages: { ...state.projectData.legalPages, [page]: content } as any
+        },
+        isDirty: true,
+        version: state.version + 1
+      };
+    }),
+    updateOrderLink: (link) => set((state) => ({
+      ...withHistory({ ...state.projectData!, orderLink: link }),
+    })),
+    reorderSections: (order) => set((state) => ({
+      ...withHistory({ ...state.projectData!, sectionOrder: order }),
+    })),
+    showLegalModal: false,
+    setShowLegalModal: (show: boolean) => set({ showLegalModal: show }),
+    compressionState: {
+      isOpen: false,
+      file: null,
+      onConfirm: () => { },
+      onKeepOriginal: () => { },
+    },
+    setCompressionState: (state) => set((s) => ({
+      compressionState: { ...s.compressionState, ...state }
+    })),
+  });
+});
