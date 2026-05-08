@@ -21,6 +21,7 @@ import { RichTextEditor } from '@/components/editor/RichTextEditor';
 import { ImageUploadField } from '@/components/editor/ImageUploadField';
 import { SEOChecker } from '@/components/editor/SEOChecker';
 import { SectionReorderPanel } from '@/components/editor/SectionReorderPanel';
+import { AnalyticsPanel } from '@/components/editor/AnalyticsPanel';
 
 
 
@@ -662,6 +663,7 @@ export default function EditorPage() {
           </button>
 
           <SEOChecker />
+          <AnalyticsPanel />
 
           <div className="h-8 w-px bg-gray-100 mx-1"></div>
 
