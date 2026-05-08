@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { useStore } from '@/lib/store';
+import { ImageCompressionDialog } from './ImageCompressionDialog';
+import { getBase64Size, formatFileSize } from '@/lib/imageUtils';
 
 interface EditableImageProps {
   src: string;
@@ -29,58 +32,46 @@ export const EditableImage: React.FC<EditableImageProps> = ({
   const [isUploading, setIsUploading] = useState(false);
   const [isEditingAlt, setIsEditingAlt] = useState(false);
   const [tempAlt, setTempAlt] = useState(alt);
+  const setCompressionState = useStore((s) => s.setCompressionState);
 
   const handleClick = () => {
     if (!isUploading && !isEditingAlt) fileInputRef.current?.click();
-  };
-
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1000;
-          let width = img.width;
-          let height = img.height;
-
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-
-          const webpBase64 = canvas.toDataURL('image/webp', 0.6);
-          resolve(webpBase64);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
+    if (file.size > 100 * 1024) {
+      setCompressionState({
+        isOpen: true,
+        file,
+        onConfirm: (url) => onChange(url),
+        onKeepOriginal: () => processFile(file)
+      });
+      return;
+    }
 
+    processFile(file);
+  };
+
+  const processFile = async (file: File) => {
+    setIsUploading(true);
     try {
-      const compressedBase64 = await compressImage(file);
-      onChange(compressedBase64);
-      setIsUploading(false);
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        onChange(e.target?.result as string);
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       console.error('Failed to process image', error);
       setIsUploading(false);
     }
   };
+
+  const currentSize = getBase64Size(src);
+  const isLarge = currentSize > 100 * 1024;
 
   return (
     <div
@@ -114,6 +105,23 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       <div className={`absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 pointer-events-none z-50 ${isCircular ? 'rounded-full' : ''}`}>
         {(src || onRemove || onToggleCircular) && (
           <div className="flex gap-2 pointer-events-auto">
+            {isLarge && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setCompressionState({
+                    isOpen: true,
+                    file: src,
+                    onConfirm: (url) => onChange(url),
+                    onKeepOriginal: () => {}
+                  });
+                }}
+                className="w-7 h-7 rounded-full bg-purple-600 text-white flex items-center justify-center shadow-lg border-none hover:bg-purple-700 hover:scale-110 transition-all animate-pulse"
+                title={`Compress Image (Currently ${formatFileSize(currentSize)})`}
+              >
+                <i className="fa-solid fa-wand-magic-sparkles text-[10px]"></i>
+              </button>
+            )}
             {onToggleCircular && (
               <button
                 onClick={(e) => {
@@ -156,6 +164,9 @@ export const EditableImage: React.FC<EditableImageProps> = ({
           </div>
         )}
         <span className="text-white/90 text-[9px] font-bold uppercase tracking-widest text-center px-2 hidden sm:block">Click to replace</span>
+        {isLarge && (
+           <span className="text-amber-400 text-[8px] font-black uppercase tracking-tighter mt-1 bg-black/40 px-1.5 py-0.5 rounded-full">Optimize for SEO ({formatFileSize(currentSize)})</span>
+        )}
       </div>
 
       {isUploading && (

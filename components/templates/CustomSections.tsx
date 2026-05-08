@@ -17,9 +17,9 @@ const Portal = ({ children }: { children: React.ReactNode }) => {
 };
 
 // Helper for Icon Selection and Styling
-const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: { 
-  value?: string; 
-  color?: string; 
+const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
+  value?: string;
+  color?: string;
   onChange: (val: string) => void;
   onColorChange?: (val: string) => void;
   className?: string;
@@ -54,7 +54,7 @@ const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
           onContextMenu={handleOpen}
         />
       ) : (
-        <button 
+        <button
           onClick={handleOpen}
           className="bg-gray-100 hover:bg-gray-200 text-[9px] px-2 py-1 rounded border border-gray-200 text-gray-500 uppercase font-bold tracking-widest transition-all mb-3 mx-auto block"
         >
@@ -110,9 +110,9 @@ const IconEditor = ({ value, color, onChange, onColorChange, className = "" }: {
                       {!c.value && <i className="fa-solid fa-droplet-slash text-[8px] text-gray-400"></i>}
                     </button>
                   ))}
-                  <input 
-                    type="color" 
-                    value={color || '#000000'} 
+                  <input
+                    type="color"
+                    value={color || '#000000'}
                     onChange={(e) => onColorChange?.(e.target.value)}
                     className="w-6 h-6 p-0 border-none rounded-full cursor-pointer overflow-hidden"
                   />
@@ -224,8 +224,8 @@ const CardItem = React.memo(({ card, idx, section, isOrganic, primaryColor, upda
         {/* Card Icon (shows when no image or explicitly chosen) */}
         {!card.image && (
           <div className="mb-3">
-            <IconEditor 
-              value={card.icon} 
+            <IconEditor
+              value={card.icon}
               color={card.iconColor}
               onChange={(val) => handleFieldUpdate('icon', val)}
               onColorChange={(val) => handleFieldUpdate('iconColor', val)}

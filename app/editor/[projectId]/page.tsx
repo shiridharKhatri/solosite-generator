@@ -1,6 +1,8 @@
 'use client';
 import { marked } from 'marked';
 import TurndownService from 'turndown';
+import { ImageCompressionDialog } from '@/components/editor/ImageCompressionDialog';
+
 
 marked.setOptions({
   breaks: true,
@@ -95,9 +97,12 @@ const LegalMarkdownEditor = ({ label, value, onChange }: { label: string; value:
           )}
         </div>
       </div>
+
     </div>
   );
 };
+
+
 
 export default function EditorPage() {
   const { projectId } = useParams();
@@ -1841,6 +1846,7 @@ export default function EditorPage() {
           </div>
         </div>
       )}
+      <ImageCompressionDialog />
     </div>
   );
 }

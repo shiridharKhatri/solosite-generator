@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useRef, useState } from 'react';
+import { useStore } from '@/lib/store';
+
 
 interface ImageUploadFieldProps {
   label: string;
@@ -12,41 +14,28 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  const setCompressionState = useStore((s) => s.setCompressionState);
 
-  const compressImage = (file: File): Promise<string> => {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = (event) => {
-        const img = new Image();
-        img.src = event.target?.result as string;
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          const MAX_WIDTH = 1000;
-          let width = img.width;
-          let height = img.height;
-          if (width > MAX_WIDTH) {
-            height *= MAX_WIDTH / width;
-            width = MAX_WIDTH;
-          }
-          canvas.width = width;
-          canvas.height = height;
-          const ctx = canvas.getContext('2d');
-          ctx?.drawImage(img, 0, 0, width, height);
-          const webpBase64 = canvas.toDataURL('image/webp', 0.6);
-          resolve(webpBase64);
-        };
-        img.onerror = reject;
-      };
-      reader.onerror = reject;
-    });
-  };
+  const uploadFile = async (file: File, skipCompressionCheck = false) => {
+    // If file > 100KB and we haven't checked compression yet, show dialog
+    if (!skipCompressionCheck && file.size > 100 * 1024) {
+      setCompressionState({
+        isOpen: true,
+        file,
+        onConfirm: (url) => onChange(url),
+        onKeepOriginal: () => uploadFile(file, true)
+      });
+      return;
+    }
 
-  const uploadFile = async (file: File) => {
     setIsUploading(true);
     try {
-      const compressedBase64 = await compressImage(file);
-      onChange(compressedBase64);
+      // Create a preview/dataURL to show immediately
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        onChange(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
       
       const formData = new FormData();
       formData.append('file', file);

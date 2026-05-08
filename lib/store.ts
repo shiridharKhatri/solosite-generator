@@ -301,6 +301,13 @@ interface EditorState {
   updateProjectData: (data: Partial<ProjectData>) => void;
   showLegalModal: boolean;
   setShowLegalModal: (show: boolean) => void;
+  compressionState: {
+    isOpen: boolean;
+    file: File | string | null;
+    onConfirm: (url: string) => void;
+    onKeepOriginal: () => void;
+  };
+  setCompressionState: (state: Partial<EditorState['compressionState']>) => void;
   isDirty: boolean;
   setDirty: (dirty: boolean) => void;
   version: number;
@@ -1013,4 +1020,13 @@ export const useStore = create<EditorState>((set) => ({
   })),
   showLegalModal: false,
   setShowLegalModal: (show: boolean) => set({ showLegalModal: show }),
+  compressionState: {
+    isOpen: false,
+    file: null,
+    onConfirm: () => {},
+    onKeepOriginal: () => {},
+  },
+  setCompressionState: (state) => set((s) => ({
+    compressionState: { ...s.compressionState, ...state }
+  })),
 }));
