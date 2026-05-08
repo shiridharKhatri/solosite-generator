@@ -115,16 +115,8 @@ export const AnalyticsPanel: React.FC = () => {
             projectData.logos[i].src,
             `Trust Logo ${i + 1}`,
             projectData.logos[i].alt,
-            (u) => {
-              const newLogos = [...projectData.logos];
-              newLogos[i] = { ...newLogos[i], src: u };
-              updateLogos(newLogos);
-            },
-            (a) => {
-              const newLogos = [...projectData.logos];
-              newLogos[i] = { ...newLogos[i], alt: a };
-              updateLogos(newLogos);
-            }
+            (u) => updateLogos(i, { src: u }),
+            (a) => updateLogos(i, { alt: a })
           );
         }
       }
@@ -295,7 +287,7 @@ export const AnalyticsPanel: React.FC = () => {
                 if (loc.includes('hero') || loc.includes('logo')) group = 'Core Branding';
                 else if (loc.includes('trust') || loc.includes('badge')) group = 'Trust & Social Proof';
                 else if (loc.includes('seo') || loc.includes('favicon')) group = 'Search & SEO';
-                
+
                 if (!groups[group]) groups[group] = [];
                 groups[group].push(item);
               });
@@ -309,7 +301,7 @@ export const AnalyticsPanel: React.FC = () => {
                     <h4 className="text-[9px] font-black uppercase tracking-[0.15em] text-slate-400">{name}</h4>
                     <div className="flex-1 h-[1px] bg-gray-100"></div>
                   </div>
-                  
+
                   {groups[name].map((img) => (
                     <div
                       key={img.id}
