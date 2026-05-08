@@ -293,7 +293,7 @@ interface EditorState {
   addTestimonial: () => void;
   removeTestimonial: (index: number) => void;
   updateResearch: (research: Partial<ProjectData['research']>) => void;
-
+  updateLogos: (index: number, logo: Partial<ProjectData['logos'][0]>) => void;
   updateNavbar: (navbar: Partial<ProjectData['navbar']>) => void;
   updateSocialProof: (proof: Partial<ProjectData['socialProof']>) => void;
   updateSectionVisibility: (section: keyof NonNullable<ProjectData['sections']>, visible: boolean) => void;
@@ -1028,6 +1028,13 @@ export const useStore = create<EditorState>((set, get) => {
         isDirty: true,
         version: state.version + 1
       };
+    }),
+
+    updateLogos: (index, logo) => set((state) => {
+      if (!state.projectData) return state;
+      const newLogos = [...state.projectData.logos];
+      newLogos[index] = { ...newLogos[index], ...logo };
+      return { projectData: { ...state.projectData, logos: newLogos }, isDirty: true, version: state.version + 1 };
     }),
 
     updateResearch: (research) => set((state) => ({
