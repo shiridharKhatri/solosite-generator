@@ -240,7 +240,7 @@ export const AnalyticsPanel: React.FC = () => {
 
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-3 py-1.5 bg-white border border-gray-100 hover:border-gray-200 transition-all shadow-sm group hover:shadow-md h-[46px] rounded-xl"
+        className="flex items-center gap-2.5 px-3 py-1.5 bg-white border border-gray-100 hover:border-gray-200 transition-all group h-[46px] rounded-xl"
         style={{ fontFamily: "'Outfit', sans-serif" }}
       >
         <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
