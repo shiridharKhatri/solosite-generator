@@ -196,6 +196,40 @@ ${pages.map((page: any) => `  <url>
 </urlset>`;
     zip.file("sitemap.xml", sitemap);
 
+    // Dynamic Sitemap for PHP hosts (like Hostinger)
+    if (data.seo?.sitemapOffset && data.seo.sitemapOffset > 0) {
+        const sitemapPhp = `<?php
+header("Content-Type: application/xml; charset=utf-8");
+$offset = ${data.seo.sitemapOffset};
+$date = new DateTime();
+if ($offset > 0) {
+    $date->modify("-$offset day");
+}
+$lastMod = $date->format('Y-m-d\\TH:i:sP');
+
+echo '<?xml version="1.0" encoding="UTF-8"?>';
+?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<?php
+$pages = ${JSON.stringify(pages)};
+$baseUrl = '${baseUrl}';
+foreach ($pages as $page) {
+    echo "  <url>\\n";
+    echo "    <loc>" . $baseUrl . "/" . $page['loc'] . "</loc>\\n";
+    echo "    <lastmod>" . $lastMod . "</lastmod>\\n";
+    echo "    <changefreq>" . $page['changefreq'] . "</changefreq>\\n";
+    echo "    <priority>" . $page['priority'] . "</priority>\\n";
+    echo "  </url>\\n";
+}
+?>
+</urlset>`;
+        zip.file("sitemap.php", sitemapPhp);
+        
+        const htaccess = `RewriteEngine On
+RewriteRule ^sitemap\\.xml$ sitemap.php [L]`;
+        zip.file(".htaccess", htaccess);
+    }
+
     zip.file("robots.txt", `User-agent: *
 Allow: /
 
@@ -1653,7 +1687,24 @@ ${seoBlock}
                 continue;
             }
 
-            if (imgSrc.startsWith('blob:')) continue;
+            if (imgSrc.startsWith('blob:')) {
+                try {
+                    const res = await fetch(imgSrc);
+                    const blob = await res.blob();
+                    const filename = `uploaded_${imageIndex}.png`;
+                    imagesFolder?.file(filename, blob);
+                    
+                    const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                    const regex = new RegExp(escapedSrc, "g");
+                    rawHtml = rawHtml.replace(regex, `images/${filename}`);
+                    rawCss = rawCss.replace(regex, `../images/${filename}`);
+                    imageIndex++;
+                    continue;
+                } catch (e) {
+                    console.warn(`Failed to fetch blob image: ${imgSrc}`, e);
+                    continue;
+                }
+            }
 
             let fetchUrl = imgSrc;
             if (imgSrc.startsWith('//')) {

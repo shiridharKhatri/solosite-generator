@@ -39,7 +39,16 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
       
       const formData = new FormData();
       formData.append('file', file);
-      fetch('/api/upload', { method: 'POST', body: formData }).catch(e => {});
+      
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) {
+          onChange(data.url); // Replace base64 with actual saved file path
+        }
+      } else {
+        console.error('Upload failed');
+      }
     } catch (error) {
       console.error('Failed to upload image', error);
     } finally {

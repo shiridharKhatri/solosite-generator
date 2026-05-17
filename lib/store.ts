@@ -158,6 +158,7 @@ export interface ProjectData {
     }[];
     headerScripts?: string;
     footerScripts?: string;
+    sitemapOffset?: number;
   };
   theme: {
     primary: string;
@@ -669,7 +670,8 @@ export const initialProjectData: ProjectData = {
     ogType: "website",
     twitterCard: "summary_large_image",
     headerScripts: "",
-    footerScripts: ""
+    footerScripts: "",
+    sitemapOffset: 0
   },
   navbar: {
     links: [

@@ -201,8 +201,6 @@ export default function EditorPage() {
 
   // Fetch project data if editing existing
   useEffect(() => {
-    if (projectId === storeProjectId) return; // Prevent re-fetching if already loaded
-
     if (projectId && projectId !== 'new') {
       fetch(`/api/projects?id=${projectId}`)
         .then(res => res.json())
@@ -1775,6 +1773,19 @@ export default function EditorPage() {
                         <option value="noindex, nofollow">Noindex, Nofollow</option>
                       </select>
                     </div>
+                  </div>
+
+                  <div className="mt-3">
+                    <label className="block text-xs font-bold text-gray-700 uppercase tracking-wide mb-1">Dynamic Sitemap Offset</label>
+                    <select value={projectData.seo?.sitemapOffset || 0} onChange={(e) => updateSEO({ sitemapOffset: parseInt(e.target.value) })} className="w-full px-4 py-2 bg-gray-50 border border-gray-200 rounded-none text-sm focus:ring-2 focus:ring-black outline-none">
+                      <option value={0}>No Dynamic Offset (Static)</option>
+                      <option value={1}>1 Day Ago</option>
+                      <option value={2}>2 Days Ago</option>
+                      <option value={3}>3 Days Ago</option>
+                      <option value={4}>4 Days Ago</option>
+                      <option value={5}>5 Days Ago</option>
+                    </select>
+                    <p className="text-[10px] text-gray-400 mt-1">This will generate a PHP sitemap that changes date dynamically. Works on Hostinger.</p>
                   </div>
 
                   <div>

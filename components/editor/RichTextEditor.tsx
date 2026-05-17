@@ -242,9 +242,21 @@ export const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 else if (url === '') editor.chain().focus().unsetLink().run();
               }}
               className={`p-1.5 rounded hover:bg-white/10 transition-colors ${editor.isActive('link') ? 'text-blue-400 bg-white/10' : 'text-white/70'}`}
+              title="Add/Edit Link"
             >
               <i className="fa-solid fa-link text-xs"></i>
             </button>
+
+            {/* Unlink */}
+            {editor.isActive('link') && (
+              <button
+                onClick={() => editor.chain().focus().unsetLink().run()}
+                className="p-1.5 rounded hover:bg-white/10 transition-colors text-red-400"
+                title="Remove Link"
+              >
+                <i className="fa-solid fa-link-slash text-xs"></i>
+              </button>
+            )}
 
             {/* Color */}
             <div className="relative flex items-center px-1">
