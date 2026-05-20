@@ -214,8 +214,8 @@ export default function EditorPage() {
             setProjectStatus(data.status || 'draft');
             setProjectId(projectId as string);
             setDirty(false); // Reset dirty after load
-            setIsLoading(false);
           }
+          setIsLoading(false);
         })
         .catch(err => {
           console.error('Failed to fetch project:', err);

@@ -22,12 +22,16 @@ export async function GET(req: NextRequest) {
       const project = await Project.findOne(projectQuery).populate("userId", "name email");
       if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
 
-      // Automatically clean up base64 images on load (lazy-migration)
-      const dataStr = JSON.stringify(project.data);
-      if (dataStr.includes("data:image/")) {
-        project.data = await migrateBase64Images(project.data);
-        project.markModified("data");
-        await project.save();
+      // Automatically clean up base64 images on load (lazy-migration, best-effort)
+      try {
+        const dataStr = JSON.stringify(project.data);
+        if (dataStr.includes("data:image/")) {
+          project.data = await migrateBase64Images(project.data);
+          project.markModified("data");
+          await project.save();
+        }
+      } catch (migrationErr) {
+        console.warn("Base64 migration skipped (non-blocking):", migrationErr);
       }
 
       return NextResponse.json(project);
@@ -71,8 +75,13 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const { name, data, status, theme, seoScore } = await req.json();
 
-  // Clean data before creating project
-  const cleanedData = await migrateBase64Images(data);
+  // Clean data before creating project (best-effort, falls back to raw data)
+  let cleanedData = data;
+  try {
+    cleanedData = await migrateBase64Images(data);
+  } catch (e) {
+    console.warn("Base64 migration skipped on POST:", e);
+  }
 
   const project = await Project.create({
     userId: session.user.id, // Record who created it
@@ -100,7 +109,12 @@ export async function PUT(req: NextRequest) {
   if (!project) return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 
   if (data) {
-    const cleanedData = await migrateBase64Images(data);
+    let cleanedData = data;
+    try {
+      cleanedData = await migrateBase64Images(data);
+    } catch (e) {
+      console.warn("Base64 migration skipped on PUT:", e);
+    }
     project.data = cleanedData;
     project.thumbnail = cleanedData?.hero?.image || '';
     project.markModified("data");
