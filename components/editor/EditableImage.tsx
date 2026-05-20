@@ -38,6 +38,54 @@ export const EditableImage: React.FC<EditableImageProps> = ({
     if (!isUploading && !isEditingAlt) fileInputRef.current?.click();
   };
 
+  const dataURLtoFile = (dataurl: string, filename: string): File => {
+    const arr = dataurl.split(',');
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
+  const uploadImage = async (file: File) => {
+    setIsUploading(true);
+    try {
+      // Set fast preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        onChange(e.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to server
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data.url) {
+          onChange(data.url);
+        }
+      } else {
+        console.error('Failed to upload image');
+        alert('Failed to upload image to server.');
+      }
+    } catch (error) {
+      console.error('Error uploading image', error);
+      alert('Error uploading image.');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -46,28 +94,21 @@ export const EditableImage: React.FC<EditableImageProps> = ({
       setCompressionState({
         isOpen: true,
         file,
-        onConfirm: (url) => onChange(url),
-        onKeepOriginal: () => processFile(file)
+        onConfirm: (url) => {
+          try {
+            const compressedFile = dataURLtoFile(url, file.name);
+            uploadImage(compressedFile);
+          } catch (err) {
+            console.error('Failed to parse compressed URL to file', err);
+            uploadImage(file);
+          }
+        },
+        onKeepOriginal: () => uploadImage(file)
       });
       return;
     }
 
-    processFile(file);
-  };
-
-  const processFile = async (file: File) => {
-    setIsUploading(true);
-    try {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        onChange(e.target?.result as string);
-        setIsUploading(false);
-      };
-      reader.readAsDataURL(file);
-    } catch (error) {
-      console.error('Failed to process image', error);
-      setIsUploading(false);
-    }
+    uploadImage(file);
   };
 
   const currentSize = getBase64Size(src);

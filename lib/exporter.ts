@@ -1653,13 +1653,35 @@ ${seoBlock}
         if (s.cards) s.cards.forEach((c: any) => { if (c.image) imageSources.add(c.image); });
     });
 
-    const sourcesArray = Array.from(imageSources);
-    sourcesArray.sort((a, b) => b.length - a.length);
-
     // Inject blocks BEFORE image replacement loop so they get processed too
     rawHtml = rawHtml.replace('</body>', `${socialProofBlock}${scrollToTopBlock}${seo.footerScripts ? `\n    <!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}\n</body>`);
 
-    for (const imgSrc of sourcesArray) {
+    // Scan rawHtml for any additional images (e.g. from rich text or custom HTML blocks)
+    // 1. Standard image tags and favicon/og image tags
+    const srcRegex = /(?:src|href)=["'](data:image\/[^"']+|[^"']+\.(?:png|jpg|jpeg|gif|webp|svg|ico|avif)(?:\?[^"']*)?)["']/gi;
+    let match;
+    while ((match = srcRegex.exec(rawHtml)) !== null) {
+        const url = match[1];
+        if (url && !url.startsWith('images/') && !url.startsWith('../images/')) {
+            imageSources.add(url);
+        }
+    }
+
+    // 2. CSS background url() pattern
+    const cssUrlRegex = /url\(["']?([^"')]+\.(?:png|jpg|jpeg|gif|webp|svg|ico|avif)(?:\?[^"']*)?)["']?\)/gi;
+    while ((match = cssUrlRegex.exec(rawHtml)) !== null) {
+        const url = match[1];
+        if (url && !url.startsWith('images/') && !url.startsWith('../images/')) {
+            imageSources.add(url);
+        }
+    }
+
+    const sourcesArray = Array.from(imageSources);
+    // Filter out trivial values and sort by length descending to prevent partial matching conflicts
+    const filteredSources = sourcesArray.filter(src => src && src.length >= 4);
+    filteredSources.sort((a, b) => b.length - a.length);
+
+    for (const imgSrc of filteredSources) {
         try {
             if (!imgSrc) continue;
 
@@ -1679,10 +1701,8 @@ ${seoBlock}
 
                 imagesFolder?.file(filename, bytes);
 
-                const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-                const regex = new RegExp(escapedSrc, "g");
-                rawHtml = rawHtml.replace(regex, `images/${filename}`);
-                rawCss = rawCss.replace(regex, `../images/${filename}`);
+                rawHtml = rawHtml.replaceAll(imgSrc, `images/${filename}`);
+                rawCss = rawCss.replaceAll(imgSrc, `../images/${filename}`);
                 imageIndex++;
                 continue;
             }
@@ -1694,10 +1714,8 @@ ${seoBlock}
                     const filename = `uploaded_${imageIndex}.png`;
                     imagesFolder?.file(filename, blob);
 
-                    const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-                    const regex = new RegExp(escapedSrc, "g");
-                    rawHtml = rawHtml.replace(regex, `images/${filename}`);
-                    rawCss = rawCss.replace(regex, `../images/${filename}`);
+                    rawHtml = rawHtml.replaceAll(imgSrc, `images/${filename}`);
+                    rawCss = rawCss.replaceAll(imgSrc, `../images/${filename}`);
                     imageIndex++;
                     continue;
                 } catch (e) {
@@ -1733,11 +1751,8 @@ ${seoBlock}
 
                 imagesFolder?.file(filename, blob);
 
-                const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-                const regex = new RegExp(escapedSrc, "g");
-
-                rawHtml = rawHtml.replace(regex, `images/${filename}`);
-                rawCss = rawCss.replace(regex, `../images/${filename}`);
+                rawHtml = rawHtml.replaceAll(imgSrc, `images/${filename}`);
+                rawCss = rawCss.replaceAll(imgSrc, `../images/${filename}`);
                 imageIndex++;
             }
         } catch (e) {
