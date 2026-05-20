@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import connectDB from "@/lib/db";
 import { Project } from "@/models/Project";
+import { migrateBase64Images } from "@/lib/migrate";
 
 export async function GET(req: NextRequest) {
   const session = await getServerSession(authOptions);
@@ -20,6 +21,14 @@ export async function GET(req: NextRequest) {
       const projectQuery = isSuperAdmin ? { _id: id } : { _id: id, userId: session.user.id };
       const project = await Project.findOne(projectQuery).populate("userId", "name email");
       if (!project) return NextResponse.json({ error: "Project not found" }, { status: 404 });
+
+      // Automatically clean up base64 images on load (lazy-migration)
+      const dataStr = JSON.stringify(project.data);
+      if (dataStr.includes("data:image/")) {
+        project.data = await migrateBase64Images(project.data);
+        project.markModified("data");
+        await project.save();
+      }
 
       return NextResponse.json(project);
     }
@@ -62,13 +71,16 @@ export async function POST(req: NextRequest) {
   await connectDB();
   const { name, data, status, theme, seoScore } = await req.json();
 
+  // Clean data before creating project
+  const cleanedData = await migrateBase64Images(data);
+
   const project = await Project.create({
     userId: session.user.id, // Record who created it
     name,
-    data,
+    data: cleanedData,
     status: status || 'draft',
-    thumbnail: data?.hero?.image || '',
-    theme: theme || data?.layoutStyle || 'default',
+    thumbnail: cleanedData?.hero?.image || '',
+    theme: theme || cleanedData?.layoutStyle || 'default',
     seoScore: seoScore || 0,
   });
 
@@ -88,8 +100,10 @@ export async function PUT(req: NextRequest) {
   if (!project) return NextResponse.json({ error: "Project not found or unauthorized" }, { status: 404 });
 
   if (data) {
-    project.data = data;
-    project.thumbnail = data?.hero?.image || '';
+    const cleanedData = await migrateBase64Images(data);
+    project.data = cleanedData;
+    project.thumbnail = cleanedData?.hero?.image || '';
+    project.markModified("data");
   }
   if (status) project.status = status;
   if (name) project.name = name;
