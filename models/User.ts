@@ -6,6 +6,11 @@ const UserSchema = new mongoose.Schema({
   image: String,
   password: { type: String, select: false },
   role: { type: String, default: 'admin' },
+  googleAccessToken: String,
+  googleRefreshToken: String,
+  googleTokenExpiry: Date,
+  googleDriveFolderId: String,
+  autoBackupGoogleDrive: { type: Boolean, default: false },
 }, { timestamps: true });
 
 export const User = mongoose.models.User || mongoose.model('User', UserSchema);

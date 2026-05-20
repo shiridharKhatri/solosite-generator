@@ -124,6 +124,9 @@ export default function EditorPage() {
   const [isExporting, setIsExporting] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const [googleBackupConfig, setGoogleBackupConfig] = useState<{ connected: boolean; autoBackup: boolean }>({ connected: false, autoBackup: false });
+  const [backupStatus, setBackupStatus] = useState<'idle' | 'backing_up' | 'success' | 'error'>('idle');
+  const [backupMessage, setBackupMessage] = useState('');
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop');
   const [isSEOModalOpen, setIsSEOModalOpen] = useState(false);
   const [seoTab, setSeoTab] = useState<'general' | 'social' | 'advanced'>('general');
@@ -332,6 +335,18 @@ export default function EditorPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [isDirty]);
 
+  // Fetch Google Backup Config on mount
+  useEffect(() => {
+    fetch('/api/auth/google/status')
+      .then(res => res.json())
+      .then(data => {
+        if (data && !data.error) {
+          setGoogleBackupConfig({ connected: data.connected, autoBackup: data.autoBackup });
+        }
+      })
+      .catch(err => console.error("Error fetching Google status inside editor:", err));
+  }, []);
+
   const handleExport = React.useCallback(async () => {
     if (!projectData) return;
 
@@ -355,12 +370,41 @@ export default function EditorPage() {
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
+
+      // Trigger automatic backup to Google Drive if configured
+      if (googleBackupConfig.connected && googleBackupConfig.autoBackup) {
+        setBackupStatus('backing_up');
+        try {
+          const zipName = customName.endsWith('.zip') ? customName : `${customName}.zip`;
+          const formData = new FormData();
+          formData.append('file', blob, zipName);
+
+          const backupRes = await fetch('/api/export/google-drive', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const backupData = await backupRes.json();
+          if (backupRes.ok && backupData.success) {
+            setBackupStatus('success');
+            setTimeout(() => setBackupStatus('idle'), 4000);
+          } else {
+            setBackupStatus('error');
+            setBackupMessage(backupData.error || 'Failed to upload backup.');
+            setTimeout(() => setBackupStatus('idle'), 6000);
+          }
+        } catch (err: any) {
+          setBackupStatus('error');
+          setBackupMessage(err.message || 'Network error occurred during backup.');
+          setTimeout(() => setBackupStatus('idle'), 6000);
+        }
+      }
     } catch (error) {
       alert('Export failed.');
     } finally {
       setIsExporting(false);
     }
-  }, [projectData]);
+  }, [projectData, googleBackupConfig]);
 
   // Keyboard shortcuts: Ctrl+Z = Undo, Ctrl+Y / Ctrl+Shift+Z = Redo
   useEffect(() => {
@@ -1917,6 +1961,45 @@ export default function EditorPage() {
       <ImageCompressionDialog />
       {isReorderPanelOpen && (
         <SectionReorderPanel onClose={() => setIsReorderPanelOpen(false)} />
+      )}
+
+      {/* Google Drive Backup Notification */}
+      {backupStatus !== 'idle' && (
+        <div className="fixed bottom-6 right-6 z-[99999] bg-white border border-gray-100 rounded-none shadow-2xl p-4 flex items-center gap-3 animate-in slide-in-from-bottom-6 fade-in duration-300 max-w-sm">
+          {backupStatus === 'backing_up' && (
+            <>
+              <div className="w-8 h-8 rounded-none bg-blue-50 flex items-center justify-center text-blue-500">
+                <i className="fa-solid fa-circle-notch animate-spin text-sm"></i>
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-widest text-blue-500">Google Drive</div>
+                <div className="text-xs font-bold text-gray-800">Uploading backup package...</div>
+              </div>
+            </>
+          )}
+          {backupStatus === 'success' && (
+            <>
+              <div className="w-8 h-8 rounded-none bg-emerald-50 flex items-center justify-center text-emerald-500">
+                <i className="fa-solid fa-cloud-arrow-up text-sm"></i>
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-widest text-emerald-500">Backup Complete</div>
+                <div className="text-xs font-bold text-gray-800">Saved to `SoloSite Backups` folder.</div>
+              </div>
+            </>
+          )}
+          {backupStatus === 'error' && (
+            <>
+              <div className="w-8 h-8 rounded-none bg-rose-50 flex items-center justify-center text-rose-500">
+                <i className="fa-solid fa-triangle-exclamation text-sm"></i>
+              </div>
+              <div>
+                <div className="text-[11px] font-black uppercase tracking-widest text-rose-500">Backup Failed</div>
+                <div className="text-xs font-bold text-gray-600 truncate max-w-[200px]" title={backupMessage}>{backupMessage || 'Upload error'}</div>
+              </div>
+            </>
+          )}
+        </div>
       )}
     </div>
   );

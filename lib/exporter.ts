@@ -224,7 +224,7 @@ foreach ($pages as $page) {
 ?>
 </urlset>`;
         zip.file("sitemap.php", sitemapPhp);
-        
+
         const htaccess = `RewriteEngine On
 RewriteRule ^sitemap\\.xml$ sitemap.php [L]`;
         zip.file(".htaccess", htaccess);
@@ -1693,7 +1693,7 @@ ${seoBlock}
                     const blob = await res.blob();
                     const filename = `uploaded_${imageIndex}.png`;
                     imagesFolder?.file(filename, blob);
-                    
+
                     const escapedSrc = imgSrc.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
                     const regex = new RegExp(escapedSrc, "g");
                     rawHtml = rawHtml.replace(regex, `images/${filename}`);
