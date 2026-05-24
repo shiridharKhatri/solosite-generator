@@ -18,7 +18,7 @@ export const config = {
     "/editor/:path*",
     "/api/projects/:path*",
     "/api/export/:path*",
-    "/api/upload/:path*",
+    "/api/upload",
     "/api/admin/:path*",
   ],
 };
