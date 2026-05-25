@@ -448,7 +448,7 @@ export const OrganicTemplate: React.FC = () => {
                 alt={projectData.hero.logoImageAlt}
                 onChange={(val) => updateHero({ logoImage: val })}
                 onAltChange={(val) => updateHero({ logoImageAlt: val })}
-                className="w-full h-full object-contain grayscale hover:grayscale-0 transition-all"
+                className="w-full h-full object-contain"
                 style={{ objectFit: 'contain' }}
               />
             </div>
@@ -601,7 +601,7 @@ export const OrganicTemplate: React.FC = () => {
                     const nl = projectData.logos.filter((_, idx) => idx !== i);
                     updateProjectData({ logos: nl });
                   }}
-                  className="img-fluid grayscale opacity-40 hover:opacity-100 hover:grayscale-0 transition-all"
+                  className="img-fluid opacity-70 hover:opacity-100 transition-all"
                 />
               </div>
             ))}
@@ -700,7 +700,7 @@ export const OrganicTemplate: React.FC = () => {
                     alt={feature.imageAlt}
                     onChange={(val) => updateFeature(i, { image: val })}
                     onAltChange={(val) => updateFeature(i, { imageAlt: val })}
-                    className="w-12 h-12 mx-auto mb-4 grayscale group-hover/feat:grayscale-0 transition-all"
+                    className="w-12 h-12 mx-auto mb-4 object-contain"
                   />
                   <EditableText tagName="h4" className="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest" value={feature.title} onChange={(val) => updateFeature(i, { title: val })} />
                   <EditableText tagName="p" className="mb-0 text-stone-700 text-xs" style={{ lineHeight: 1.8 }} value={feature.description} onChange={(val) => updateFeature(i, { description: val })} />
@@ -785,7 +785,7 @@ export const OrganicTemplate: React.FC = () => {
                     alt={projectData.about.imageAlt}
                     onChange={(val) => updateAbout({ image: val })}
                     onAltChange={(val) => updateAbout({ imageAlt: val })}
-                    className="img-fluid grayscale hover:grayscale-0 transition-all duration-700"
+                    className="img-fluid object-contain"
                     style={{ maxHeight: '400px', objectFit: 'contain' }}
                   />
                 </div>
@@ -970,7 +970,7 @@ export const OrganicTemplate: React.FC = () => {
                         alt={item.imageAlt}
                         onChange={(val) => updateTestimonials(i, { image: val })}
                         onAltChange={(val) => updateTestimonials(i, { imageAlt: val })}
-                        className="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all"
+                        className="w-100 h-100 object-cover"
                       />
                     </div>
                     <EditableText tagName="h5" className="fw-bold mb-1 text-sm font-serif" value={item.name} onChange={(val) => updateTestimonials(i, { name: val })} />
@@ -1138,7 +1138,7 @@ export const OrganicTemplate: React.FC = () => {
           <div className="flex-shrink-0 w-16 h-16 bg-stone-50 border border-stone-100 p-1 flex items-center justify-center">
             <img
               src={projectData.socialProof?.items[proofIndex]?.image || projectData.hero.image || '/image/default.png'}
-              className="w-full h-full object-contain grayscale"
+              className="w-full h-full object-contain"
               alt={projectData.socialProof?.items[proofIndex]?.imageAlt || "Botanical Batch"}
               onError={(e) => { (e.target as HTMLImageElement).src = '/image/default.png'; }}
             />

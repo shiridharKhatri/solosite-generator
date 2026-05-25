@@ -325,7 +325,7 @@ Sitemap: ${baseUrl}/sitemap.xml`);
             </a>
         </div>
         
-        <div class="mt-20 flex items-center justify-center gap-4 opacity-30 grayscale">
+        <div class="mt-20 flex items-center justify-center gap-4 opacity-50">
             <img src="https://upload.wikimedia.org/wikipedia/commons/b/b5/PayPal.svg" alt="PayPal" class="h-4" />
             <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-3" />
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="Mastercard" class="h-5" />
@@ -1168,7 +1168,7 @@ ${seoBlock}
             <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
                 ${(data.logos || []).map((logo: any) => `
                 <div style="width: 80px;">
-                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" loading="lazy" />
+                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid opacity-75 hover:opacity-100 transition-all" loading="lazy" />
                 </div>`).join('')}
             </div>
 
@@ -1279,7 +1279,7 @@ ${seoBlock}
             <div class="row g-5 align-items-center">
                 <div class="col-lg-5 text-center">
                     <div class="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
-                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" loading="lazy" />
+                        <img src="${data.about.image}" alt="About Us" class="img-fluid transition-all duration-700" style="max-height: 400px; object-fit: contain;" loading="lazy" />
                     </div>
                 </div>
                 <div class="col-lg-7">
@@ -1370,7 +1370,7 @@ ${seoBlock}
                 <div class="col-md-4">
                     <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
                         <div class="w-16 h-16 rounded-circle mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
-                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" loading="lazy" />
+                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover" loading="lazy" />
                         </div>
                         <h5 class="fw-bold mb-1 text-sm font-serif">${cleanHtmlText(t.name)}</h5>
                         <div class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${cleanHtmlText(t.role || '')}</div>
@@ -1595,7 +1595,7 @@ ${seoBlock}
         <div class="container px-3 d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="#">
                 <div style="width: 45px; height: 45px; flex-shrink: 0;">
-                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" class="w-100 h-100 object-contain grayscale hover:grayscale-0 transition-all" style="object-fit: contain;" alt="Logo" fetchpriority="high" />` : ''}
+                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" class="w-100 h-100 object-contain" style="object-fit: contain;" alt="Logo" fetchpriority="high" />` : ''}
                 </div>
                 <span class="fs-3 fw-bold logo" style="color: var(--org-primary);">${data.productName}</span>
             </a>
