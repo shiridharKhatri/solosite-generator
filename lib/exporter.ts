@@ -15,6 +15,16 @@ const escapeHtml = (value: any) => String(value ?? '')
 
 const escapeAttr = (value: any) => escapeHtml(value);
 const renderRichText = (value: any) => String(value ?? '');
+const cleanHtmlText = (value: any) => {
+    let str = String(value ?? '');
+    if (str.startsWith('<p>') && str.endsWith('</p>')) {
+        const content = str.substring(3, str.length - 4);
+        if (!content.includes('<p>') && !content.includes('</p>')) {
+            return content;
+        }
+    }
+    return str;
+};
 
 export async function generateProjectZip(data: any) {
     // Helper to render the multi-bottle stack in static exports
@@ -23,7 +33,7 @@ export async function generateProjectZip(data: any) {
         if (total <= 1) {
             return `
             <div style="position: relative; height: 200px; width: 100%; display: flex; align-items: center; justify-content: center;">
-                <img src="${image || '/image/default.png'}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain; transform: scale(1.15); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));" />
+                <img src="${image || '/image/default.png'}" alt="${title}" class="mx-auto" style="height: ${height}; object-fit: contain; transform: scale(1.15); filter: drop-shadow(0 20px 40px rgba(0,0,0,0.12));" loading="lazy" />
             </div>`;
         }
 
@@ -49,7 +59,7 @@ export async function generateProjectZip(data: any) {
                 filter = 'drop-shadow(0 15px 35px rgba(0,0,0,0.15))';
             }
 
-            return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;">`;
+            return `<img src="${image || '/image/default.png'}" alt="${title}" style="position: absolute; left: 50%; top: 50%; height: ${height}; object-fit: contain; transform: ${transform}; z-index: ${zIndex}; filter: ${filter}; transition: all 1s ease;" loading="lazy">`;
         }).join('');
 
         return `<div style="position: relative; height: 200px; width: 100%; perspective: 1200px; overflow: visible; display: flex; align-items: center; justify-content: center;">${stackHtml}</div>`;
@@ -65,16 +75,16 @@ export async function generateProjectZip(data: any) {
 
             const isOrganic = layoutStyle === 'organic';
             const showTitleInContent = section.title && isOrganic;
-            const titleHtml = showTitleInContent ? `<h2 class="fw-bold mb-4 font-serif" style="font-size: 2.5rem;">${escapeHtml(section.title)}</h2>` : '';
+            const titleHtml = showTitleInContent ? `<h2 class="fw-bold mb-4 font-serif" style="font-size: 2.5rem;">${cleanHtmlText(section.title)}</h2>` : '';
 
             const contentHtml = section.content ? `<div class="fs-5 opacity-90" style="line-height: 1.8;">${renderRichText(section.content)}</div>` : '';
             const contentHtmlLg = section.content ? `<div class="opacity-90" style="line-height: 1.9; font-size: 1.1rem;">${renderRichText(section.content)}</div>` : '';
-            const imageHtml = `<div class="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-sm" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;"><img src="${escapeAttr(section.image || '/image/banner-img.webp')}" alt="${escapeAttr(section.imageAlt || section.title)}" class="img-fluid rounded-xl mx-auto d-block" style="max-height: 450px; object-fit: contain; border-radius: 0.75rem;" /></div>`;
+            const imageHtml = `<div class="p-4 bg-white/5 border border-white/10 rounded-2xl shadow-sm" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem;"><img src="${escapeAttr(section.image || '/image/banner-img.webp')}" alt="${escapeAttr(section.imageAlt || section.title)}" class="img-fluid rounded-xl mx-auto d-block" style="max-height: 450px; object-fit: contain; border-radius: 0.75rem;" loading="lazy" /></div>`;
 
             const buttonHtml = section.buttonText ? `
                 <div class="mt-4 ${section.type === 'text' || section.type === 'cards' ? 'text-center mt-5' : ''}">
                     <a href="${section.buttonHref || '#order'}" class="d-inline-block fw-bold ${isOrganic ? 'organic-btn organic-btn-primary' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${secondaryColor}; color: #000; font-size: 1.1rem; padding: 1rem 2.5rem; text-decoration: none; border-radius: 50px;` : ''}">
-                        ${section.buttonText}
+                        ${cleanHtmlText(section.buttonText)}
                         ${section.icon ? `<i class="${section.icon}" style="color: ${section.iconColor || 'inherit'};"></i>` : ''}
                     </a>
                 </div>
@@ -104,15 +114,15 @@ export async function generateProjectZip(data: any) {
                 `;
             } else if (section.type === 'cards') {
                 const cardsHtml = (section.cards || []).map((card: any) => {
-                    const cardImageHtml = card.image ? `<div class="mb-3 rounded-2 overflow-hidden" style="max-height: 180px;"><img src="${escapeAttr(card.image)}" alt="${escapeAttr(card.title)}" class="img-fluid w-100" style="object-fit: cover; max-height: 180px;" /></div>` : '';
+                    const cardImageHtml = card.image ? `<div class="mb-3 rounded-2 overflow-hidden" style="max-height: 180px;"><img src="${escapeAttr(card.image)}" alt="${escapeAttr(card.title)}" class="img-fluid w-100" style="object-fit: cover; max-height: 180px;" loading="lazy" /></div>` : '';
                     const cardIconHtml = !card.image && card.icon ? `<i class="${escapeAttr(card.icon)} fs-1 mb-3 d-block" style="color: ${card.iconColor || primaryColor};"></i>` : '';
-                    const cardButtonHtml = card.buttonText ? `<div class="mt-3 pt-3 border-top"><a href="${escapeAttr(card.buttonHref || '#')}" class="d-inline-block fw-bold text-decoration-none ${isOrganic ? 'organic-btn organic-btn-outline' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${primaryColor}; color: #fff; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 50px;` : ''}">${escapeHtml(card.buttonText)} ${card.icon ? `<i class="${escapeAttr(card.icon)}" style="color: ${card.iconColor || 'inherit'};"></i>` : ''}</a></div>` : '';
+                    const cardButtonHtml = card.buttonText ? `<div class="mt-3 pt-3 border-top"><a href="${escapeAttr(card.buttonHref || '#')}" class="d-inline-block fw-bold text-decoration-none ${isOrganic ? 'organic-btn organic-btn-outline' : 'btn-custom-pill shadow-sm'}" style="${!isOrganic ? `background-color: ${primaryColor}; color: #fff; font-size: 0.85rem; padding: 0.6rem 1.5rem; border-radius: 50px;` : ''}">${cleanHtmlText(card.buttonText)} ${card.icon ? `<i class="${escapeAttr(card.icon)}" style="color: ${card.iconColor || 'inherit'};"></i>` : ''}</a></div>` : '';
                     return `
                     <div class="col-12 col-md-6 col-lg-4">
                         <div class="h-100 p-4 border rounded-3 bg-white text-dark shadow-sm text-center d-flex flex-column">
                             ${cardImageHtml}
                             ${cardIconHtml}
-                            <h4 class="fw-bold mb-3">${escapeHtml(card.title)}</h4>
+                            <h4 class="fw-bold mb-3">${cleanHtmlText(card.title)}</h4>
                             <div class="mb-0 text-muted flex-grow-1" style="line-height: 1.6;">${renderRichText(card.content)}</div>
                             ${cardButtonHtml}
                         </div>
@@ -136,7 +146,7 @@ export async function generateProjectZip(data: any) {
                 topTitleHtml = `
                 <section class="container-fluid text-center mt-0 sectioncolor" style="background-color: ${primaryColor};">
                     <div class="container">
-                        <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${escapeHtml(section.title)}</h2>
+                        <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${cleanHtmlText(section.title)}</h2>
                     </div>
                 </section>
                 `;
@@ -661,11 +671,13 @@ ${customTagsHtml}
 
     ${schemaJSON ? `<!-- JSON-LD Schema -->\n    <script type="application/ld+json">\n${schemaJSON}\n    </script>` : ''}
     ${seo.headerScripts ? `<!-- Header Scripts -->\n    ${seo.headerScripts}` : ''}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     `;
 
     if (layoutStyle !== 'organic') {
         cssContent = `
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
 html, body { overflow-x: hidden; overflow-y: auto; scroll-behavior: smooth; margin: 0; padding: 0; }
 body { font-family: 'Inter', sans-serif; color: #333; background-color: #ffffff; overflow-x: hidden; }
 .navbar { position: sticky; top: 0; z-index: 1000; }
@@ -680,7 +692,7 @@ p, span, li, a, .nav-link, button { font-family: 'Inter', sans-serif; }
 @media (max-width: 576px) { section .btn-custom-pill { min-width: 100%; } }
 .btn-custom-pill:hover { opacity: 0.9; transform: translateY(-2px); color: black; }
 .about-description { text-align: justify; }
-.text-muted, .text-muted * { color: #444 !important; }
+.text-muted { color: #444; }
 .title-scale { font-size: clamp(1.5rem, 4vw, 2.75rem); line-height: 1.15; overflow-wrap: break-word; hyphens: auto; }
 @media (max-width: 992px) { 
     .title-scale { font-size: 1.6rem !important; } 
@@ -728,7 +740,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             <div class="row hero-row">
                 <div class="col-12 col-lg-5 text-center mb-3 mb-lg-0 hero-img-col">
                     <div class="position-relative hero-img-wrap hero-media">
-                        <img src="${escapeAttr(data.hero?.image || '')}" alt="${escapeAttr(data.hero?.imageAlt || 'Product Banner')}" class="mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
+                        <img src="${escapeAttr(data.hero?.image || '')}" alt="${escapeAttr(data.hero?.imageAlt || 'Product Banner')}" class="mx-auto d-block" style="${data.hero.imageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" fetchpriority="high" />
                         ${data.hero?.badge?.enabled ? `
                         <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
                             <img src="${escapeAttr(data.hero.badge.image)}" alt="${escapeAttr(data.hero.badge.imageAlt || 'Badge')}" style="width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 20px 13px rgba(0,0,0,0.03)) drop-shadow(0 8px 5px rgba(0,0,0,0.08));" />
@@ -767,11 +779,11 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
                     </div>
                 </div>
                 <div class="col-12 col-lg-7 px-3 px-lg-5 text-center text-lg-start" style="padding-top: 0.25rem;">
-                    <div class="fw-bold mb-3 title-scale w-100" style="margin-top: 0;">${escapeHtml(data.hero?.title)}</div>
-                    <div class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100" style="line-height: 1.7; text-align: justify; white-space: pre-line;">${escapeHtml(data.hero?.subtitle)}</div>
+                    <div class="fw-bold mb-3 title-scale w-100" style="margin-top: 0;">${cleanHtmlText(data.hero?.title)}</div>
+                    <div class="fs-6 mt-2 fw-medium text-dark opacity-90 mx-auto mx-lg-0 w-100" style="line-height: 1.7; text-align: justify; white-space: pre-line;">${cleanHtmlText(data.hero?.subtitle)}</div>
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-4 justify-content-center justify-content-lg-start align-items-center mt-4">
-                        <a href="${escapeAttr(data.hero?.buttonHref)}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${escapeHtml(data.hero?.buttonText)}</span> ${data.hero?.icon ? `<i class="${escapeAttr(data.hero.icon)}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}</a>
-                        <a href="${escapeAttr(data.hero?.secondaryButtonHref || '#')}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${escapeHtml(data.hero?.secondaryButtonText || 'Learn More')}</span> ${data.hero?.secondaryIcon ? `<i class="${escapeAttr(data.hero.secondaryIcon)}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>
+                        <a href="${escapeAttr(data.hero?.buttonHref)}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none" style="background-color: ${secondaryColor} !important; color: #000 !important; border-radius: 50px; font-weight: 700;"><span>${cleanHtmlText(data.hero?.buttonText)}</span> ${data.hero?.icon ? `<i class="${escapeAttr(data.hero.icon)}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}</a>
+                        <a href="${escapeAttr(data.hero?.secondaryButtonHref || '#')}" class="btn-custom-pill px-5 py-2.5 fs-6 text-decoration-none secondary-btn-export" style="background-color: transparent !important; border: 2px solid #ddd !important; color: #333 !important; border-radius: 50px; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; gap: 10px;"><span>${cleanHtmlText(data.hero?.secondaryButtonText || 'Learn More')}</span> ${data.hero?.secondaryIcon ? `<i class="${escapeAttr(data.hero.secondaryIcon)}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>
                     </div>
                 </div>
             </div>
@@ -780,16 +792,16 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             features: (data.sections?.features !== false) ? `
     <section id="features" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.featuresTitle || 'Features'}</h2>
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${cleanHtmlText(data.featuresTitle || 'Features')}</h2>
         </div>
     </section>
 
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.featuresSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.featuresSubtitle}</p></div>` : ''}
+            ${data.featuresSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.featuresSubtitle)}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
                 ${(data.features || []).map((f: any) => `
-                <div class="col-12 col-sm-6 col-md-4 col-lg-3"><div class="bgbadge text-center h-100"><img src="${escapeAttr(f.image)}" alt="${escapeAttr(f.imageAlt || f.title)}" class="img-fluid mb-4" style="height: 120px; object-fit: contain; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" /><h3 class="fw-bold fs-4 mb-3">${escapeHtml(f.title)}</h3><div class="fs-5 text-muted">${escapeHtml(f.description)}</div></div></div>
+                <div class="col-12 col-sm-6 col-md-4 col-lg-3"><div class="bgbadge text-center h-100"><img src="${escapeAttr(f.image)}" alt="${escapeAttr(f.imageAlt || f.title)}" class="img-fluid mb-4" style="height: 120px; object-fit: contain; ${f.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" loading="lazy" /><h3 class="fw-bold fs-4 mb-3">${cleanHtmlText(f.title)}</h3><div class="fs-5 text-muted">${cleanHtmlText(f.description)}</div></div></div>
                 `).join('')}
             </div>
         </div>
@@ -797,49 +809,49 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             about: (data.sections?.about !== false) ? `
     <section id="about" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.about?.title || 'About'}</h2>
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${cleanHtmlText(data.about?.title || 'About')}</h2>
         </div>
     </section>
 
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
-            ${data.about?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.about.subtitle}</p></div>` : ''}
+            ${data.about?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.about.subtitle)}</p></div>` : ''}
             <div class="clearfix">
                 <!-- Image Section - Floated Right for Newspaper Style -->
                 <div class="float-lg-end ms-lg-5 mb-4 mb-lg-1 col-12 col-lg-5 px-0 text-center">
                     <div class="d-inline-block p-3 bg-white shadow-md border border-light w-100" style="${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1;' : 'border-radius: 8px;'}">
-                        <img src="${escapeAttr(data.about?.image)}" alt="${escapeAttr(data.about?.imageAlt || 'About Product')}" class="img-fluid rounded w-100" style="max-height: 380px; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
+                        <img src="${escapeAttr(data.about?.image)}" alt="${escapeAttr(data.about?.imageAlt || 'About Product')}" class="img-fluid rounded w-100" style="max-height: 380px; ${data.about.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" loading="lazy" />
                         <div class="mt-2" style="font-size: 9px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.2em; border-top: 1px solid #eee; pt-2;">Editorial: Clinical Formula Composition</div>
                     </div>
                 </div>
-                <div class="fs-5 text-muted about-description" style="line-height: 1.7; text-align: justify; color: #444 !important;">${data.about?.description}</div>
+                <div class="fs-5 text-muted about-description" style="line-height: 1.7; text-align: justify; color: #444 !important;">${cleanHtmlText(data.about?.description)}</div>
             </div>
         </div>
     </section>` : '',
             research: (data.sections?.research !== false && data.research) ? `
     <section id="research" class="container-fluid text-center sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.research.title}</h2>
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${cleanHtmlText(data.research.title)}</h2>
         </div>
     </section>
     <section class="container-fluid py-5 sectioncolor1 border-bottom">
         <div class="container">
-            ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.research.subtitle}</p></div>` : ''}
+            ${data.research.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.research.subtitle)}</p></div>` : ''}
             <div class="row align-items-center g-5">
                 <div class="col-12 col-lg-6 text-center text-lg-start">
-                    <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${data.research.description}</p>
+                    <p class="fs-5 text-muted mb-4" style="line-height: 1.7; text-align: justify;">${cleanHtmlText(data.research.description)}</p>
                     <div class="row g-4 mt-2">
                         ${data.research.stats.map((stat: any) => `
                         <div class="col-4">
-                            <div class="fw-bold fs-2" style="color: ${primaryColor};">${stat.value}</div>
-                            <div class="text-muted small fw-bold">${stat.label}</div>
+                            <div class="fw-bold fs-2" style="color: ${primaryColor};">${cleanHtmlText(stat.value)}</div>
+                            <div class="text-muted small fw-bold">${cleanHtmlText(stat.label)}</div>
                         </div>
                         `).join('')}
                     </div>
                 </div>
                 <div class="col-12 col-lg-6">
                     <div class="p-3 bg-white border rounded shadow-sm">
-                        <img src="${escapeAttr(data.research.image)}" alt="${escapeAttr(data.research.imageAlt || 'Clinical Research')}" class="img-fluid rounded w-100" style="max-height: 400px; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" />
+                        <img src="${escapeAttr(data.research.image)}" alt="${escapeAttr(data.research.imageAlt || 'Clinical Research')}" class="img-fluid rounded w-100" style="max-height: 400px; ${data.research.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: contain;'}" loading="lazy" />
                     </div>
                 </div>
             </div>
@@ -848,16 +860,16 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             benefits: (data.sections?.benefits !== false) ? `
     <section id="benefits" class="container-fluid text-center sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${data.benefits?.title || 'Benefits'}</h2>
+            <h2 class="text-center fs-1 py-3 fw-bold text-white mb-0">${cleanHtmlText(data.benefits?.title || 'Benefits')}</h2>
         </div>
     </section>
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.benefits?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.benefits.subtitle}</p></div>` : ''}
-            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="width: 100%;">${data.benefits?.description || ''}</p>
+            ${data.benefits?.subtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.benefits.subtitle)}</p></div>` : ''}
+            <p class="fs-5 text-center mb-5  mx-auto text-muted" style="width: 100%;">${cleanHtmlText(data.benefits?.description || '')}</p>
             <div class="row g-4 justify-content-center">
                 ${(data.benefits?.items || []).map((b: any) => `
-                <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${b.title}</h3><div class="fs-5 text-muted mb-0">${b.description}</div></div></div>
+                <div class="col-12 col-lg-10"><div class="card h-100 border-0 p-4 bg-white shadow-sm" style="border-radius: 12px;"><h3 class="fw-bold fs-4 mb-2">${cleanHtmlText(b.title)}</h3><div class="fs-5 text-muted mb-0">${cleanHtmlText(b.description)}</div></div></div>
                 `).join('')}
             </div>
         </div>
@@ -865,22 +877,22 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             ingredients: (data.sections?.ingredients !== false) ? `
     <section id="ingredients" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${escapeHtml(data.ingredients?.title || 'Ingredients')}</h2>
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${cleanHtmlText(data.ingredients?.title || 'Ingredients')}</h2>
         </div>
     </section>
 
     <section class="container-fluid py-5 sectioncolor1">
         <div class="container">
-            ${data.ingredients?.subtitle ? `<div class="text-center mb-5"><div class="fs-5 text-muted mx-auto" style="width: 100%;">${renderRichText(data.ingredients.subtitle)}</div></div>` : ''}
+            ${data.ingredients?.subtitle ? `<div class="text-center mb-5"><div class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.ingredients.subtitle)}</div></div>` : ''}
             <div class="row g-4 justify-content-center">
                 ${(data.ingredients?.items || []).map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="ingredient-card shadow-sm border-0">
                         <div class="ingredient-img-frame mx-auto" style="${item.isCircular ? 'border-radius: 50%;' : 'border-radius: 0;'} box-shadow: 0 0 0 2px ${secondaryColor}, inset 0 2px 4px rgba(0,0,0,0.05);">
-                            <img src="${escapeAttr(item.image || 'https://placehold.co/400x400?text=Ingredient')}" alt="${escapeAttr(item.imageAlt || item.title)}" style="width: 100%; height: 100%; ${item.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: cover;'}">
+                            <img src="${escapeAttr(item.image || 'https://placehold.co/400x400?text=Ingredient')}" alt="${escapeAttr(item.imageAlt || item.title)}" style="width: 100%; height: 100%; ${item.isCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : 'object-fit: cover;'}" loading="lazy">
                         </div>
-                        <h3 class="fw-bold fs-4 mb-2 text-dark">${escapeHtml(item.title)}</h3>
-                        <div class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${renderRichText(item.description)}</div>
+                        <h3 class="fw-bold fs-4 mb-2 text-dark">${cleanHtmlText(item.title)}</h3>
+                        <div class="fs-6 text-muted mb-0 " style="line-height: 1.6;">${cleanHtmlText(item.description)}</div>
                     </div>
                 </div>
                 `).join('')}
@@ -890,21 +902,21 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             guarantee: `
     <section id="guarantee" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.guaranteeTitle || 'Guarantee'}</h2>
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${cleanHtmlText(data.guaranteeTitle || 'Guarantee')}</h2>
         </div>
     </section>
     <section class="container-fluid py-5 bg-white">
         <div class="container mx-auto">
-            ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.guaranteeSubtitle}</p></div>` : ''}
+            ${data.guaranteeSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.guaranteeSubtitle)}</p></div>` : ''}
             <div class="container border p-4 p-lg-5 mx-auto" style="border-radius: 12px; background: #fff;">
                 <div class="row align-items-center g-5">
                     <div class="col-12 col-lg-4 text-center">
-                        <img src="${escapeAttr(data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee')}" alt="${escapeAttr(data.footer?.trustImageAlt || 'Money Back Guarantee')}" class="img-fluid mb-3 mx-auto" style="max-width: 300px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" />
-                        <p class="fs-6 fw-semibold text-success mt-2">${data.guaranteeSmallText || "Zero Risk • Complete Satisfaction Promise"}</p>
+                        <img src="${escapeAttr(data.footer?.trustImage || 'https://placehold.co/300x300?text=Guarantee')}" alt="${escapeAttr(data.footer?.trustImageAlt || 'Money Back Guarantee')}" class="img-fluid mb-3 mx-auto" style="max-width: 300px; ${data.footer.trustImageIsCircular ? 'border-radius: 50%; aspect-ratio: 1/1; object-fit: cover;' : ''}" loading="lazy" />
+                        <p class="fs-6 fw-semibold text-success mt-2">${cleanHtmlText(data.guaranteeSmallText || "Zero Risk • Complete Satisfaction Promise")}</p>
                     </div>
                     <div class="col-12 col-lg-8 text-center text-lg-start">
-                        <h3 class="fs-2 fw-bold mb-3">${data.guaranteeHeadline || "Full 60-Day Refund Assurance"}</h3>
-                        <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${data.guaranteeDescription || defaultGuaranteeDescription}</p>
+                        <h3 class="fs-2 fw-bold mb-3">${cleanHtmlText(data.guaranteeHeadline || "Full 60-Day Refund Assurance")}</h3>
+                        <p class="fs-5 text-gray-700 " style="line-height: 1.6;">${cleanHtmlText(data.guaranteeDescription || defaultGuaranteeDescription)}</p>
                         <a href="${data.hero?.buttonHref || '#'}" class="btn-custom-pill mt-4 px-5 py-3 fs-5">Grab Your Risk-Free Package <i class="fa-solid fa-cart-arrow-down"></i></a>
                     </div>
                 </div>
@@ -914,19 +926,19 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             pricing: (data.sections?.pricing !== false) ? `
     <section id="pricing" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.pricingTitle || 'Pricing'}</h2>
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${cleanHtmlText(data.pricingTitle || 'Pricing')}</h2>
         </div>
     </section>
 
     <section class="container-fluid py-5" style="background-color: #f9f9f9;">
         <div class="container">
-            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-dark mx-auto" style="width: 100%;">${data.pricingSubtitle}</p></div>` : ''}
+            ${data.pricingSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-dark mx-auto" style="width: 100%;">${cleanHtmlText(data.pricingSubtitle)}</p></div>` : ''}
             <div class="row g-4 justify-content-center">
             ${(data.pricing || []).map((plan: any) => `
             <div class="col-12 col-md-6 col-lg-4 mb-4">
                 <div class="h-100 p-4 text-center bg-white position-relative" style="border-radius: 2rem; border: ${plan.isPrimary ? '2px solid ' + secondaryColor : '1px solid #efefef'}; ${plan.isPrimary ? 'transform: scale(1.04); z-index: 10;' : ''}">
                 ${plan.isPrimary ? `<div class="position-absolute top-0 start-50 translate-middle px-4 py-1 rounded-none fw-bold text-uppercase" style="background-color: ${secondaryColor}; color: #000; font-size: 10px; white-space: nowrap;">BEST VALUE BUNDLE</div>` : ''}
-                <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${plan.title}</h3>
+                <h3 class="fs-4 fw-bold mb-3 text-uppercase tracking-tight">${cleanHtmlText(plan.title)}</h3>
                 <div class="position-relative mx-auto mb-3" style="width: 100%; min-height: 200px; display: inline-block;">
                     ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                     <div style="position: absolute; right: 0; bottom: 0; z-index: 20; transform: rotate(8deg);">
@@ -934,16 +946,16 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
                     </div>
                 </div>
                 <div class="d-flex align-items-baseline justify-content-center gap-1 mb-3">
-                    <span class="fs-2 fw-bold" style="color: ${primaryColor};">${plan.price}</span>
+                    <span class="fs-2 fw-bold" style="color: ${primaryColor};">${cleanHtmlText(plan.price)}</span>
                     <span class="fs-6 text-dark">/ bottle</span>
                 </div>
                 <div class="bg-light rounded-4 p-3 mb-4 mx-auto border" style="max-width: 280px;">
                     <ul class="list-unstyled mb-0 text-start d-inline-block w-100">
-                        ${plan.features.map((f: string) => `<li class="mb-2 small fw-medium d-flex align-items-center gap-2"><i class="fa-solid fa-check-circle fs-6" style="color: ${primaryColor};"></i><span>${f}</span></li>`).join('')}
+                        ${plan.features.map((f: string) => `<li class="mb-2 small fw-medium d-flex align-items-center gap-2"><i class="fa-solid fa-check-circle fs-6" style="color: ${primaryColor};"></i><span>${cleanHtmlText(f)}</span></li>`).join('')}
                     </ul>
                 </div>
-                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3.5 fs-6 fw-bold text-decoration-none d-flex align-items-center justify-content-center" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'}; margin-left: 8px;"></i>` : ''}</a>
-                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${(plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE'}</span></div>
+                <a href="${plan.buttonHref}" class="btn-custom-pill w-100 py-3.5 fs-6 fw-bold text-decoration-none d-flex align-items-center justify-content-center" style="background-color: ${plan.isPrimary ? secondaryColor : '#333'}; color: ${plan.isPrimary ? '#000' : '#fff'}; border: none;"><span>${cleanHtmlText(plan.buttonText)}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'}; margin-left: 8px;"></i>` : ''}</a>
+                <div class="mt-3 d-flex align-items-center justify-content-center gap-1 opacity-50 fw-bold" style="font-size: 10px;"><i class="${(plan.guaranteeBadge?.icon || data.guaranteeBadge?.icon) || 'fa-solid fa-lock'}"></i><span>${cleanHtmlText((plan.guaranteeBadge?.text || data.guaranteeBadge?.text) || '60-DAY MONEY-BACK GUARANTEE')}</span></div>
             </div></div>
             `).join('')}
         </div></div>
@@ -951,7 +963,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             testimonials: (data.sections?.testimonials !== false && data.testimonials) ? `
     <section id="testimonials" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.testimonials.title}</h2>
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${cleanHtmlText(data.testimonials.title)}</h2>
         </div>
     </section>
 
@@ -959,7 +971,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
         <div class="container mx-auto">
             ${data.testimonials.subtitle ? `
             <div class="text-center mb-4">
-                <div class="fs-5 text-dark mx-auto w-100 mb-0">${renderRichText(data.testimonials.subtitle)}</div>
+                <div class="fs-5 text-dark mx-auto w-100 mb-0">${cleanHtmlText(data.testimonials.subtitle)}</div>
             </div>
             ` : ''}
             <div class="row g-4 justify-content-center">
@@ -968,11 +980,11 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
                     <div class="card h-100 border-0 shadow-sm bg-white p-4 testimonial-card" style="border-radius: 2rem;">
                         <div class="d-flex align-items-center gap-3 mb-4">
                             <div class="avatar-frame overflow-hidden" style="${item.isCircular !== false ? 'border-radius: 50%;' : 'border-radius: 0;'}">
-                                <img src="${escapeAttr(item.image || 'https://i.pravatar.cc/150')}" alt="${escapeAttr(item.imageAlt || item.name)}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}">
+                                <img src="${escapeAttr(item.image || 'https://i.pravatar.cc/150')}" alt="${escapeAttr(item.imageAlt || item.name)}" style="width: 100%; height: 100%; object-fit: cover; ${item.isCircular !== false ? 'border-radius: 50%; aspect-ratio: 1/1;' : ''}" loading="lazy">
                             </div>
                             <div>
-                                <h4 class="fw-bold mb-0 text-dark">${escapeHtml(item.name)}</h4>
-                                <span class="text-dark small">${escapeHtml(item.role || 'Verified Buyer')}</span>
+                                <h4 class="fw-bold mb-0 text-dark">${cleanHtmlText(item.name)}</h4>
+                                <span class="text-dark small">${cleanHtmlText(item.role || 'Verified Buyer')}</span>
                             </div>
                         </div>
                         <div class="mb-3 text-warning d-flex gap-1">
@@ -994,7 +1006,7 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
                         </div>
                         <div style="position: relative;">
                             <i class="fa-solid fa-quote-left" style="position: absolute; top: -10px; left: -10px; opacity: 0.1; font-size: 2rem;"></i>
-                            <p class="fs-6 text-dark font-italic italic mb-0" style="line-height: 1.6; position: relative; z-index: 1;">${(item.content || '').trim()}</p>
+                            <p class="fs-6 text-dark font-italic italic mb-0" style="line-height: 1.6; position: relative; z-index: 1;">${cleanHtmlText(item.content)}</p>
                         </div>
                     </div>
                 </div>
@@ -1005,22 +1017,22 @@ ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
             faq: (data.sections?.faq !== false && data.faq?.length) ? `
     <section id="faq" class="container-fluid text-center mt-0 sectioncolor">
         <div class="container">
-            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${data.faqTitle || 'FAQ'}</h2>
+            <h2 class="text-center fs-1 fw-bold py-3 text-white mb-0">${cleanHtmlText(data.faqTitle || 'FAQ')}</h2>
         </div>
     </section>
 
     <section class="container-fluid py-5 bg-white">
         <div class="container">
-            ${data.faqSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${data.faqSubtitle}</p></div>` : ''}
+            ${data.faqSubtitle ? `<div class="text-center mb-5"><p class="fs-5 text-muted mx-auto" style="width: 100%;">${cleanHtmlText(data.faqSubtitle)}</p></div>` : ''}
             <div class="container mx-auto" style="width: 100%;">
                 <div class="accordion accordion-flush" id="faqAccordion">
                     ${(data.faq || []).map((item: any, i: number) => `
                     <div class="accordion-item mb-3 border rounded shadow-sm overflow-hidden">
                         <h3 class="accordion-header">
-                            <button class="accordion-button fw-bold fs-5 p-4 bg-white shadow-none ${i === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">${item.question}</button>
+                            <button class="accordion-button fw-bold fs-5 p-4 bg-white shadow-none ${i === 0 ? '' : 'collapsed'}" type="button" data-bs-toggle="collapse" data-bs-target="#collapse${i}">${cleanHtmlText(item.question)}</button>
                         </h3>
                         <div id="collapse${i}" class="accordion-collapse collapse ${i === 0 ? 'show' : ''}" data-bs-parent="#faqAccordion">
-                            <div class="accordion-body fs-5 text-muted p-4 border-top bg-light">${item.answer}</div>
+                            <div class="accordion-body fs-5 text-muted p-4 border-top bg-light">${cleanHtmlText(item.answer)}</div>
                         </div>
                     </div>
                     `).join('')}
@@ -1066,7 +1078,7 @@ ${seoBlock}
         <nav class="navbar navbar-expand-lg border-bottom bg-white py-2">
             <div class="container px-3 d-flex justify-content-between align-items-center mx-auto">
                 <a class="navbar-brand d-flex align-items-center gap-2 text-decoration-none" href="index.html">
-                    ${data.hero?.logoImage ? `<img src="${escapeAttr(data.hero.logoImage)}" style="height: 40px; width: auto;" alt="${escapeAttr(data.hero?.logoImageAlt || 'Logo')}" />` : ''}
+                    ${data.hero?.logoImage ? `<img src="${escapeAttr(data.hero.logoImage)}" style="height: 40px; width: auto;" alt="${escapeAttr(data.hero?.logoImageAlt || 'Logo')}" fetchpriority="high" />` : ''}
                     <span class="fs-2 fw-bold logo text-capitalize">${data.productName}</span>
                 </a>
                 <div class="d-flex align-items-center gap-2 d-lg-none ms-auto">
@@ -1117,29 +1129,28 @@ ${seoBlock}
     ${seo.footerScripts ? `<!-- Footer Scripts -->\n    ${seo.footerScripts}` : ''}
 </body>
 </html>`;
-    }
-    else if (layoutStyle === 'organic') {
+    } else if (layoutStyle === 'organic') {
         const sections: Record<string, string> = {
             hero: `
     <section class="py-5 overflow-hidden section-reveal">
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-12 col-lg-7 text-center text-lg-start pe-lg-5">
-                    <h1 class="display-3 fw-bold mb-3" style="line-height: 0.9;">${data.hero?.title}</h1>
-                    <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${data.hero?.subtitle}</p>
+                    <h1 class="display-3 fw-bold mb-3" style="line-height: 0.9;">${cleanHtmlText(data.hero?.title)}</h1>
+                    <p class="fs-6 text-stone-700 mb-4 italic font-serif w-100" style="line-height: 1.6;">${cleanHtmlText(data.hero?.subtitle)}</p>
                     <div class="d-flex flex-wrap flex-lg-nowrap gap-3 justify-content-center justify-content-lg-start align-items-center">
                         <a href="${data.hero?.buttonHref}" class="organic-btn organic-btn-primary">
-                            <span>${data.hero?.buttonText}</span>
+                            <span>${cleanHtmlText(data.hero?.buttonText)}</span>
                             ${data.hero?.icon ? `<i class="${data.hero.icon}" style="color: ${data.hero.iconColor || 'inherit'};"></i>` : ''}
                         </a>
-                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${data.hero.secondaryButtonText}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>` : ''}
+                        ${data.hero?.secondaryButtonText ? `<a href="${data.hero?.secondaryButtonHref}" class="organic-btn organic-btn-outline"><span>${cleanHtmlText(data.hero.secondaryButtonText)}</span> ${data.hero?.secondaryIcon ? `<i class="${data.hero.secondaryIcon}" style="color: ${data.hero.secondaryIconColor || 'inherit'};"></i>` : ''}</a>` : ''}
                     </div>
                 </div>
                 <div class="col-12 col-lg-5">
                     <div class="position-relative">
                         <div class="position-absolute organic-blob bg-stone-100 rotate-12" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(12deg) translateX(20px);"></div>
                         <div class="p-4 organic-blob bg-white border border-[#E6D5C3]" style="position: relative; z-index: 10;">
-                            <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                            <img src="${data.hero?.image}" alt="Hero Image" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" fetchpriority="high" />
                         </div>
                         ${data.hero?.badge?.enabled ? `
                         <div style="position: absolute; top: -16px; right: -16px; z-index: 20; width: 140px; height: 140px; transform: rotate(5deg);">
@@ -1157,7 +1168,7 @@ ${seoBlock}
             <div class="d-flex justify-content-center flex-wrap gap-4 gap-md-5 align-items-center">
                 ${(data.logos || []).map((logo: any) => `
                 <div style="width: 80px;">
-                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" />
+                    <img src="${logo.src}" alt="Partner Logo" class="img-fluid grayscale opacity-50 hover:opacity-100 hover:grayscale-0 transition-all" loading="lazy" />
                 </div>`).join('')}
             </div>
 
@@ -1197,18 +1208,18 @@ ${seoBlock}
     <section id="ingredients" class="py-5 section-reveal" style="background-color: var(--org-accent);">
         <div class="container py-lg-5 text-center">
             <i class="fa-solid fa-leaf mb-3 text-2xl" style="color: var(--org-secondary);"></i>
-            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2.5rem;">${data.ingredients?.title || 'From the Earth'}</h2>
-            ${data.ingredients?.subtitle ? `<p class="text-[#4A3B2E] font-serif text-lg mx-auto" style="max-width: 700px;">${data.ingredients.subtitle}</p>` : ''}
+            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2.5rem;">${cleanHtmlText(data.ingredients?.title || 'From the Earth')}</h2>
+            ${data.ingredients?.subtitle ? `<p class="text-[#4A3B2E] font-serif text-lg mx-auto" style="max-width: 700px;">${cleanHtmlText(data.ingredients.subtitle)}</p>` : ''}
             
             <div class="row g-4 mt-4">
                 ${(data.ingredients?.items || []).map((item: any) => `
                 <div class="col-12 col-md-6 col-lg-4">
                     <div class="organic-card p-4 h-100 text-center bg-white">
                         <div class="mx-auto mb-4 organic-blob" style="width: 130px; height: 130px; border: 4px solid #F9F7F2;">
-                            <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" />
+                            <img src="${item.image}" alt="${item.title}" class="w-100 h-100" style="object-fit: cover;" loading="lazy" />
                         </div>
-                        <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${item.title}</h4>
-                        <p class="mb-0 text-[#4A3B2E] small">${item.description}</p>
+                        <h4 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 1.25rem;">${cleanHtmlText(item.title)}</h4>
+                        <p class="mb-0 text-[#4A3B2E] small">${cleanHtmlText(item.description)}</p>
                     </div>
                 </div>`).join('')}
             </div>
@@ -1218,15 +1229,15 @@ ${seoBlock}
     <section id="features" class="py-5 bg-white section-reveal">
         <div class="container py-lg-4">
             <div class="text-center mb-5">
-                <h2 class="fw-bold mb-2" style="color: var(--org-primary); font-size: 2.2rem;">${data.featuresTitle || 'Our Philosophy'}</h2>
+                <h2 class="fw-bold mb-2" style="color: var(--org-primary); font-size: 2.2rem;">${cleanHtmlText(data.featuresTitle || 'Our Philosophy')}</h2>
                 <div class="w-12 h-0.5 bg-green-800 mx-auto mt-3" style="width: 50px; height: 2px; background: #1e3932;"></div>
             </div>
             <div class="row g-0 border border-[#E6D5C3]">
                 ${(data.features || []).map((f: any) => `
                 <div class="col-12 col-md-3 border-end border-bottom border-[#E6D5C3] p-5 text-center transition-colors hover:bg-stone-50">
-                    <img src="${f.image}" alt="${f.title}" class="w-12 h-12 mx-auto mb-4" style="width: 48px; height: 48px;" />
-                    <h4 class="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest">${f.title}</h4>
-                    <p class="mb-0 text-stone-700 text-xs">${f.description}</p>
+                    <img src="${f.image}" alt="${f.title}" class="w-12 h-12 mx-auto mb-4" style="width: 48px; height: 48px;" loading="lazy" />
+                    <h4 class="fw-bold mb-3 text-[0.85rem] uppercase tracking-widest">${cleanHtmlText(f.title)}</h4>
+                    <p class="mb-0 text-stone-700 text-xs">${cleanHtmlText(f.description)}</p>
                 </div>`).join('')}
             </div>
         </div>
@@ -1237,14 +1248,14 @@ ${seoBlock}
             <div class="row align-items-center g-5">
                 <div class="col-lg-6">
                     <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-3 d-block">Scientific Verification</span>
-                    <h2 class="fw-bold mb-4 font-serif" style="color: var(--org-primary); font-size: 2.5rem;">${data.research.title}</h2>
-                    <p class="fs-5 text-stone-700 mb-4 italic">${data.research.subtitle}</p>
-                    <div class="text-stone-700 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${data.research.description}</div>
+                    <h2 class="fw-bold mb-4 font-serif" style="color: var(--org-primary); font-size: 2.5rem;">${cleanHtmlText(data.research.title)}</h2>
+                    <p class="fs-5 text-stone-700 mb-4 italic">${cleanHtmlText(data.research.subtitle)}</p>
+                    <div class="text-stone-700 mb-5" style="line-height: 1.9; font-size: 0.95rem;">${cleanHtmlText(data.research.description)}</div>
                     <div class="row g-4 pt-4 border-top border-[#E6D5C3]">
                         ${(data.research.stats || []).map((stat: any) => `
                         <div class="col-4">
-                            <div class="fw-bold fs-3 text-stone-800">${stat.value}</div>
-                            <div class="text-stone-600 small uppercase tracking-tighter" style="font-size: 10px;">${stat.label}</div>
+                            <div class="fw-bold fs-3 text-stone-800">${cleanHtmlText(stat.value)}</div>
+                            <div class="text-stone-600 small uppercase tracking-tighter" style="font-size: 10px;">${cleanHtmlText(stat.label)}</div>
                         </div>`).join('')}
                     </div>
                 </div>
@@ -1252,7 +1263,7 @@ ${seoBlock}
                     <div class="position-relative">
                         <div class="position-absolute organic-blob bg-stone-100 -rotate-6" style="width: 100%; height: 100%; top: 0; left: 0; z-index: -1; transform: rotate(-6deg) translateX(20px);"></div>
                         <div class="p-4 organic-blob bg-white border border-[#E6D5C3]">
-                            <img src="${data.research.image}" alt="Research Data" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" />
+                            <img src="${data.research.image}" alt="Research Data" class="img-fluid mx-auto d-block" style="max-height: 450px; object-fit: contain;" loading="lazy" />
                         </div>
                     </div>
                 </div>
@@ -1263,17 +1274,17 @@ ${seoBlock}
     <section id="about" class="py-5 bg-white section-reveal">
         <div class="container">
             <div class="text-center mb-5">
-                <h2 class="display-5 fw-bold mb-4" style="color: var(--org-primary);">${data.about.title || 'The Botanical Journal'}</h2>
+                <h2 class="display-5 fw-bold mb-4" style="color: var(--org-primary);">${cleanHtmlText(data.about.title || 'The Botanical Journal')}</h2>
             </div>
             <div class="row g-5 align-items-center">
                 <div class="col-lg-5 text-center">
                     <div class="p-3 border border-stone-100 bg-stone-50 inline-block shadow-sm">
-                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" />
+                        <img src="${data.about.image}" alt="About Us" class="img-fluid grayscale hover:grayscale-0 transition-all duration-700" style="max-height: 400px; object-fit: contain;" loading="lazy" />
                     </div>
                 </div>
                 <div class="col-lg-7">
                     <div class="ps-lg-4 border-start border-4 border-success border-opacity-25" style="border-left: 4px solid rgba(25, 135, 84, 0.25) !important;">
-                        <div class="text-stone-600 font-serif" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${data.about.description}</div>
+                        <div class="text-stone-600 font-serif" style="line-height: 1.9; font-size: 1.1rem; white-space: pre-line;">${cleanHtmlText(data.about.description)}</div>
                     </div>
                 </div>
             </div>
@@ -1286,8 +1297,8 @@ ${seoBlock}
                 <div class="col-lg-10">
                     <div class="bg-white p-5 border border-[#E6D5C3]">
                         <div class="text-center mb-5">
-                            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2rem;">${data.benefits.title || 'Holistic Rewards'}</h2>
-                            <p class="text-stone-700 italic mx-auto font-serif" style="max-width: 600px;">${data.benefits.description}</p>
+                            <h2 class="fw-bold mb-3" style="color: var(--org-primary); font-size: 2rem;">${cleanHtmlText(data.benefits.title || 'Holistic Rewards')}</h2>
+                            <p class="text-stone-700 italic mx-auto font-serif" style="max-width: 600px;">${cleanHtmlText(data.benefits.description)}</p>
                         </div>
                         <div class="row g-4">
                             ${(data.benefits.items || []).map((b: any) => `
@@ -1295,8 +1306,8 @@ ${seoBlock}
                                 <div class="d-flex align-items-start gap-4 p-3 hover:bg-stone-50 transition-colors">
                                     <div class="text-success pt-1"><i class="fa-solid fa-leaf text-xs"></i></div>
                                     <div>
-                                        <h4 class="fw-bold mb-1 text-sm uppercase tracking-wider">${b.title}</h4>
-                                        <p class="mb-0 text-stone-700 text-xs">${b.description}</p>
+                                        <h4 class="fw-bold mb-1 text-sm uppercase tracking-wider">${cleanHtmlText(b.title)}</h4>
+                                        <p class="mb-0 text-stone-700 text-xs">${cleanHtmlText(b.description)}</p>
                                     </div>
                                 </div>
                             </div>`).join('')}
@@ -1310,7 +1321,7 @@ ${seoBlock}
     <section id="pricing" class="py-5 bg-white section-reveal">
         <div class="container py-lg-5">
             <div class="text-center mb-5">
-                <h2 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 2.8rem;">${data.pricingTitle || 'Select Your Batch'}</h2>
+                <h2 class="fw-bold mb-2 font-serif" style="color: var(--org-primary); font-size: 2.8rem;">${cleanHtmlText(data.pricingTitle || 'Select Your Batch')}</h2>
                 <div class="w-16 h-px bg-stone-200 mx-auto mt-4" style="width: 64px; height: 1px; background: #e7e5e4;"></div>
             </div>
             <div class="row g-4 justify-content-center">
@@ -1319,7 +1330,7 @@ ${seoBlock}
                     <div class="organic-card h-100 d-flex flex-column bg-white ${plan.isPrimary ? 'border-success' : ''}" style="${plan.isPrimary ? 'border-color: #1e3932 !important; border-width: 2px !important;' : ''}">
                         ${plan.isPrimary ? `<div class="bg-success text-white text-[9px] fw-bold py-1 text-center uppercase tracking-widest" style="background-color: #1e3932 !important;">Recommended Choice</div>` : ''}
                         <div class="p-5 flex-grow-1 text-center">
-                            <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${plan.title}</h4>
+                            <h4 class="fw-bold mb-4 text-xs uppercase tracking-[0.2em] text-stone-600">${cleanHtmlText(plan.title)}</h4>
                             <div class="relative mb-5 position-relative" style="width: 100%; min-height: 200px; display: inline-block;">
                                 ${renderBottleStack(plan.multiplier || 'X1', plan.image || '', plan.title, '180px')}
                                 ${plan.multiplier ? `
@@ -1327,19 +1338,19 @@ ${seoBlock}
                                     <div style="background-color: #dc2626; color: white; border-radius: 9999px; font-weight: 900; font-size: 14px; border: 3px solid white; box-shadow: 0 10px 25px rgba(0,0,0,0.2); padding: 8px 24px; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; justify-content: center; white-space: nowrap; width: fit-content; line-height: 1;">${plan.multiplier}</div>
                                 </div>` : ''}
                             </div>
-                            <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${plan.price}</div>
+                            <div class="fw-bold mb-4 font-serif text-3xl" style="font-size: 1.875rem;">${cleanHtmlText(plan.price)}</div>
                             <div class="mb-5 text-start ps-4 border-start border-stone-100">
                                 ${plan.features.map((f: string) => `
                                 <div class="mb-2 d-flex align-items-center gap-2 text-stone-700 text-xs">
                                     <i class="fa-solid fa-check" style="color: var(--org-primary);"></i>
-                                    <span>${f}</span>
+                                    <span>${cleanHtmlText(f)}</span>
                                 </div>`).join('')}
                             </div>
-                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}"><span>${plan.buttonText}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'};"></i>` : ''}</a>
+                            <a href="${plan.buttonHref}" class="organic-btn w-100 justify-content-center ${plan.isPrimary ? 'organic-btn-primary' : 'organic-btn-outline'}"><span>${cleanHtmlText(plan.buttonText)}</span> ${plan.icon ? `<i class="${plan.icon}" style="color: ${plan.iconColor || 'inherit'};"></i>` : ''}</a>
                             ${plan.guaranteeBadge ? `
                             <div class="mt-4 d-flex align-items-center justify-content-center gap-2 text-stone-300 font-bold text-[9px] tracking-widest uppercase">
                                 <i class="${plan.guaranteeBadge.icon || 'fa-solid fa-shield-halved'}"></i>
-                                <span>${plan.guaranteeBadge.text}</span>
+                                <span>${cleanHtmlText(plan.guaranteeBadge.text)}</span>
                             </div>` : ''}
                         </div>
                     </div>
@@ -1352,17 +1363,17 @@ ${seoBlock}
         <div class="container py-lg-4">
             <div class="text-center mb-5">
                 <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">The Community Voice</span>
-                <h2 class="fw-bold font-serif mb-4" style="color: var(--org-primary); font-size: 2.5rem;">${data.testimonials.title || 'Community Stories'}</h2>
+                <h2 class="fw-bold font-serif mb-4" style="color: var(--org-primary); font-size: 2.5rem;">${cleanHtmlText(data.testimonials.title || 'Community Stories')}</h2>
             </div>
             <div class="row g-4">
                 ${(data.testimonials.items || []).map((t: any) => `
                 <div class="col-md-4">
                     <div class="p-4 bg-white border border-[#E6D5C3] h-100 d-flex flex-column align-items-start text-start">
                         <div class="w-16 h-16 rounded-circle mb-3 border border-2 border-light" style="width: 64px; height: 64px;">
-                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" />
+                            <img src="${t.image || 'https://i.pravatar.cc/150'}" alt="${t.name}" class="w-100 h-100 object-cover grayscale hover:grayscale-0 transition-all" loading="lazy" />
                         </div>
-                        <h5 class="fw-bold mb-1 text-sm font-serif">${t.name}</h5>
-                        <div class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${renderRichText(t.role || '')}</div>
+                        <h5 class="fw-bold mb-1 text-sm font-serif">${cleanHtmlText(t.name)}</h5>
+                        <div class="mb-3 text-[10px] text-stone-600 uppercase tracking-widest">${cleanHtmlText(t.role || '')}</div>
                         <div class="mb-3 d-flex gap-1 text-[#D4C3B2] text-[10px]">
                             ${[...Array(5)].map((_, idx) => {
                 const fill = idx + 1;
@@ -1380,7 +1391,7 @@ ${seoBlock}
                 }
             }).join('')}
                         </div>
-                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${(t.content || '').trim()}</p>
+                        <p class="mb-0 text-stone-600 italic text-sm" style="line-height: 1.8;">${cleanHtmlText(t.content)}</p>
                     </div>
                 </div>`).join('')}
             </div>
@@ -1391,12 +1402,12 @@ ${seoBlock}
         <div class="container">
             <div class="row align-items-center g-5">
                 <div class="col-lg-4 text-center">
-                    <img src="${data.footer?.trustImage || 'https://via.placeholder.com/220x100?text=Guarantee'}" alt="Guarantee" class="img-fluid mb-3 mx-auto" style="max-width: 220px;" />
+                    <img src="${data.footer?.trustImage || 'https://via.placeholder.com/220x100?text=Guarantee'}" alt="Guarantee" class="img-fluid mb-3 mx-auto" style="max-width: 220px;" loading="lazy" />
                 </div>
                 <div class="col-lg-8">
                     <span class="text-[10px] fw-bold text-stone-600 uppercase tracking-widest mb-2 d-block">Our Pure Promise</span>
-                    <h3 class="fw-bold mb-3 font-serif" style="color: var(--org-primary); font-size: 2rem;">${data.guaranteeHeadline || '60-Day Botanical Promise'}</h3>
-                    <p class="text-stone-700" style="line-height: 1.8; font-size: 0.95rem;">${data.guaranteeDescription || `Your path to wellness is protected. Every bottle of ${data.productName} is covered by our 60-day satisfaction protocol. If you don't feel the difference, we will honor a full refund.`}</p>
+                    <h3 class="fw-bold mb-3 font-serif" style="color: var(--org-primary); font-size: 2rem;">${cleanHtmlText(data.guaranteeHeadline || '60-Day Botanical Promise')}</h3>
+                    <p class="text-stone-700" style="line-height: 1.8; font-size: 0.95rem;">${cleanHtmlText(data.guaranteeDescription || `Your path to wellness is protected. Every bottle of ${data.productName} is covered by our 60-day satisfaction protocol. If you don't feel the difference, we will honor a full refund.`)}</p>
                 </div>
             </div>
         </div>
@@ -1405,17 +1416,17 @@ ${seoBlock}
     <section id="faq" class="py-5 bg-[#F9F7F2] section-reveal">
         <div class="container py-lg-4">
             <div class="text-center mb-5">
-                <h2 class="fw-bold font-serif mb-3" style="color: var(--org-primary); font-size: 2.3rem;">${data.faqTitle || 'Inquiries & Insights'}</h2>
+                <h2 class="fw-bold font-serif mb-3" style="color: var(--org-primary); font-size: 2.3rem;">${cleanHtmlText(data.faqTitle || 'Inquiries & Insights')}</h2>
             </div>
             <div class="mx-auto" style="max-width: 800px;">
                 ${data.faq.map((item: any, i: number) => `
                 <div class="bg-white border border-[#E6D5C3] mb-3">
                     <div class="p-4 cursor-pointer d-flex justify-content-between align-items-center" onclick="const ans = document.getElementById('faq-ans-${i}'); const icon = document.getElementById('faq-icon-${i}'); ans.classList.toggle('d-none'); icon.classList.toggle('rotate-45');">
-                        <span class="fw-bold text-stone-800 text-sm font-serif">${item.question}</span>
+                        <span class="fw-bold text-stone-800 text-sm font-serif">${cleanHtmlText(item.question)}</span>
                         <i id="faq-icon-${i}" class="fa-solid fa-plus text-[10px] text-stone-300 transition-transform"></i>
                     </div>
                     <div id="faq-ans-${i}" class="px-4 pb-4 d-none">
-                        <p class="mb-0 text-stone-700 text-xs" style="line-height: 1.8;">${item.answer}</p>
+                        <p class="mb-0 text-stone-700 text-xs" style="line-height: 1.8;">${cleanHtmlText(item.answer)}</p>
                     </div>
                 </div>`).join('')}
             </div>
@@ -1439,7 +1450,6 @@ ${seoBlock}
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700&display=swap');
         
         :root {
           --org-primary: ${primaryColor};
@@ -1585,7 +1595,7 @@ ${seoBlock}
         <div class="container px-3 d-flex justify-content-between align-items-center">
             <a class="navbar-brand d-flex align-items-center gap-3 no-underline" href="#">
                 <div style="width: 45px; height: 45px; flex-shrink: 0;">
-                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" class="w-100 h-100 object-contain grayscale hover:grayscale-0 transition-all" style="object-fit: contain;" alt="Logo" />` : ''}
+                    ${data.hero?.logoImage ? `<img src="${data.hero.logoImage}" class="w-100 h-100 object-contain grayscale hover:grayscale-0 transition-all" style="object-fit: contain;" alt="Logo" fetchpriority="high" />` : ''}
                 </div>
                 <span class="fs-3 fw-bold logo" style="color: var(--org-primary);">${data.productName}</span>
             </a>

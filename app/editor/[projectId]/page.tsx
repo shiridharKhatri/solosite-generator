@@ -167,7 +167,7 @@ export default function EditorPage() {
               output[key] = deepMerge(target[key], source[key]);
             }
           } else {
-            if (!(key in target) || target[key] === undefined || target[key] === null || target[key] === "") {
+            if (!(key in target) || target[key] === undefined || target[key] === null) {
               output[key] = source[key];
             }
           }
@@ -204,7 +204,15 @@ export default function EditorPage() {
 
   // Fetch project data if editing existing
   useEffect(() => {
+    // Robust Sync: Avoid overwriting active unsaved/new editor states if store is already synced
+    const currentStoreId = useStore.getState().projectId;
+    if (projectId === currentStoreId) {
+      setIsLoading(false);
+      return;
+    }
+
     if (projectId && projectId !== 'new') {
+      setIsLoading(true);
       fetch(`/api/projects?id=${projectId}`)
         .then(res => res.json())
         .then(data => {
@@ -227,7 +235,7 @@ export default function EditorPage() {
       setDirty(false);
       setIsLoading(false);
     }
-  }, [projectId, storeProjectId, setProjectData, setProjectId, sanitizeProjectData, setDirty]);
+  }, [projectId, setProjectData, setProjectId, sanitizeProjectData, setDirty]);
 
   const handleSave = React.useCallback(async (status: 'draft' | 'published', isAutoSave: boolean = false) => {
     if (!projectData) return;
@@ -236,7 +244,8 @@ export default function EditorPage() {
     else setIsSaving(true);
 
     try {
-      const isNew = projectId === 'new';
+      const activeId = useStore.getState().projectId || projectId;
+      const isNew = !activeId || activeId === 'new';
       const method = isNew ? 'POST' : 'PUT';
 
       // Calculate a rough SEO score for the dashboard
@@ -251,7 +260,7 @@ export default function EditorPage() {
           seoScore
         }
         : {
-          id: projectId,
+          id: activeId,
           data: projectData,
           status,
           name: projectData.productName,
@@ -278,10 +287,8 @@ export default function EditorPage() {
 
         if (isNew && data._id) {
           setProjectId(data._id); // Update local store first to prevent fetch race condition
-          // Immediately redirect to the new project ID to prevent further POSTs (duplicates)
-          // Using window.history.replaceState to update URL without full reload if possible, 
-          // but router.push is safer for Next.js consistency.
-          router.replace(`/editor/${data._id}`);
+          // Silently update URL in the address bar without triggering Next.js routing, loading screens, or restarts.
+          window.history.replaceState(null, '', `/editor/${data._id}`);
         }
       } else if (!isAutoSave) {
         alert(data.error || 'Failed to save');
