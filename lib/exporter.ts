@@ -1619,11 +1619,20 @@ ${seoBlock}
 
     <div class="d-flex flex-column">
         ${renderCustomSections('top')}
-        ${sections.logos}
-        ${sectionOrder.map((key: string) => `
-            ${sections[key] || ''}
-            ${renderCustomSections(key)}
-        `).join('')}
+        ${sectionOrder.map((key: string) => {
+            if (key === 'hero') {
+                return `
+                    ${sections.hero || ''}
+                    ${renderCustomSections('hero')}
+                    ${sections.logos || ''}
+                    ${renderCustomSections('logos')}
+                `;
+            }
+            return `
+                ${sections[key] || ''}
+                ${renderCustomSections(key)}
+            `;
+        }).join('')}
     </div>
 
     <!-- Footer -->

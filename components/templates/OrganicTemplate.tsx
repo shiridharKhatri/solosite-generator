@@ -451,6 +451,7 @@ export const OrganicTemplate: React.FC = () => {
                 className="w-full h-full object-contain"
                 style={{ objectFit: 'contain' }}
               />
+
             </div>
             <EditableText tagName="span" className="fs-3 fw-bold logo" style={{ color: primary }} value={projectData.productName} onChange={() => { }} />
           </a>
