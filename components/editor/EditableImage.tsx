@@ -3,7 +3,7 @@
 import React, { useRef, useState } from 'react';
 import { useStore } from '@/lib/store';
 import { ImageCompressionDialog } from './ImageCompressionDialog';
-import { getBase64Size, formatFileSize } from '@/lib/imageUtils';
+import { getBase64Size, formatFileSize, dataURLtoFile } from '@/lib/imageUtils';
 
 interface EditableImageProps {
   src: string;
@@ -36,18 +36,6 @@ export const EditableImage: React.FC<EditableImageProps> = ({
 
   const handleClick = () => {
     if (!isUploading && !isEditingAlt) fileInputRef.current?.click();
-  };
-
-  const dataURLtoFile = (dataurl: string, filename: string): File => {
-    const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/png';
-    const bstr = atob(arr[1]);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
   };
 
   const uploadImage = async (file: File) => {

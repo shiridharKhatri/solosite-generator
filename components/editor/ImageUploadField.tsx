@@ -2,6 +2,7 @@
 
 import React, { useRef, useState } from 'react';
 import { useStore } from '@/lib/store';
+import { dataURLtoFile } from '@/lib/imageUtils';
 
 
 interface ImageUploadFieldProps {
@@ -22,7 +23,15 @@ export const ImageUploadField: React.FC<ImageUploadFieldProps> = ({ label, value
       setCompressionState({
         isOpen: true,
         file,
-        onConfirm: (url) => onChange(url),
+        onConfirm: (url) => {
+          try {
+            const compressedFile = dataURLtoFile(url, file.name);
+            uploadFile(compressedFile, true);
+          } catch (err) {
+            console.error('Failed to parse compressed URL to file', err);
+            uploadFile(file, true);
+          }
+        },
         onKeepOriginal: () => uploadFile(file, true)
       });
       return;
